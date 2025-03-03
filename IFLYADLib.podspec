@@ -28,7 +28,7 @@ Pod::Spec.new do |spec|
   spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
-  spec.vendored_frameworks = 'Framework/IFLYADLib.framework'
+  spec.ios.vendored_frameworks = 'IFLYADLib.framework'
 
   spec.static_framework = true
 
@@ -46,7 +46,7 @@ Pod::Spec.new do |spec|
   #  non-essential files like tests, examples and documentation.
   #
 
-  # spec.resource  = "icon.png"
+  spec.resource  = "IFLYADLib.framework/IFLYPlayer.bundle"
   # spec.resources = "Resources/*.png"
 
   # spec.preserve_paths = "FilesToSave", "MoreFilesToSave"
