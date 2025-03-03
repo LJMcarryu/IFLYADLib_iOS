@@ -7,7 +7,7 @@ Pod::Spec.new do |spec|
 科大讯飞消费者BG-AI营销-ADX广告SDK-IFLYADLib.使用OC实现
                    DESC
 
-  spec.homepage     = "https://github.com/LJMcarryu/IFLYADLib"
+  spec.homepage     = "https://github.com/LJMcarryu/IFLYADLib_iOS"
   # spec.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
   spec.license = { :type => "MIT", :file => "LICENSE" }
@@ -23,7 +23,7 @@ Pod::Spec.new do |spec|
   # spec.tvos.deployment_target = "9.0"
   # spec.visionos.deployment_target = "1.0"
 
-  spec.source       = { :git => "https://github.com/LJMcarryu/IFLYADLib.git", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/LJMcarryu/IFLYADLib_iOS.git", :tag => "#{spec.version}" }
 
   spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
