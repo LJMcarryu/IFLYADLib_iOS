@@ -26,7 +26,7 @@
 /**
  *  原生广告错误回调
  *
- *  @param errorCode 错误码，详见接入手册
+ *  @param error 错误码，详见接入手册
  */
 - (void)onNativeAdFailed:(IFLYAdError *)error;
 
@@ -89,7 +89,7 @@
  *  广告点击调用方法
  *  详解：当用户点击广告时，开发者需调用本方法，系统会弹出内嵌浏览器、或内置AppStore、
  *      或打开系统Safari，来展现广告目标页面
- *      @param view         渲染出的广告结果页面
+ *      @param ext         渲染出的广告结果页面
  */
 - (BOOL)clickAdWithExt:(NSDictionary *)ext;
 

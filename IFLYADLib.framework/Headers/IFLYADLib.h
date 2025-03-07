@@ -13,9 +13,6 @@ FOUNDATION_EXPORT double IFLYADLibVersionNumber;
 //! Project version string for IFLYADLib.
 FOUNDATION_EXPORT const unsigned char IFLYADLibVersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <IFLYADLib/PublicHeader.h>
-
-
 #pragma mark - model
 #import <IFLYADLib/IFLYAdData.h>
 #import <IFLYADLib/IFLYAdAudioData.h>
