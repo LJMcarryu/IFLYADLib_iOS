@@ -1,0 +1,16 @@
+PODS:
+  - IFLYADLib (4.5.3)
+
+DEPENDENCIES:
+  - IFLYADLib
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - IFLYADLib
+
+SPEC CHECKSUMS:
+  IFLYADLib: bb411239c4d18560d76be7c1abd666632575a232
+
+PODFILE CHECKSUM: ed1e0c200eacb9299d7e04ed7d48e99de6ea4b07
+
+COCOAPODS: 1.16.2
