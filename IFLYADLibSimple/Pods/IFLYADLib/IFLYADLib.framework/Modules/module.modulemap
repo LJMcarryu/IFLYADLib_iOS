@@ -1,6 +1,0 @@
-framework module IFLYADLib {
-  umbrella header "IFLYADLib.h"
-  export *
-
-  module * { export * }
-}
