@@ -1,0 +1,36 @@
+//
+//  IFLYAdPrefixHeader.pch
+//  IFLYADLibDemo
+//
+//  Created by admin on 28.2.25.
+//
+
+#ifndef IFLYAdPrefixHeader_pch
+#define IFLYAdPrefixHeader_pch
+
+#import <Availability.h>
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+    #import <UIKit/UIKit.h>
+#endif
+
+#ifndef __OPTIMIZE__
+#define NSLog(...)            printf("[IFLYAdSample] %s\n", [[NSString stringWithFormat:__VA_ARGS__] UTF8String]);
+#else
+#define NSLog(...)            {};
+#endif
+
+#define XH_ScreenW                       [UIScreen mainScreen].bounds.size.width
+#define XH_ScreenH                       [UIScreen mainScreen].bounds.size.height
+
+#define isStringEmpty(string) (string == nil || string == NULL || (![string isKindOfClass:[NSString class]]) || ([string isEqual:@""]) || [string isEqualToString:@""] || [string isEqualToString:@" "] || ([string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) || ([string respondsToSelector:@selector(length)] && [(NSData *)string length] == 0))
+
+#define __SPLASH_NATIVE_AD_UNIT_ID__     @"D65CC066BF3AE066C48F4A101A30005C"
+#define __TYPED_ONE_NATIVE_AD_UNIT_ID__  @"24556006C29E3C51A624F4B704BC7345"
+#define __TYPED_MORE_NATIVE_AD_UNIT_ID__ @"CE6F8624BCEC3F7AD0257E9EDD224CE0"
+#define __SPLASH_VIDEO_AD_UNIT_ID__      @"DDC620929747D6DB85FFEB14AB893F4E"
+#define __PATCH_VIDEO_AD_UNIT_ID__       @"4FD6D66E06506E31B431209A80189614"
+#define __FEED_VIDEO_AD_UNIT_ID__        @"3AE3AC7B093A4CC6A1E2F19CF16709FC"
+
+#endif /* IFLYAdPrefixHeader_pch */

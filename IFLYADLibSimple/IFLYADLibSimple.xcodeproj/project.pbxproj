@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		416A56D9E7C0C05365EF6908 /* Pods_IFLYADLibSimple.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16794F4C2046AE36B4026F64 /* Pods_IFLYADLibSimple.framework */; };
+		843EDA582D7AE178006E715D /* Pods_IFLYADLibSimple.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16794F4C2046AE36B4026F64 /* Pods_IFLYADLibSimple.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,7 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				416A56D9E7C0C05365EF6908 /* Pods_IFLYADLibSimple.framework in Frameworks */,
+				843EDA582D7AE178006E715D /* Pods_IFLYADLibSimple.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -234,6 +234,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FM295M5CZ5;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "$(PROJECT_DIR)/IFLYADLibSimple/Supporting Files/IFLYAdPrefixHeader.pch";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IFLYADLibSimple/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
@@ -265,6 +266,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = FM295M5CZ5;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "$(PROJECT_DIR)/IFLYADLibSimple/Supporting Files/IFLYAdPrefixHeader.pch";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = IFLYADLibSimple/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "";
