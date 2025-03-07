@@ -1,4 +1,4 @@
-# SDK接入说明
+# 讯飞广告SDK接入指南
 
 讯飞广告SDK代码托管地址：[IFLYADLib_iOS](https://github.com/LJMcarryu/IFLYADLib_iOS)
 
