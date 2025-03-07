@@ -45,7 +45,6 @@ fastlane/test_output
 
 # CocoaPods
 Pods/
-Podfile
 Podfile.lock
 *.xcworkspace
 
