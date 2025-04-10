@@ -1,13 +1,14 @@
-# 讯飞广告SDK接入指南
+# SDK接入说明
 
 讯飞广告SDK代码托管地址：[IFLYADLib_iOS](https://github.com/LJMcarryu/IFLYADLib_iOS)
 
 ## SDK版本发布记录
 | 文档版本 | 修订日期 | 修订说明 |
 |-------|-------|-------|
+| v5.0.3 | 2025-04-10 | 【优化】优化摇一摇功能 |
+| v5.0.2 | 2025-04-01 | 【新增】原生广告可选参数 jumperViewController |
 | v5.0.1 | 2025-03-07 | 【新增】SDK接入demo |
 | v5.0.0 | 2025-03-07 | 【优化】支持CocoaPods导入<br>【优化】SDK文档说明 |
-
 
 ## SDK准备工作
 
