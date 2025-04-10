@@ -98,9 +98,9 @@
     splashAd.mediumBottomView = bottomView;
     ///
     /// 6.4
-    /// 设置是否支持摇一摇功能
-    /// 默认true 非必填
-    splashAd.shakingAllowStatus = true;
+    /// 设置是否禁止摇一摇功能
+    /// 默认false 非必填
+//    splashAd.disableShaking = false;
 
     /// 7. 监听各种回调，自行实现额外的操作
     splashAd.didShowBlock = ^{

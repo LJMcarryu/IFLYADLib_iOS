@@ -94,6 +94,12 @@ typedef NS_ENUM(NSInteger, IFLYVideoAdType) {
 @property (nonatomic, weak) UIViewController *currentViewController;
 
 /**
+ *  跳转视图
+ *  可设置为显示落地页的UIViewController，不填默认 currentViewController
+ */
+@property (nonatomic, weak) UIViewController *jumperViewController;
+
+/**
  *  父view
  *  需设置为显示广告的UIView
  */

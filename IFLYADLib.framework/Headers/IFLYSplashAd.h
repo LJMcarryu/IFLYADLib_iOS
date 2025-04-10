@@ -67,9 +67,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) UIView *mediumBottomView;
 
 /**
- *  设置是否支持摇一摇功能
+ *  设置是否禁止摇一摇功能
  */
-@property (nonatomic, assign) BOOL shakingAllowStatus;
+@property (nonatomic, assign) BOOL disableShaking;
 
 /**
  *  广告发起请求方法 并直接显示
