@@ -4,6 +4,10 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>.DS_Store</key>
+		<data>
+		4DN0ocVtkZLsDCrd0xAkIkO3OpI=
+		</data>
 		<key>Headers/IFLYADLib.h</key>
 		<data>
 		pCrvblsUkp1vYIfmPZTidfn+00Y=
@@ -58,15 +62,15 @@
 		</data>
 		<key>Headers/IFLYNativeAd.h</key>
 		<data>
-		IW9RiECyVQ/16GoQpaI7MesRXwk=
+		0sk6km+6AKdsS/aALvPy9SSxAno=
 		</data>
 		<key>Headers/IFLYSplashAd.h</key>
 		<data>
-		QzQ9hKSVNNiiEhAMi72+M36hxQw=
+		HP8zeWC8P6KuMPNkxU3NHL7YWRk=
 		</data>
 		<key>Headers/IFLYVideoAd.h</key>
 		<data>
-		e0+KlBKWzs96MgFSmR9nTLUK7o4=
+		vSsTHHYCwvJxGaGpgzRW+kP2QjE=
 		</data>
 		<key>IFLYPlayer.bundle/IFLYAdGIF_click.gif</key>
 		<data>
@@ -190,7 +194,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		WF5thPw0u0zT2Obe0HIeXZFsKIA=
+		A9T31d7kbDbUtIQowc5fWX7gHs0=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -294,21 +298,21 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			H/3lJco/jIC7cTyM6mZ6421v29ox6hteTwbbJif2RYU=
+			cAif/n4BCzsAeXwsfNGow1WHS63tYrCGCd3wLJgEA0w=
 			</data>
 		</dict>
 		<key>Headers/IFLYSplashAd.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Obrmu5OpHnvowIomdsuma6tAYj8yIVOIifGtrtauJ0c=
+			0x0cSnwtioHIryW/HrYhn2LqUPVuEmSNdyF6WK6eZc4=
 			</data>
 		</dict>
 		<key>Headers/IFLYVideoAd.h</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			GPQ+qGz2ULgBHNabNbeznw+7NiS+DqP9nWAzHUpZySI=
+			9K8KvoBFIVzlLNjMrxgrCnE6eKFnKG+ClLmeVxiVZRo=
 			</data>
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYAdGIF_click.gif</key>

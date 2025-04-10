@@ -78,6 +78,7 @@
     /// 显示广告的UIViewController
     /// ⚠️⚠️⚠️⚠️⚠️ 广告视图必须是放在此currentViewController上 「必填」
     nativeAd.currentViewController = self;
+//    nativeAd.jumperViewController = self;
 
 
     /// 7. 监听各种回调，自行实现额外的操作

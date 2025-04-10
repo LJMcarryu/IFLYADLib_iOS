@@ -70,6 +70,7 @@
     /// 显示广告的 UIViewController
     /// ⚠️⚠️⚠️⚠️⚠️ 广告视图必须是放在此自定义 UIViewController 上 此参数「必填」
     videoAd.currentViewController = self;
+//    videoAd.jumperViewController = self;
     /// 6.2
     /// 显示广告的 UIView
     /// ⚠️⚠️⚠️⚠️⚠️ 广告视图必须是放在此 UIView 上

@@ -140,21 +140,21 @@
 //    }
 //
 //    /// 实时竞价
-////    {
-////        if (adData.price && adData.price > 0) {
-////        /// 发送是否竞价获胜的通知
-////        /// 完整参数和释义可参考 'IFLYSplashAd.h' 文件和开发文档
-////        /// ⚠️⚠️⚠️ 竞价广告 此字段「必填」
-////            [self.splashAd sendWinNoticeWithType:@100 reason:@"测试竞价成功"];
-////
-////        /// 填写实际成交价 单位：元
-////        /// ⚠️⚠️⚠️ 竞价广告 此字段「必填」
+//    {
+//        if (adData.price && adData.price > 0) {
+//        /// 发送是否竞价获胜的通知
+//        /// 完整参数和释义可参考 'IFLYSplashAd.h' 文件和开发文档
+//        /// ⚠️⚠️⚠️ 竞价广告 此字段「必填」
+//            [self.splashAd sendWinNoticeWithType:@100 reason:@"讯飞广告竞价成功"];
+//
+//        /// 填写实际成交价 单位：元
+//        /// ⚠️⚠️⚠️ 竞价广告 此字段「必填」
 ////            [self.splashAd setParamValue:@"0.11" forKey:IFLYAdKeyAuctionPrice];
-////
-////        /// 曝光广告 「必填」
-////            [self.splashAd showAd];
-////        }
-////    }
+//
+//        /// 曝光广告 「必填」
+//            [self.splashAd showAd];
+//        }
+//    }
 //}
 //
 ///**

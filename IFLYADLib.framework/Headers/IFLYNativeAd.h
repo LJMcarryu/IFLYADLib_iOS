@@ -47,6 +47,12 @@
 @property (nonatomic, weak) UIViewController *currentViewController;
 
 /**
+ *  跳转视图
+ *  可设置为显示落地页的UIViewController，不填默认 currentViewController
+ */
+@property (nonatomic, weak) UIViewController *jumperViewController;
+
+/**
  *  构造方法
  *  详解：adUnitId是广告位id
  */
