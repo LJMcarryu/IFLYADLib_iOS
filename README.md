@@ -5,6 +5,7 @@
 ## SDK版本发布记录
 | 文档版本 | 修订日期 | 修订说明 |
 |-------|-------|-------|
+| v5.0.3 | 2025-04-17 | 【优化】优化包体积 |
 | v5.0.3 | 2025-04-10 | 【优化】优化摇一摇功能 |
 | v5.0.2 | 2025-04-01 | 【新增】原生广告可选参数 jumperViewController |
 | v5.0.1 | 2025-03-07 | 【新增】SDK接入demo |
@@ -20,8 +21,8 @@
 platform :ios, '12.0'
 
 target 'YOUR_RELEASE_TARGET' do
-	use_frameworks!
-	pod 'IFLYADLib'
+    use_frameworks!
+    pod 'IFLYADLib'
 end
 ```
 
@@ -82,9 +83,9 @@ SDK初始化操作由**IFLYAdConfig**类来完成。
 
 ```
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	
-	......
-	
+    
+    ......
+    
     /// 设置是否开启个性化推荐
     [IFLYAdConfig setPersonalizedEnabled:YES];
 
