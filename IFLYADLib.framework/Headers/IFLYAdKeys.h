@@ -85,11 +85,6 @@ extern IFLYAdKey const IFLYAdKeyUA;
  */
 extern IFLYAdKey const IFLYAdKeyIDFA;
 /**
- * 广告请求中广协CAID
- * 值：NSString；格式"00000000000000000000000000000000"
- */
-extern IFLYAdKey const IFLYAdKeyCAID;
-/**
  * 广告请求中广协CAIDList
  * 值：NSArray 参数示例：[{"ver": "20230330", "caid": "75c7bc3754b3019c135b526cb8eb4420"}, {"ver": "20220111", "caid": "8799abe1c76805fab06ee3f98a3f704e"}]
  */
@@ -104,12 +99,6 @@ extern IFLYAdKey const IFLYAdKeyNeedAudio;
  * BOOL 型 NSNumber
  */
 extern IFLYAdKey const IFLYAdKeyNeedLocation;
-/**
- * 广告请求是否关闭 HttpDNS 解析
- * BOOL 型 NSNumber(@(NO))
- * 默认：开启
- */
-extern IFLYAdKey const IFLYAdKeyHttpDNS;
 /**
  * 广告落地页跳转动画样式
  * NSUInteger 型 NSNumber

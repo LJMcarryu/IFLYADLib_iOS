@@ -15,9 +15,7 @@ FOUNDATION_EXPORT const unsigned char IFLYADLibVersionString[];
 
 #pragma mark - model
 #import <IFLYADLib/IFLYAdData.h>
-#import <IFLYADLib/IFLYAdAudioData.h>
 #import <IFLYADLib/IFLYAdDeal.h>
-#import <IFLYADLib/IFLYAdHtmlData.h>
 #import <IFLYADLib/IFLYAdImgVoiceData.h>
 #import <IFLYADLib/IFLYAdMonitorData.h>
 #import <IFLYADLib/IFLYAdVideoData.h>
@@ -32,6 +30,5 @@ FOUNDATION_EXPORT const unsigned char IFLYADLibVersionString[];
 #import <IFLYADLib/IFLYAdKeys.h>
 #import <IFLYADLib/IFLYAdTool.h>
 #import <IFLYADLib/IFLYAdError.h>
-#import <IFLYADLib/IFLYAdLog.h>
 
 

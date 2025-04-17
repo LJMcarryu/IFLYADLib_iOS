@@ -6,15 +6,11 @@
 	<dict>
 		<key>.DS_Store</key>
 		<data>
-		4DN0ocVtkZLsDCrd0xAkIkO3OpI=
+		A5+p8M0IS+X6a3+N5EWLVa653Ic=
 		</data>
 		<key>Headers/IFLYADLib.h</key>
 		<data>
-		pCrvblsUkp1vYIfmPZTidfn+00Y=
-		</data>
-		<key>Headers/IFLYAdAudioData.h</key>
-		<data>
-		X/fNlK4mzODOZOSJBnapYtXxuh8=
+		BnBEQUgdEYeg4O6nFMWr53xJnCA=
 		</data>
 		<key>Headers/IFLYAdConfig.h</key>
 		<data>
@@ -32,21 +28,13 @@
 		<data>
 		mmf1zWbion1kqPqCXERgEx83A0w=
 		</data>
-		<key>Headers/IFLYAdHtmlData.h</key>
-		<data>
-		z7KbovN0/NFiZ/JyJHslyb3L8qw=
-		</data>
 		<key>Headers/IFLYAdImgVoiceData.h</key>
 		<data>
 		ooWB6wDbyTYxc6/OtHPbL46d29o=
 		</data>
 		<key>Headers/IFLYAdKeys.h</key>
 		<data>
-		3NUrxiHWwraUUudHi03BFin89NQ=
-		</data>
-		<key>Headers/IFLYAdLog.h</key>
-		<data>
-		RUwNXwLkAHtc48H16DGY9pmZlFk=
+		Fv4ff17j5LqsckoNamFRNnAG6NY=
 		</data>
 		<key>Headers/IFLYAdMonitorData.h</key>
 		<data>
@@ -207,14 +195,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			TyPInED9VqhWr7iU2VhA4rWsRo3FbIB8k375UMMlb2c=
-			</data>
-		</dict>
-		<key>Headers/IFLYAdAudioData.h</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			gkXJe7oQSKLzh7VNX2UItQRGuyKsVR9dj7mMasP5RwI=
+			KDB4E+TNsAYxp3xdD2+1X0nfAfF18eXnTTBReDVUoQs=
 			</data>
 		</dict>
 		<key>Headers/IFLYAdConfig.h</key>
@@ -245,13 +226,6 @@
 			H3AaT6LdSqZP3noszbRtXO0ZvSEeac/sUUaS9fzRrLA=
 			</data>
 		</dict>
-		<key>Headers/IFLYAdHtmlData.h</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			F/q7NyGuKc6ImKgWKspN6tu2owFcJhqhhavYPY+TI2Y=
-			</data>
-		</dict>
 		<key>Headers/IFLYAdImgVoiceData.h</key>
 		<dict>
 			<key>hash2</key>
@@ -263,14 +237,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			LGgw+mFkY3aDSudUmmYz/iSKUuG8O7p9jgN4xwmFYiU=
-			</data>
-		</dict>
-		<key>Headers/IFLYAdLog.h</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			LvskJfRP07HL8Hqw8YBWFbXA6qJrTeAnCO1MrTvGpLA=
+			raQeNIHnF/teAeJ4vY9CGWR+Ke1SSU13N3IrJlv0jT0=
 			</data>
 		</dict>
 		<key>Headers/IFLYAdMonitorData.h</key>
