@@ -1,11 +1,3 @@
-//
-//  IFLYNativeAd.h
-//  IFLYAdLib
-//
-//  Created by chengping on 15/12/18.
-//  Copyright © 2015年 faf. All rights reserved.
-//
-
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
