@@ -96,8 +96,8 @@
 				84320C392D75455C0051F812 /* Sources */,
 				84320C3A2D75455C0051F812 /* Frameworks */,
 				84320C3B2D75455C0051F812 /* Resources */,
-				2877AAB6A699BEE6502F8120 /* [CP] Embed Pods Frameworks */,
-				1D6AA326E9E7BFC724788ECE /* [CP] Copy Pods Resources */,
+				2CC9BAABABB1A9C25BCFDE2E /* [CP] Embed Pods Frameworks */,
+				A1F14604B9E5CF0972845F15 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -177,24 +177,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		1D6AA326E9E7BFC724788ECE /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		2877AAB6A699BEE6502F8120 /* [CP] Embed Pods Frameworks */ = {
+		2CC9BAABABB1A9C25BCFDE2E /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -209,6 +192,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A1F14604B9E5CF0972845F15 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
