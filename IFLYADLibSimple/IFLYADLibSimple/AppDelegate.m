@@ -8,7 +8,7 @@
 #import "AppDelegate.h"
 #import "ViewController.h"
 
-#import <IFLYADLib/IFLYADLib.h>
+//#import <IFLYADLib/IFLYADLib.h>
 
 @interface AppDelegate ()
 
@@ -24,8 +24,8 @@
     self.window.rootViewController = navigationController;
     [self.window makeKeyAndVisible];
 
-    /// 设置是否开启个性化推荐
-    [IFLYAdConfig setPersonalizedEnabled:YES];
+//    /// 设置是否开启个性化推荐
+//    [IFLYAdConfig setPersonalizedEnabled:YES];
 
     return YES;
 }
