@@ -1,16 +1,16 @@
-////
-////  IFLYVideoViewController.h
-////  IFLYADLibDemo
-////
-////  Created by admin on 6.3.25.
-////
 //
-//#import <UIKit/UIKit.h>
+//  IFLYVideoViewController.h
+//  IFLYADLibDemo
 //
-//NS_ASSUME_NONNULL_BEGIN
+//  Created by admin on 6.3.25.
 //
-//@interface IFLYVideoViewController : UIViewController
-//
-//@end
-//
-//NS_ASSUME_NONNULL_END
+
+#import <UIKit/UIKit.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface IFLYVideoViewController : UIViewController
+
+@end
+
+NS_ASSUME_NONNULL_END
