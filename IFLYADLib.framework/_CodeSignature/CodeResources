@@ -6,7 +6,7 @@
 	<dict>
 		<key>.DS_Store</key>
 		<data>
-		Off9m1FdMffP7fZV7eyV/xIjdIY=
+		bd+tAgtwrp8JWnGmk3IJ5tfaqPo=
 		</data>
 		<key>Headers/IFLYADLib.h</key>
 		<data>
@@ -189,6 +189,10 @@
 	<dict>
 		<key>Headers/IFLYADLib.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			H5HT3aLWZEWV2/OvHctJmE1nwRs=
+			</data>
 			<key>hash2</key>
 			<data>
 			IaOpBcDtlFary+YKYU1PZyl2QZUVtHm6UZgwU5oHgP8=
@@ -196,6 +200,10 @@
 		</dict>
 		<key>Headers/IFLYAdConfig.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			oOLDHm7Obadjh/JqJrcmyeTDVpk=
+			</data>
 			<key>hash2</key>
 			<data>
 			DsKOVR/PdHNO/HpjwAkmTfm0bFJiV2oOClT3vrG2wMY=
@@ -203,6 +211,10 @@
 		</dict>
 		<key>Headers/IFLYAdData.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			x1cpfnzijHtZfQfpPRK9quMQTpo=
+			</data>
 			<key>hash2</key>
 			<data>
 			8ViRwq/EK0nC6P7/Hx1hC6ehz7r2DqLmwQE3VcC2+w4=
@@ -210,6 +222,10 @@
 		</dict>
 		<key>Headers/IFLYAdError.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			mmf1zWbion1kqPqCXERgEx83A0w=
+			</data>
 			<key>hash2</key>
 			<data>
 			H3AaT6LdSqZP3noszbRtXO0ZvSEeac/sUUaS9fzRrLA=
@@ -217,6 +233,10 @@
 		</dict>
 		<key>Headers/IFLYAdImgVoiceData.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			ooWB6wDbyTYxc6/OtHPbL46d29o=
+			</data>
 			<key>hash2</key>
 			<data>
 			2cklij+h6IpqfbyPbrxh9LXwLb45YWozesXg6sTDqMg=
@@ -224,6 +244,10 @@
 		</dict>
 		<key>Headers/IFLYAdKeys.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			Fv4ff17j5LqsckoNamFRNnAG6NY=
+			</data>
 			<key>hash2</key>
 			<data>
 			raQeNIHnF/teAeJ4vY9CGWR+Ke1SSU13N3IrJlv0jT0=
@@ -231,6 +255,10 @@
 		</dict>
 		<key>Headers/IFLYAdMonitorData.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			MbJjArEYX+U2sYg+wz++8/EU9zA=
+			</data>
 			<key>hash2</key>
 			<data>
 			wnqMrXa3+APY7mhpINhTv6drU3owzQab4n8vOTLwl1A=
@@ -238,6 +266,10 @@
 		</dict>
 		<key>Headers/IFLYAdTool.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			7MA4GgOquuJNWbkbHTZMBTSZkH8=
+			</data>
 			<key>hash2</key>
 			<data>
 			ro+UnI2brZ3424hMHL2uhtof2mTwJ2y2JTm2DOqjUjw=
@@ -245,6 +277,10 @@
 		</dict>
 		<key>Headers/IFLYAdVideoData.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			A7NTw+X92ClK4LpXvlGzWN7Vn8E=
+			</data>
 			<key>hash2</key>
 			<data>
 			HGyigqRCBFZ5W4GHwvd8LuUhUMZoUnkdpfe3M1xI2g8=
@@ -252,6 +288,10 @@
 		</dict>
 		<key>Headers/IFLYNativeAd.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			LZEmn5Y7N06GQr5+Np+Jk9j7gVk=
+			</data>
 			<key>hash2</key>
 			<data>
 			WdN9r6naVhBmcy4xsvCSCIcpWE8KEVxyss0aBfRJiDU=
@@ -259,6 +299,10 @@
 		</dict>
 		<key>Headers/IFLYSplashAd.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			HP8zeWC8P6KuMPNkxU3NHL7YWRk=
+			</data>
 			<key>hash2</key>
 			<data>
 			0x0cSnwtioHIryW/HrYhn2LqUPVuEmSNdyF6WK6eZc4=
@@ -266,6 +310,10 @@
 		</dict>
 		<key>Headers/IFLYVideoAd.h</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			vSsTHHYCwvJxGaGpgzRW+kP2QjE=
+			</data>
 			<key>hash2</key>
 			<data>
 			9K8KvoBFIVzlLNjMrxgrCnE6eKFnKG+ClLmeVxiVZRo=
@@ -273,6 +321,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYAdGIF_click.gif</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			xPpu+5rM+2D6JcioM1f2IcpNliU=
+			</data>
 			<key>hash2</key>
 			<data>
 			51ExNqEqcPHr6Ra1bC3EC3aroN50HOZKmvTfdeob+FU=
@@ -280,6 +332,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYAdGIF_shack.gif</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			3B7Vsz4zd+Dwy/zRNfTtMvwGBpY=
+			</data>
 			<key>hash2</key>
 			<data>
 			z5dumbS9vdfVJo60Dq/MVbEbpOyCntQ5JtfNhwnoZHM=
@@ -287,6 +343,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYAdGIF_slide.gif</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			17Xu982fLowyKAN0QEm2ta1eqKE=
+			</data>
 			<key>hash2</key>
 			<data>
 			JHQZZ+/gbK8JhJUo7+FhHV7ZfpfjGJyJ+Ml2JG7lNk4=
@@ -294,6 +354,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYAd_click.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			9/7w1XBtcRvaCAiR9cG/+qcJIX0=
+			</data>
 			<key>hash2</key>
 			<data>
 			gPbq2bU+1FHdswAuEHY9ytpaUhFz4QrBLqPZeitLz10=
@@ -301,6 +365,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYAd_right_arrow.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			nld1hWDwciDjLmmSwTJbM/mE3F4=
+			</data>
 			<key>hash2</key>
 			<data>
 			YQl3OHv+vMhe/6vWIvwodLgDcCoGqBkaJPDwEo5JwC8=
@@ -308,6 +376,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYAd_shack.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			k5MlFBxNawlQ4TK5MoDtHWQCGo0=
+			</data>
 			<key>hash2</key>
 			<data>
 			ifikEAC4SMSIfZagGkrchJjys+BveMHuH+3WVwS2Wjk=
@@ -315,6 +387,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_close_volume.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			HRvjIfW9TTj1+Kyj5kkr+N9FrXY=
+			</data>
 			<key>hash2</key>
 			<data>
 			wSls0onfwh5InivC8Otlt+8d1m/AF8w2GfXAr7XGu1o=
@@ -322,6 +398,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_close_volume@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			LkA929XP/fW/wXymdtSnyuGmRRQ=
+			</data>
 			<key>hash2</key>
 			<data>
 			DvA7gfDSJhO4FNFM0QTjmDp3UryFg4Uv/kRkLfnqklY=
@@ -329,6 +409,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_close_volume@3x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			iFEI6MZsJM9NTxuwvfHtCl5nsBk=
+			</data>
 			<key>hash2</key>
 			<data>
 			nv93iai1sbqLyTuA4whWLLX/hakM+8Q2w5Sgz4e/hBU=
@@ -336,6 +420,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_open_volume.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			8b+K1PxKuUpjs8uh9JjQefVGb64=
+			</data>
 			<key>hash2</key>
 			<data>
 			vijyh5krnbZMAJHFvXU0pwsnHaD9Qby5hN+p4dUOthY=
@@ -343,6 +431,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_open_volume@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			v6rTm1ZQhwx4MT43BxYU/LGjXj0=
+			</data>
 			<key>hash2</key>
 			<data>
 			LCDDUtssggF5Wr1EiLctXrr26i78ODcN0utNuqVXJ1s=
@@ -350,6 +442,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_open_volume@3x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			ia76BUIbdtlByEX6SLdCpaszESY=
+			</data>
 			<key>hash2</key>
 			<data>
 			VRXLyx5Erh1QdqMKuTjxfpaxzpgYEG922nHV5Y2fcxM=
@@ -357,6 +453,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_slider.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			s0p1+eQyn601c+9zG69QXbPYNsY=
+			</data>
 			<key>hash2</key>
 			<data>
 			pXRf6TRvRiZeS2+At/+C0Na3G1y/zoGW1YZBqlPHG0Y=
@@ -364,6 +464,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_slider@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			MWzIgzbFd0mn829CexmLsx8Tqhc=
+			</data>
 			<key>hash2</key>
 			<data>
 			BM127oVrdYqG0VJbaX9hE2+y+4R15dbkJG0rgHO/FFY=
@@ -371,6 +475,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYFPlayer_slider@3x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			Krfgoin7gxE6nr4nXM9X3YsE1xc=
+			</data>
 			<key>hash2</key>
 			<data>
 			hru3JYZdiJfAUWzUV3KvWAxn8Rcr8oUVJByJvpqStS0=
@@ -378,6 +486,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_bottom_shadow.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			Ywzi+v3Lyn26OhRYAfWu6U+CZXg=
+			</data>
 			<key>hash2</key>
 			<data>
 			sv3iJ1QlM4hJQNj7nNAgW0oBO2cO5hFQ83fwCQP8lkA=
@@ -385,6 +497,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_fast_backward@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			zX+B8pKluyJatY6Hsce/2dNk7fA=
+			</data>
 			<key>hash2</key>
 			<data>
 			7Wg8z+INavTNfSpoPi9zg8Id8CN89lFNHtNZGmUymJA=
@@ -392,6 +508,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_fast_backward@3x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			7Aps8oNdrT9tqQUSEJMQHvuNjKM=
+			</data>
 			<key>hash2</key>
 			<data>
 			0pYoO7zqWB+JTqhFGpfamoRt4ZzIjalEAfMYwEUlml0=
@@ -399,6 +519,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_fast_forward@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			VYPEe0ea7C7p5ZXn0chJPh93Sdk=
+			</data>
 			<key>hash2</key>
 			<data>
 			3WAgnwRGRqsDRV1WenBZQD6SOOfiO0dIapiM+fAXVvA=
@@ -406,6 +530,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_fast_forward@3x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			r0cYXIt3lbyTNpjXyeOO14S3iVo=
+			</data>
 			<key>hash2</key>
 			<data>
 			lFGx1QTfS+Wu5ZgyBJlsb4rxvV39MFSzebX9z4D7NrU=
@@ -413,6 +541,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_pause.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			kyxhlYtjxSC3pTl+YfXG+CbjWs8=
+			</data>
 			<key>hash2</key>
 			<data>
 			fSzPIYnk0+I+A4wgNnKDTK503E35lvXw+nxt0EcWqpw=
@@ -420,6 +552,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_pause@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			lVfNJeT+vg2/fqz6zFdk5nHINVA=
+			</data>
 			<key>hash2</key>
 			<data>
 			2xNhqj+mac+kJc9MJSo/+MWqOVUl6OoMKfiuCqCeNTU=
@@ -427,6 +563,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_pause@3x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			iqCo8UmT7osBBSj5QG3STbjrd5U=
+			</data>
 			<key>hash2</key>
 			<data>
 			XIqF8Oq4pvzr8q+SGfu4xwcqFgP9YTtyHENhVQPUahI=
@@ -434,6 +574,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_play@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			PDH4IBB8lATOQIhqwpw8llfVYMg=
+			</data>
 			<key>hash2</key>
 			<data>
 			82t5IK1Lid+qNOnKI4Z7nSxI+yChlA4ruDnwmpfXerc=
@@ -441,6 +585,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_play@3x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			wNXT6oNmUffieCz8yQd2Ou4SFQA=
+			</data>
 			<key>hash2</key>
 			<data>
 			oS6QCc2Ngvk0V26TX1/DdCM24B55J0VcWBOU4X/WgRU=
@@ -448,6 +596,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_play_btn@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			kuP72JhmHm0xVoPmmSzkn12l9/M=
+			</data>
 			<key>hash2</key>
 			<data>
 			ZstcIs0jfvVNUZCn9lmSnkDQDV7DE2YoeCnCiRCMdqY=
@@ -455,6 +607,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_repeat_video.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			MixYyjU58jt57+bj1LJPVeZOX3Y=
+			</data>
 			<key>hash2</key>
 			<data>
 			hV5orwH2MdgbyLiyh9G8dvjLQaD8GPsha88GMaUmXVI=
@@ -462,6 +618,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_repeat_video@2x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			Ejj9IjZEBVxyBOW3AJEdi4dlSL0=
+			</data>
 			<key>hash2</key>
 			<data>
 			fSy3dHjpZyWjMSxkzPtUCIE3oWqCjbkVdGPZJZ1Fp9A=
@@ -469,6 +629,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_repeat_video@3x.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			SPG8Ghp5uLOnhZIPreitYj1YPus=
+			</data>
 			<key>hash2</key>
 			<data>
 			FK05M08MtDtcqMmqJqCLFrIdKyIvx/dApO7PXILSwoU=
@@ -476,6 +640,10 @@
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYPlayer_top_shadow.png</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			rK/rUDzLaAFqYD5ccsQnyUbGkl4=
+			</data>
 			<key>hash2</key>
 			<data>
 			tOeqtpwoMwloWteShVlEUg4oFh8zBVpC1SytJamBLF0=
@@ -483,6 +651,10 @@
 		</dict>
 		<key>Modules/module.modulemap</key>
 		<dict>
+			<key>hash</key>
+			<data>
+			8uwyDi6QgSjRWx5ixfWKnoPHIpY=
+			</data>
 			<key>hash2</key>
 			<data>
 			Ryw3dOXZD2U6ZMLp74YHXT26ezOyZ7SCoFv/gWneSNw=
