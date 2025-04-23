@@ -7,14 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7751B87043CA62375D6FCCFE /* libPods-IFLYADLibSimple.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D99520A13FD603FF8044A077 /* libPods-IFLYADLibSimple.a */; };
+		50B607275C83C25A3ADA0879 /* Pods_IFLYADLibSimple.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B22DC63BEDAC6E2FE7FDA3DB /* Pods_IFLYADLibSimple.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2A651440CB6A999274B907D3 /* Pods-IFLYADLibSimple.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IFLYADLibSimple.release.xcconfig"; path = "Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple.release.xcconfig"; sourceTree = "<group>"; };
 		84320C3D2D75455C0051F812 /* IFLYADLibSimple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IFLYADLibSimple.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B22DC63BEDAC6E2FE7FDA3DB /* Pods_IFLYADLibSimple.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_IFLYADLibSimple.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA56773F708F1C0E06ECCE3E /* Pods-IFLYADLibSimple.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IFLYADLibSimple.debug.xcconfig"; path = "Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple.debug.xcconfig"; sourceTree = "<group>"; };
-		D99520A13FD603FF8044A077 /* libPods-IFLYADLibSimple.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-IFLYADLibSimple.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -43,7 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7751B87043CA62375D6FCCFE /* libPods-IFLYADLibSimple.a in Frameworks */,
+				50B607275C83C25A3ADA0879 /* Pods_IFLYADLibSimple.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,7 +71,7 @@
 		EDFC175E6D7532D3DFC63685 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D99520A13FD603FF8044A077 /* libPods-IFLYADLibSimple.a */,
+				B22DC63BEDAC6E2FE7FDA3DB /* Pods_IFLYADLibSimple.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -96,7 +96,6 @@
 				84320C392D75455C0051F812 /* Sources */,
 				84320C3A2D75455C0051F812 /* Frameworks */,
 				84320C3B2D75455C0051F812 /* Resources */,
-				1A40450D192810CEF6127862 /* [CP] Embed Pods Frameworks */,
 				C62034924A9869CAD16DDE94 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -175,23 +174,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		1A40450D192810CEF6127862 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IFLYADLibSimple/Pods-IFLYADLibSimple-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C62034924A9869CAD16DDE94 /* [CP] Copy Pods Resources */ = {
