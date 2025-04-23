@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "IFLYADLib"
-  spec.version      = "5.0.8"
+  spec.version      = "5.0.9"
   spec.summary      = "科大讯飞消费者BG-AI营销-ADX广告SDK-IFLYADLib."
   spec.description  = <<-DESC
 科大讯飞消费者BG-AI营销-ADX广告SDK-IFLYADLib.使用OC实现
@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
 
   spec.author             = { "jmliu6" => "jmliu6@iflytek.com" }
 
-  spec.platform     = :ios, "12.0"
+  spec.platform     = :ios, "11.0"
 
   #  When using multiple platforms
   # spec.ios.deployment_target = "5.0"
