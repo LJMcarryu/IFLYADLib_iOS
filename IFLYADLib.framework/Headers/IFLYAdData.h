@@ -63,6 +63,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic, strong) NSString *deeplink;
 @property (readonly, nonatomic, strong) NSString *landing;
 @property (readonly, nonatomic, strong) NSString *action_type;
+@property (readonly, nonatomic, strong) NSString *ad_source_icon;
 @property (readonly, nonatomic, strong) NSString *ad_source_mark;
 @property (readonly, nonatomic, strong) NSDictionary *ext;
 
