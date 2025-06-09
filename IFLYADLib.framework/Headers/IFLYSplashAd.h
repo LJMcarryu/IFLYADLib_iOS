@@ -95,6 +95,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendWinNoticeWithType:(NSNumber *)type reason:(NSString *)reason;
 
 /**
+ *  获取广告请求成功后特定的物料信息
+ */
+- (NSDictionary *)getAdCallbackDic;
+
+/**
  * 广告展示成功
  */
 @property (nonatomic, copy) void (^ didShowBlock)(void);
