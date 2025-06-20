@@ -3,7 +3,7 @@ platform :ios, '12.0'
 target 'IFLYADLibSimple' do
 use_frameworks!
 
-pod 'IFLYADLib'
+pod 'IFLYADLib_simulator'
 
 #pod 'Ads-CN-Beta','6.7.0.3', :subspecs => ['BUAdSDK', 'CSJMediation']
 
