@@ -62,6 +62,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger traceDuration;
 
 /**
+ *  设置免除广告
+ */
+@property (nonatomic, assign) BOOL showNoAds;
+
+/**
  *  设置媒体自定义底部图片
  */
 @property (nonatomic, strong) UIView *mediumBottomView;
@@ -123,6 +128,10 @@ NS_ASSUME_NONNULL_BEGIN
  * 广告跳过的回调
  */
 @property (nonatomic, copy) void (^ didSkipBlock)(void);
+/**
+ * 广告免除的回调
+ */
+@property (nonatomic, copy) void (^ didNoAdsBlock)(void);
 /**
  * 广告退出落地页的回调
  */

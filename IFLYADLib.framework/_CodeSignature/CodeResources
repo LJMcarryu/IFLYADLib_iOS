@@ -4,10 +4,6 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>.DS_Store</key>
-		<data>
-		sSCutQUQ3LIbL9mbyeBkrFGaVeo=
-		</data>
 		<key>Headers/IFLYADLib.h</key>
 		<data>
 		H5HT3aLWZEWV2/OvHctJmE1nwRs=
@@ -50,7 +46,7 @@
 		</data>
 		<key>Headers/IFLYSplashAd.h</key>
 		<data>
-		QSRe7eHS42iS8IrRmv82pZx6RCQ=
+		08pXoqgyTwZccU6R1eAiWFm+08I=
 		</data>
 		<key>Headers/IFLYVideoAd.h</key>
 		<data>
@@ -301,11 +297,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			QSRe7eHS42iS8IrRmv82pZx6RCQ=
+			08pXoqgyTwZccU6R1eAiWFm+08I=
 			</data>
 			<key>hash2</key>
 			<data>
-			OyWlr0J4s5d8P+CUYepEKs2/6OEYgiKzMA8fII+WM4s=
+			aIHPZ9NO9ueEvJfdOHXNImJtfX8UqiFlR7K/CJSRRLo=
 			</data>
 		</dict>
 		<key>Headers/IFLYVideoAd.h</key>
