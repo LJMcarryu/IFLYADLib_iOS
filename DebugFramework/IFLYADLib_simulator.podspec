@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "IFLYADLib_simulator"
-  spec.version      = "5.2.3"
+  spec.version      = "5.2.6"
   spec.summary      = "(仅模拟器版本)科大讯飞消费者BG-AI营销-ADX广告SDK-IFLYADLib."
   spec.description  = <<-DESC
 (仅模拟器版本)科大讯飞消费者BG-AI营销-ADX广告SDK-IFLYADLib.使用OC实现
