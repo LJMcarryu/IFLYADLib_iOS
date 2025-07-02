@@ -5,6 +5,7 @@
 ## SDK版本发布记录
 | 文档版本 | 修订日期 | 修订说明 |
 |-------|-------|-------|
+| v5.2.5 | 2025-07-02 | 【新增】添加免除广告按钮<br>【新增】IFLYADLib_simulator调试库 |
 | v5.1.1 | 2025-06-09 | 【新增】开屏广告添加网盘定制物料回调信息 |
 | v5.1.0 | 2025-05-12 | 【新增】开屏广告添加广告方logo标识 |
 | v5.0.8 | 2025-04-18 | 【优化】将包改为静态库 |
@@ -25,8 +26,8 @@
 platform :ios, '11.0'
 
 target 'YOUR_RELEASE_TARGET' do
-	use_frameworks!
-	pod 'IFLYADLib'
+    use_frameworks!
+    pod 'IFLYADLib'
 end
 ```
 
@@ -87,9 +88,9 @@ SDK初始化操作由**IFLYAdConfig**类来完成。
 
 ```
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-	
-	......
-	
+    
+    ......
+    
     /// 设置是否开启个性化推荐
     [IFLYAdConfig setPersonalizedEnabled:YES];
 
