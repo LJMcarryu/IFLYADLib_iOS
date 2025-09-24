@@ -212,22 +212,24 @@ typedef NS_ENUM(NSInteger, IFLYVideoAdType) {
 - (void)sendWinNoticeWithType:(NSNumber *)type reason:(NSString *)reason;
 
 /**
- * 广告退出落地页的回调
- */
-@property (nonatomic, copy) void (^ dismissBlock)(void);
-
-/**
- * 广告退出应用商店的回调
- */
-@property (nonatomic, copy) void (^ dismissStoreBlock)(void);
-
-/**
  * 广告点击跳转完成回调
  */
 @property (nonatomic, copy) void (^ didJumpBlock)(BOOL success);
 
 /**
- * deeplink跳转离开app回调
+ * 广告退出落地页的回调（jump之后的回调）
+ * 与 dismissStoreBlock 互斥
+ */
+@property (nonatomic, copy) void (^ dismissBlock)(void);
+
+/**
+ * 广告退出应用商店的回调（jump之后的回调）
+ * 与 dismissBlock 互斥
+ */
+@property (nonatomic, copy) void (^ dismissStoreBlock)(void);
+
+/**
+ * deeplink跳转、进入后台离开app回调（不影响其他回调）
  */
 @property (nonatomic, copy) void (^ didLeaveApp)(void);
 
