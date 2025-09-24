@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  *  开屏广告错误回调
  *
- *  @param errorCode 错误码，详见接入手册
+ *  @param error 错误码，详见接入手册
  */
 - (void)onSplashAdFailed:(IFLYAdError *)error;
 
@@ -62,11 +62,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger traceDuration;
 
 /**
- *  设置免除广告
- */
-@property (nonatomic, assign) BOOL showNoAds;
-
-/**
  *  设置媒体自定义底部图片
  */
 @property (nonatomic, strong) UIView *mediumBottomView;
@@ -77,10 +72,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL disableShaking;
 
 /**
- *  广告发起请求方法 并直接显示
+ *  媒体定制：设置免除广告
+ */
+@property (nonatomic, assign) BOOL showNoAds;
+
+/**
+ *  广告发起请求方法
  *  详解：[必选]发起拉取广告请求,在获得广告数据后回调delegate
  */
 - (void)loadAd;
+
+/**
+ * 广告展示，内部自动曝光广告
+ */
 
 - (void)showAd;
 
@@ -100,46 +104,53 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)sendWinNoticeWithType:(NSNumber *)type reason:(NSString *)reason;
 
 /**
- *  获取广告请求成功后特定的物料信息
+ *  媒体定制：获取广告请求成功后特定的物料信息
  */
 - (NSDictionary *)getAdCallbackDic;
 
 /**
  * 广告展示成功
+ * 与 didShowFailedBlock 互斥
  */
 @property (nonatomic, copy) void (^ didShowBlock)(void);
 /**
  * 广告展示失败
+ * 与 didShowBlock 互斥
  */
 @property (nonatomic, copy) void (^ didShowFailedBlock)(void);
 /**
- * 广告点击跳转完成回调
- */
-@property (nonatomic, copy) void (^ didJumpBlock)(BOOL success);
-/**
- * deeplink跳转离开app回调
- */
-@property (nonatomic, copy) void (^ didLeaveApp)(void);
-/**
- * 广告结束的回调
+ * 广告结束的回调，仅倒计时正常结束会调用（skip、jump不会调用）
+ * 与 didSkipBlock、didJumpBlock 互斥
  */
 @property (nonatomic, copy) void (^ didCloseBlock)(void);
 /**
- * 广告跳过的回调
+ * 广告跳过的回调，也代表着广告结束
+ * 与 didCloseBlock、didJumpBlock 互斥
  */
 @property (nonatomic, copy) void (^ didSkipBlock)(void);
 /**
- * 广告免除的回调
+ * 广告点击跳转完成回调，也代表着广告结束
+ * 与 didCloseBlock、didSkipBlock 互斥
  */
-@property (nonatomic, copy) void (^ didNoAdsBlock)(void);
+@property (nonatomic, copy) void (^ didJumpBlock)(BOOL success);
 /**
- * 广告退出落地页的回调
+ * 广告退出落地页的回调（jump之后的回调）
+ * 与 dismissStoreBlock 互斥
  */
 @property (nonatomic, copy) void (^ dismissBlock)(void);
 /**
- * 广告退出应用商店的回调
+ * 广告退出应用商店的回调（jump之后的回调）
+ * 与 dismissBlock 互斥
  */
 @property (nonatomic, copy) void (^ dismissStoreBlock)(void);
+/**
+ * deeplink跳转、进入后台离开app回调（不影响其他回调）
+ */
+@property (nonatomic, copy) void (^ didLeaveApp)(void);
+/**
+ * 广告免除的回调（媒体定制按钮，点击之后未做任何操作，不影响其他回调）
+ */
+@property (nonatomic, copy) void (^ didNoAdsBlock)(void);
 
 @end
 

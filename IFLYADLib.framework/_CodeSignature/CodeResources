@@ -42,15 +42,15 @@
 		</data>
 		<key>Headers/IFLYNativeAd.h</key>
 		<data>
-		LZEmn5Y7N06GQr5+Np+Jk9j7gVk=
+		XV0mUCGIBz3hAKF+d44XvVrbsz8=
 		</data>
 		<key>Headers/IFLYSplashAd.h</key>
 		<data>
-		08pXoqgyTwZccU6R1eAiWFm+08I=
+		Map2+Rp/TkzU+vr85yFNQm+MsnA=
 		</data>
 		<key>Headers/IFLYVideoAd.h</key>
 		<data>
-		vSsTHHYCwvJxGaGpgzRW+kP2QjE=
+		n0bRuxOxUbIZKM1Ivi2vrm94KOE=
 		</data>
 		<key>IFLYPlayer.bundle/IFLYAdGIF_click.gif</key>
 		<data>
@@ -174,7 +174,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		GI4ZX5A2fV3uqZdejLXmgfI/ZPc=
+		voeAN9ParQOlt3SJwc/3BTIAfAk=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -286,33 +286,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			LZEmn5Y7N06GQr5+Np+Jk9j7gVk=
+			XV0mUCGIBz3hAKF+d44XvVrbsz8=
 			</data>
 			<key>hash2</key>
 			<data>
-			WdN9r6naVhBmcy4xsvCSCIcpWE8KEVxyss0aBfRJiDU=
+			805EYS6NMYtZ1zXuzB/YJ4YJT1hFufR0O55mU77ShFc=
 			</data>
 		</dict>
 		<key>Headers/IFLYSplashAd.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			08pXoqgyTwZccU6R1eAiWFm+08I=
+			Map2+Rp/TkzU+vr85yFNQm+MsnA=
 			</data>
 			<key>hash2</key>
 			<data>
-			aIHPZ9NO9ueEvJfdOHXNImJtfX8UqiFlR7K/CJSRRLo=
+			eFaPkq6xqR+9EMIoXWYv/7HT/FHYc/FpHNtIE6cxDy4=
 			</data>
 		</dict>
 		<key>Headers/IFLYVideoAd.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			vSsTHHYCwvJxGaGpgzRW+kP2QjE=
+			n0bRuxOxUbIZKM1Ivi2vrm94KOE=
 			</data>
 			<key>hash2</key>
 			<data>
-			9K8KvoBFIVzlLNjMrxgrCnE6eKFnKG+ClLmeVxiVZRo=
+			int5yY0s26ubRTke3FcDFWeacIZxijY6eVL7/5zwNGs=
 			</data>
 		</dict>
 		<key>IFLYPlayer.bundle/IFLYAdGIF_click.gif</key>
