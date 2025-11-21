@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "IFLYADLib"
-  spec.version      = "5.4.7"
+  spec.version      = "5.4.8"
   spec.summary      = "科大讯飞消费者BG-AI营销-ADX广告SDK-IFLYADLib."
   spec.description  = <<-DESC
 科大讯飞消费者BG-AI营销-ADX广告SDK-IFLYADLib.使用OC实现
