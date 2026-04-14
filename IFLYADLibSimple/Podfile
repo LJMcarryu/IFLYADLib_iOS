@@ -5,6 +5,6 @@ use_frameworks!
 
 pod 'IFLYADLib'
 
-#pod 'Ads-CN-Beta','6.7.0.3', :subspecs => ['BUAdSDK', 'CSJMediation']
+pod 'Ads-CN-Beta','6.7.0.3', :subspecs => ['BUAdSDK', 'CSJMediation']
 
 end
