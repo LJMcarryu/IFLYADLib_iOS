@@ -10,7 +10,7 @@ Pod::Spec.new do |spec|
   spec.homepage     = "https://github.com/LJMcarryu/IFLYADLib_iOS"
   spec.license = { :type => "MIT", :file => "LICENSE" }
   spec.author             = { "jmliu6" => "jmliu6@iflytek.com" }
-  spec.platform     = :ios, "12.0"
+  spec.platform     = :ios, "13.0"
   spec.source       = { :git => "https://github.com/LJMcarryu/IFLYADLib_iOS.git", :tag => "#{spec.version}" }
 
   spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
