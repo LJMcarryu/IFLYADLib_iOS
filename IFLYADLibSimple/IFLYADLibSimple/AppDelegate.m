@@ -8,9 +8,12 @@
 #import "AppDelegate.h"
 #import "ViewController.h"
 
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <IFLYADLib/IFLYADLib.h>
 
 @interface AppDelegate ()
+
+@property (nonatomic, assign) BOOL didRequestTrackingAuthorization;
 
 @end
 
@@ -30,6 +33,30 @@
     [IFLYAdConfig setLogEnabled:YES];
 
     return YES;
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    [self requestTrackingAuthorizationIfNeeded];
+}
+
+- (void)requestTrackingAuthorizationIfNeeded {
+    if (@available(iOS 14, *)) {
+        if (self.didRequestTrackingAuthorization) {
+            return;
+        }
+
+        ATTrackingManagerAuthorizationStatus currentStatus = ATTrackingManager.trackingAuthorizationStatus;
+        if (currentStatus != ATTrackingManagerAuthorizationStatusNotDetermined) {
+            self.didRequestTrackingAuthorization = YES;
+            IFLYSampleLogInfo(@"ATT", @"trackingAuthorizationStatus=%ld", (long)currentStatus);
+            return;
+        }
+
+        self.didRequestTrackingAuthorization = YES;
+        [ATTrackingManager requestTrackingAuthorizationWithCompletionHandler:^(ATTrackingManagerAuthorizationStatus status) {
+            IFLYSampleLogInfo(@"ATT", @"trackingAuthorizationStatus=%ld", (long)status);
+        }];
+    }
 }
 
 @end
