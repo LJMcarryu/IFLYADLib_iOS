@@ -8,149 +8,148 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import <IFLYADLib/IFLYAdBase.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class IFLYAdData;
 @class IFLYAdError;
+@class IFLYSplashAd;
 
+/// 开屏展示配置。用于在 show 阶段一次性传入窗口、倒计时、底部视图、交互与静音配置。
+/// @discussion 展示期参数只通过 showAdFromRootViewController:config: 传入，避免与加载参数混在一起。
+@interface IFLYSplashAdConfig : IFLYAdShowConfig
+
+/// 媒体自定义展示 Window。非空时开屏本体 addSubview 到该 window；为空时使用 rootVC 所在 window。
+@property (nonatomic, weak, nullable) UIWindow *customWindow;
+/// 广告倒计时时长，单位秒。有效值为 3~5；默认 5，传 0 或越界值时展示层回退为 5。
+@property (nonatomic, assign) NSInteger traceDuration;
+/// 媒体自定义底部视图，例如 App Logo 区域。视图高度由媒体侧控制。
+@property (nonatomic, strong, nullable) UIView *mediumBottomView;
+/// 摇一摇/扭一扭交互方式开关。默认 NO=摇一摇；YES=降级为扭一扭，并非禁用交互。
+@property (nonatomic, assign) BOOL headingInteractionEnabled;
+/// 是否显示"免除广告"按钮。默认 NO。
+@property (nonatomic, assign) BOOL showNoAds;
+@end
+
+/// 开屏广告代理协议。所有回调方法均为 @optional，且统一在主线程触发。
 @protocol IFLYSplashAdDelegate <NSObject>
 
-/**
- *  开屏广告加载广告数据成功回调
- *
- *  @param adData IFLYAdData对象
- */
-- (void)onSplashAdReceived:(IFLYAdData *)adData;
-
-/**
- *  开屏广告错误回调
- *
- *  @param error 错误码，详见接入手册
- */
-- (void)onSplashAdFailed:(IFLYAdError *)error;
+@optional
+/// 广告响应解析成功，主素材尚未下载完成；此时可读取 adData / bidInfo 做竞价决策。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidLoad:(IFLYSplashAd *)ad;
+/// 主素材下载校验完成，此时 isAdValid 可返回 YES，可调用 showAdFromRootViewController:。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidReady:(IFLYSplashAd *)ad;
+/// 开屏已展示到宿主 window。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidShow:(IFLYSplashAd *)ad;
+/// 开屏达到有效曝光并完成曝光监测上报。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidExpose:(IFLYSplashAd *)ad;
+/// 用户点击广告。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidClick:(IFLYSplashAd *)ad;
+/// 广告点击跳转完成。
+/// @param ad      触发回调的开屏广告实例
+/// @param success YES 表示跳转成功，NO 表示跳转失败
+- (void)splashAd:(IFLYSplashAd *)ad didJumpWithSuccess:(BOOL)success;
+/// 用户关闭内嵌落地页。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidDismissLandingPage:(IFLYSplashAd *)ad;
+/// 用户关闭应用内 App Store 页面。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidDismissStore:(IFLYSplashAd *)ad;
+/// DeepLink 外跳或 App 进入后台。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidLeaveApplication:(IFLYSplashAd *)ad;
+/// 视频开始播放（仅视频开屏）。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidStartPlay:(IFLYSplashAd *)ad;
+/// 视频暂停播放（仅视频开屏）。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidPausePlay:(IFLYSplashAd *)ad;
+/// 视频恢复播放（仅视频开屏）。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidResumePlay:(IFLYSplashAd *)ad;
+/// 视频播放完成（仅视频开屏）。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidPlayFinish:(IFLYSplashAd *)ad;
+/// 视频播放失败（仅视频开屏）。
+/// @param ad    触发回调的开屏广告实例
+/// @param error 播放失败错误
+/// @note 这是视频播放失败的细分回调；同一失败还会进入 didFailWithError: 统一失败出口。
+- (void)splashAd:(IFLYSplashAd *)ad didFailToPlayWithError:(IFLYAdError *)error;
+/// 倒计时自然结束，广告关闭。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidClose:(IFLYSplashAd *)ad;
+/// 用户点击跳过按钮，广告关闭。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidSkip:(IFLYSplashAd *)ad;
+/// 用户点击"免除广告"按钮。SDK 内部不执行关闭或跳转。
+/// @param ad 触发回调的开屏广告实例
+- (void)splashAdDidTapNoAds:(IFLYSplashAd *)ad;
+/// 广告加载或展示失败。
+/// @param ad    触发回调的开屏广告实例
+/// @param error 失败错误
+- (void)splashAd:(IFLYSplashAd *)ad didFailWithError:(IFLYAdError *)error;
 
 @end
 
-@interface IFLYSplashAd : NSObject
+/// 开屏广告
+/// @discussion 开屏广告为全屏展示的广告形式，支持图片和视频素材，通常在 App 启动时展示。
+///             典型接入流程：initWithAdUnitId: → 设置 delegate → loadAd → splashAdDidReady: →
+///             showAdFromRootViewController:
+@interface IFLYSplashAd : IFLYAdBase
 
-/**
- *  委托对象
- */
-@property (nonatomic, weak) id<IFLYSplashAdDelegate> delegate;
+/// 委托对象，用于接收广告加载结果回调
+/// @note 回调均在主线程触发，delegate 为弱引用
+@property (nonatomic, weak, nullable) id<IFLYSplashAdDelegate> delegate;
+/// 当前加载的广告数据。splashAdDidLoad: 后可读，未加载或已销毁时为 nil。
+@property (nonatomic, strong, readonly, nullable) IFLYAdData *adData;
+/// 是否为视频素材。splashAdDidLoad: 后可读。
+@property (nonatomic, assign, readonly) BOOL hasVideoTemplate;
+/// 是否横版模板。splashAdDidLoad: 后可读，取决于服务端 @c rendering.screen_orientation == 1。
+/// @discussion 该字段只透出服务端模板方向，不改变开屏本体的全屏承载方式、宿主方向或布局策略。
+@property (nonatomic, assign, readonly) BOOL isLandscapeTemplate;
 
-/**
- *  构造方法
- *  详解：adUnitId是广告位id
- */
-- (instancetype)initWithAdUnitId:(NSString *)adUnitId;
-
-/**
- *  设置广告配置参数
- */
-- (void)setParamValue:(NSObject *)value forKey:(NSString *)key;
-
-
-/**
- *  设置媒体自定义展示 Window
- */
-@property (nonatomic, strong) UIWindow *customWindow;
-
-/**
- *  设置广告倒计时 默认5秒
- */
-@property (nonatomic, assign) NSInteger traceDuration;
-
-/**
- *  设置媒体自定义底部图片
- */
-@property (nonatomic, strong) UIView *mediumBottomView;
-
-/**
- *  设置是否禁止摇一摇功能
- */
-@property (nonatomic, assign) BOOL disableShaking;
-
-/**
- *  媒体定制：设置免除广告
- */
-@property (nonatomic, assign) BOOL showNoAds;
-
-/**
- *  广告发起请求方法
- *  详解：[必选]发起拉取广告请求,在获得广告数据后回调delegate
- */
+/// 发起广告请求
+/// @discussion [必选] 发起拉取广告请求，广告数据返回后通过 delegate 回调通知。
+///             调用前需确保已设置 delegate
+/// @note 成功时依次回调 splashAdDidLoad: → splashAdDidReady:；失败时回调 splashAd:didFailWithError:
 - (void)loadAd;
 
-/**
- * 广告展示，内部自动曝光广告
- */
+/// 使用 S2S 服务端竞价响应 token 发起广告加载。
+/// @param rspToken 媒体服务端竞价胜出后返回给客户端的响应 token。
+/// @note 空 token 会回调 @c IFLYAdErrorCodeS2STokenEmpty；重复使用、加载中或已消耗 token 会回调
+///       @c IFLYAdErrorCodeS2STokenInvalid。成功加载后的 @c ecpm 固定返回 0.0。
+- (void)loadAdWithServerBiddingToken:(NSString *)rspToken;
 
-- (void)showAd;
+/// 展示开屏广告
+/// @param vc 用于确认宿主窗口并承载落地页的根视图控制器，须已加入 window。
+/// @discussion 须在 splashAdDidReady: 回调后调用。开屏本体以 addSubview 覆盖在 vc.view.window 上。
+/// @note 展示结果通过 splashAdDidShow: / splashAd:didFailWithError: 回调通知。
+- (void)showAdFromRootViewController:(UIViewController *)vc;
 
-/**
- *  广告竞价胜出通知
- *  详解：[必选]
- *  TYPE=100，即获胜竞得
- *  TYPE=101，原因是出价低即未获胜
- *  TYPE=102，即未获胜原因是素材未审核
- *  TYPE=103，即未获胜原因是素材审核拒绝
- *  TYPE=104，即未获胜原因是竞价优先级低(如PDB>PD>RTB)
- *  TYPE=105，竞价响应错误
- *  TYPE=106，竞价响应超时
- *
- *  reason支持媒体侧自定义替换，上报的内容需要进行urlencode 当TYPE=103时尽量填写具体拒绝原因
- */
-- (void)sendWinNoticeWithType:(NSNumber *)type reason:(NSString *)reason;
+/// 携带展示配置展示开屏广告。
+/// @param vc     用于确认宿主窗口并承载落地页的根视图控制器，须已加入 window。
+/// @param config 展示配置；传 nil 时使用默认配置。
+/// @discussion 须在 splashAdDidReady: 回调后调用。
+- (void)showAdFromRootViewController:(UIViewController *)vc config:(nullable IFLYSplashAdConfig *)config;
 
-/**
- *  媒体定制：获取广告请求成功后特定的物料信息
- */
-- (NSDictionary *)getAdCallbackDic;
+/// 销毁广告，释放资源并使在途请求/下载回调失效
+/// @discussion 调用后会取消在途的广告请求与视频下载、断开呈现层回交，使在途回调因 token 失配被丢弃。
+///             销毁后再次调用 loadAd 不会发起新请求。建议在不再使用该广告实例时调用。
+/// @note 幂等，重复调用无副作用
+- (void)destroy;
 
-/**
- * 广告展示成功
- * 与 didShowFailedBlock 互斥
- */
-@property (nonatomic, copy) void (^ didShowBlock)(void);
-/**
- * 广告展示失败
- * 与 didShowBlock 互斥
- */
-@property (nonatomic, copy) void (^ didShowFailedBlock)(void);
-/**
- * 广告结束的回调，仅倒计时正常结束会调用（skip、jump不会调用）
- * 与 didSkipBlock、didJumpBlock 互斥
- */
-@property (nonatomic, copy) void (^ didCloseBlock)(void);
-/**
- * 广告跳过的回调，也代表着广告结束
- * 与 didCloseBlock、didJumpBlock 互斥
- */
-@property (nonatomic, copy) void (^ didSkipBlock)(void);
-/**
- * 广告点击跳转完成回调，也代表着广告结束
- * 与 didCloseBlock、didSkipBlock 互斥
- */
-@property (nonatomic, copy) void (^ didJumpBlock)(BOOL success);
-/**
- * 广告退出落地页的回调（jump之后的回调）
- * 与 dismissStoreBlock 互斥
- */
-@property (nonatomic, copy) void (^ dismissBlock)(void);
-/**
- * 广告退出应用商店的回调（jump之后的回调）
- * 与 dismissBlock 互斥
- */
-@property (nonatomic, copy) void (^ dismissStoreBlock)(void);
-/**
- * deeplink跳转、进入后台离开app回调（不影响其他回调）
- */
-@property (nonatomic, copy) void (^ didLeaveApp)(void);
-/**
- * 广告免除的回调（媒体定制按钮，点击之后未做任何操作，不影响其他回调）
- */
-@property (nonatomic, copy) void (^ didNoAdsBlock)(void);
+/// 广告当前是否可展示。
+/// @return 已加载且素材就绪、未展示/未销毁、未过期且素材有效时返回 YES。
+- (BOOL)isAdValid;
+
+/// 返回当前广告价格，单位：元。未加载或无价格时返回 -1.0。
+- (double)ecpm;
 
 @end
 
