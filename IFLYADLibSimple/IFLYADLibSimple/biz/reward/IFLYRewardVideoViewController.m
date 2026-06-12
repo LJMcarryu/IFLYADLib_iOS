@@ -1,30 +1,29 @@
-#import "IFLYSplashViewController.h"
+#import "IFLYRewardVideoViewController.h"
 
 #import "IFLYADUtil.h"
 #import <IFLYADLib/IFLYADLib.h>
 
-@interface IFLYSplashViewController () <IFLYSplashAdDelegate>
+@interface IFLYRewardVideoViewController () <IFLYRewardVideoAdDelegate>
 
-@property (nonatomic, strong) IFLYSplashAd *splashAd;
-@property (nonatomic, strong) UISegmentedControl *slotControl;
+@property (nonatomic, strong) IFLYRewardVideoAd *rewardAd;
 @property (nonatomic, strong) UIButton *showButton;
 @property (nonatomic, strong) UILabel *statusLabel;
 @property (nonatomic, strong) UITextView *logView;
 
 @end
 
-@implementation IFLYSplashViewController
+@implementation IFLYRewardVideoViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"开屏广告";
+    self.title = @"激励视频广告";
     self.view.backgroundColor = UIColor.whiteColor;
     [self setupUI];
-    [self log:@"开屏示例：Load -> Ready -> Show"];
+    [self log:@"激励视频示例：Load -> Ready -> Show -> Reward/Close"];
 }
 
 - (void)dealloc {
-    [self.splashAd destroy];
+    [self.rewardAd destroy];
 }
 
 - (void)setupUI {
@@ -33,16 +32,10 @@
     CGFloat contentWidth = width - margin * 2;
     CGFloat y = 110;
 
-    UILabel *desc = [IFLYADUtil createSectionTitleWithText:@"开屏广告通常在启动页后展示。示例中手动点击 Show，便于观察完整生命周期。"
-                                                     frame:CGRectMake(margin, y, contentWidth, 40)];
+    UILabel *desc = [IFLYADUtil createSectionTitleWithText:@"激励视频须等待 rewardVideoAdDidReady: 后展示。发奖以 didRewardEffective 回调为准。"
+                                                     frame:CGRectMake(margin, y, contentWidth, 42)];
     [self.view addSubview:desc];
-    y += 50;
-
-    self.slotControl = [[UISegmentedControl alloc] initWithItems:@[@"图片开屏", @"视频开屏"]];
-    self.slotControl.frame = CGRectMake(margin, y, contentWidth, 32);
-    self.slotControl.selectedSegmentIndex = 0;
-    [self.view addSubview:self.slotControl];
-    y += 48;
+    y += 54;
 
     CGFloat buttonWidth = (contentWidth - 8) / 2.0;
     UIButton *loadButton = [IFLYADUtil createADTypeButtonWithFrame:CGRectMake(margin, y, buttonWidth, 44)
@@ -94,46 +87,30 @@
 - (void)loadAd {
     [self destroyAdSilently];
     [self setShowButtonEnabled:NO];
+    [self updateStatus:@"正在加载激励视频" color:UIColor.systemBlueColor];
+    [self log:[NSString stringWithFormat:@"Load adUnitId=%@", __REWARD_VIDEO_AD_UNIT_ID__]];
 
-    NSString *adUnitId = self.slotControl.selectedSegmentIndex == 1 ? __SPLASH_VIDEO_AD_UNIT_ID__ : __SPLASH_NATIVE_AD_UNIT_ID__;
-    [self updateStatus:@"正在加载开屏" color:UIColor.systemBlueColor];
-    [self log:[NSString stringWithFormat:@"Load adUnitId=%@", adUnitId]];
-
-    IFLYSplashAd *ad = [[IFLYSplashAd alloc] initWithAdUnitId:adUnitId];
+    IFLYRewardVideoAd *ad = [[IFLYRewardVideoAd alloc] initWithAdUnitId:__REWARD_VIDEO_AD_UNIT_ID__];
     ad.delegate = self;
     ad.currentViewController = self;
-    self.splashAd = ad;
+    self.rewardAd = ad;
     [ad loadAdWithRequestConfig:[IFLYADUtil mediaSampleRequestConfig]];
 }
 
 - (void)showAd {
-    if (!self.splashAd || ![self.splashAd isAdValid]) {
-        [self log:@"Show ignored: 开屏尚未 ready 或已失效"];
+    if (!self.rewardAd || ![self.rewardAd isAdValid]) {
+        [self log:@"Show ignored: 激励视频尚未 ready 或已失效"];
         [self updateStatus:@"请先等待 ready 回调" color:UIColor.systemRedColor];
         [self setShowButtonEnabled:NO];
         return;
     }
 
-    IFLYSplashAdConfig *config = [[IFLYSplashAdConfig alloc] init];
-    config.traceDuration = 5;
-    config.mediumBottomView = [self bottomLogoView];
+    IFLYRewardVideoAdConfig *config = [[IFLYRewardVideoAdConfig alloc] init];
     config.muteOnStart = YES;
     config.muteButtonHidden = NO;
     [self log:@"调用 showAdFromRootViewController:config:"];
     [self setShowButtonEnabled:NO];
-    [self.splashAd showAdFromRootViewController:self config:config];
-}
-
-- (UIView *)bottomLogoView {
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, UIScreen.mainScreen.bounds.size.width, 90)];
-    view.backgroundColor = UIColor.whiteColor;
-    UILabel *label = [[UILabel alloc] initWithFrame:view.bounds];
-    label.text = @"媒体 App Logo / 品牌区";
-    label.textAlignment = NSTextAlignmentCenter;
-    label.textColor = UIColor.darkTextColor;
-    label.font = [UIFont systemFontOfSize:17 weight:UIFontWeightMedium];
-    [view addSubview:label];
-    return view;
+    [self.rewardAd showAdFromRootViewController:self config:config];
 }
 
 - (void)destroyAd {
@@ -144,17 +121,17 @@
 
 - (void)checkStatus {
     [self log:[NSString stringWithFormat:@"状态 isAdValid=%@ ecpm=%.2f",
-                                      (self.splashAd && [self.splashAd isAdValid]) ? @"YES" : @"NO",
-                                      self.splashAd ? [self.splashAd ecpm] : -1.0]];
+                                      (self.rewardAd && [self.rewardAd isAdValid]) ? @"YES" : @"NO",
+                                      self.rewardAd ? [self.rewardAd ecpm] : -1.0]];
 }
 
 - (void)destroyAdSilently {
-    if (!self.splashAd) {
+    if (!self.rewardAd) {
         return;
     }
-    self.splashAd.delegate = nil;
-    [self.splashAd destroy];
-    self.splashAd = nil;
+    self.rewardAd.delegate = nil;
+    [self.rewardAd destroy];
+    self.rewardAd = nil;
     [self setShowButtonEnabled:NO];
 }
 
@@ -170,54 +147,71 @@
 
 - (void)log:(NSString *)text {
     [IFLYADUtil appendLog:text toTextView:self.logView];
-    IFLYSampleLogInfo(@"Splash", @"%@", text);
+    IFLYSampleLogInfo(@"Reward", @"%@", text);
 }
 
-#pragma mark - IFLYSplashAdDelegate
+#pragma mark - IFLYRewardVideoAdDelegate
 
-- (void)splashAdDidLoad:(IFLYSplashAd *)ad {
-    [self log:[NSString stringWithFormat:@"splashAdDidLoad video=%@ landscape=%@ ecpm=%.2f",
+- (void)rewardVideoAdDidLoad:(IFLYRewardVideoAd *)ad {
+    [self log:[NSString stringWithFormat:@"rewardVideoAdDidLoad video=%@ landscape=%@ ecpm=%.2f",
                                       ad.hasVideoTemplate ? @"YES" : @"NO",
                                       ad.isLandscapeTemplate ? @"YES" : @"NO",
                                       [ad ecpm]]];
     [self updateStatus:@"已加载，等待素材 ready" color:UIColor.systemIndigoColor];
 }
 
-- (void)splashAdDidReady:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidReady"];
-    [self updateStatus:@"开屏已 ready，可展示" color:UIColor.systemGreenColor];
-    [self setShowButtonEnabled:ad == self.splashAd && [ad isAdValid]];
+- (void)rewardVideoAdDidReady:(IFLYRewardVideoAd *)ad {
+    [self log:@"rewardVideoAdDidReady"];
+    [self updateStatus:@"激励视频已 ready，可展示" color:UIColor.systemGreenColor];
+    [self setShowButtonEnabled:ad == self.rewardAd && [ad isAdValid]];
 }
 
-- (void)splashAdDidShow:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidShow"];
+- (void)rewardVideoAdDidShow:(IFLYRewardVideoAd *)ad {
+    [self log:@"rewardVideoAdDidShow"];
 }
 
-- (void)splashAdDidExpose:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidExpose"];
+- (void)rewardVideoAdDidExpose:(IFLYRewardVideoAd *)ad {
+    [self log:@"rewardVideoAdDidExpose"];
 }
 
-- (void)splashAdDidClick:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidClick"];
+- (void)rewardVideoAdDidClick:(IFLYRewardVideoAd *)ad {
+    [self log:@"rewardVideoAdDidClick"];
 }
 
-- (void)splashAdDidClose:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidClose"];
-    [self updateStatus:@"开屏已关闭" color:UIColor.systemTealColor];
+- (void)rewardVideoAdDidStartPlay:(IFLYRewardVideoAd *)ad {
+    [self log:@"rewardVideoAdDidStartPlay"];
 }
 
-- (void)splashAdDidSkip:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidSkip"];
+- (void)rewardVideoAdDidPlayFinish:(IFLYRewardVideoAd *)ad {
+    [self log:@"rewardVideoAdDidPlayFinish"];
 }
 
-- (void)splashAd:(IFLYSplashAd *)ad didFailWithError:(IFLYAdError *)error {
-    [self log:[NSString stringWithFormat:@"splashAd didFailWithError %@", [IFLYADUtil summaryForError:error]]];
-    [self updateStatus:@"开屏加载或展示失败" color:UIColor.systemRedColor];
+- (void)rewardVideoAd:(IFLYRewardVideoAd *)ad didRewardEffective:(NSDictionary *)info {
+    [self log:[NSString stringWithFormat:@"rewardVideoAd didRewardEffective info=%@", info ?: @{}]];
+    [self updateStatus:@"激励已生效，媒体侧可在此发放奖励" color:UIColor.systemGreenColor];
+}
+
+- (void)rewardVideoAdDidClose:(IFLYRewardVideoAd *)ad {
+    [self log:@"rewardVideoAdDidClose"];
+    [self updateStatus:@"激励视频已关闭" color:UIColor.systemTealColor];
+}
+
+- (void)rewardVideoAd:(IFLYRewardVideoAd *)ad didFailWithError:(IFLYAdError *)error {
+    [self log:[NSString stringWithFormat:@"rewardVideoAd didFailWithError %@", [IFLYADUtil summaryForError:error]]];
+    [self updateStatus:@"激励视频加载或展示失败" color:UIColor.systemRedColor];
     [self setShowButtonEnabled:NO];
 }
 
-- (void)splashAd:(IFLYSplashAd *)ad didJumpWithSuccess:(BOOL)success {
-    [self log:[NSString stringWithFormat:@"splashAd didJumpWithSuccess=%@", success ? @"YES" : @"NO"]];
+- (void)rewardVideoAd:(IFLYRewardVideoAd *)ad didFailToRenderWithError:(IFLYAdError *)error {
+    [self log:[NSString stringWithFormat:@"rewardVideoAd didFailToRender %@", [IFLYADUtil summaryForError:error]]];
+}
+
+- (void)rewardVideoAd:(IFLYRewardVideoAd *)ad didFailToPlayWithError:(IFLYAdError *)error {
+    [self log:[NSString stringWithFormat:@"rewardVideoAd didFailToPlay %@", [IFLYADUtil summaryForError:error]]];
+}
+
+- (void)rewardVideoAd:(IFLYRewardVideoAd *)ad didJumpWithSuccess:(BOOL)success {
+    [self log:[NSString stringWithFormat:@"rewardVideoAd didJumpWithSuccess=%@", success ? @"YES" : @"NO"]];
 }
 
 @end

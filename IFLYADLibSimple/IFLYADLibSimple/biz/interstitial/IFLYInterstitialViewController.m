@@ -1,30 +1,30 @@
-#import "IFLYSplashViewController.h"
+#import "IFLYInterstitialViewController.h"
 
 #import "IFLYADUtil.h"
 #import <IFLYADLib/IFLYADLib.h>
 
-@interface IFLYSplashViewController () <IFLYSplashAdDelegate>
+@interface IFLYInterstitialViewController () <IFLYInterstitialAdDelegate>
 
-@property (nonatomic, strong) IFLYSplashAd *splashAd;
-@property (nonatomic, strong) UISegmentedControl *slotControl;
+@property (nonatomic, strong) IFLYInterstitialAd *interstitialAd;
+@property (nonatomic, strong) UISegmentedControl *styleControl;
 @property (nonatomic, strong) UIButton *showButton;
 @property (nonatomic, strong) UILabel *statusLabel;
 @property (nonatomic, strong) UITextView *logView;
 
 @end
 
-@implementation IFLYSplashViewController
+@implementation IFLYInterstitialViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"开屏广告";
+    self.title = @"插屏广告";
     self.view.backgroundColor = UIColor.whiteColor;
     [self setupUI];
-    [self log:@"开屏示例：Load -> Ready -> Show"];
+    [self log:@"插屏示例：Load -> Ready -> Show -> Close"];
 }
 
 - (void)dealloc {
-    [self.splashAd destroy];
+    [self.interstitialAd destroy];
 }
 
 - (void)setupUI {
@@ -33,15 +33,15 @@
     CGFloat contentWidth = width - margin * 2;
     CGFloat y = 110;
 
-    UILabel *desc = [IFLYADUtil createSectionTitleWithText:@"开屏广告通常在启动页后展示。示例中手动点击 Show，便于观察完整生命周期。"
-                                                     frame:CGRectMake(margin, y, contentWidth, 40)];
+    UILabel *desc = [IFLYADUtil createSectionTitleWithText:@"插屏由 SDK 负责渲染和 present。媒体侧在 didReady 后传入展示配置并调用 show。"
+                                                     frame:CGRectMake(margin, y, contentWidth, 38)];
     [self.view addSubview:desc];
-    y += 50;
+    y += 48;
 
-    self.slotControl = [[UISegmentedControl alloc] initWithItems:@[@"图片开屏", @"视频开屏"]];
-    self.slotControl.frame = CGRectMake(margin, y, contentWidth, 32);
-    self.slotControl.selectedSegmentIndex = 0;
-    [self.view addSubview:self.slotControl];
+    self.styleControl = [[UISegmentedControl alloc] initWithItems:@[@"半屏", @"全屏"]];
+    self.styleControl.frame = CGRectMake(margin, y, contentWidth, 32);
+    self.styleControl.selectedSegmentIndex = 0;
+    [self.view addSubview:self.styleControl];
     y += 48;
 
     CGFloat buttonWidth = (contentWidth - 8) / 2.0;
@@ -86,7 +86,7 @@
     [self.view addSubview:logTitle];
     y += 22;
 
-    CGFloat logHeight = MAX(300, self.view.bounds.size.height - y - 24);
+    CGFloat logHeight = MAX(260, self.view.bounds.size.height - y - 24);
     self.logView = [IFLYADUtil createLogTextViewWithFrame:CGRectMake(margin, y, contentWidth, logHeight)];
     [self.view addSubview:self.logView];
 }
@@ -94,46 +94,33 @@
 - (void)loadAd {
     [self destroyAdSilently];
     [self setShowButtonEnabled:NO];
+    [self updateStatus:@"正在加载插屏" color:UIColor.systemBlueColor];
+    [self log:[NSString stringWithFormat:@"Load adUnitId=%@", __INTERSTITIAL_AD_UNIT_ID__]];
 
-    NSString *adUnitId = self.slotControl.selectedSegmentIndex == 1 ? __SPLASH_VIDEO_AD_UNIT_ID__ : __SPLASH_NATIVE_AD_UNIT_ID__;
-    [self updateStatus:@"正在加载开屏" color:UIColor.systemBlueColor];
-    [self log:[NSString stringWithFormat:@"Load adUnitId=%@", adUnitId]];
-
-    IFLYSplashAd *ad = [[IFLYSplashAd alloc] initWithAdUnitId:adUnitId];
+    IFLYInterstitialAd *ad = [[IFLYInterstitialAd alloc] initWithAdUnitId:__INTERSTITIAL_AD_UNIT_ID__];
     ad.delegate = self;
     ad.currentViewController = self;
-    self.splashAd = ad;
+    self.interstitialAd = ad;
     [ad loadAdWithRequestConfig:[IFLYADUtil mediaSampleRequestConfig]];
 }
 
 - (void)showAd {
-    if (!self.splashAd || ![self.splashAd isAdValid]) {
-        [self log:@"Show ignored: 开屏尚未 ready 或已失效"];
+    if (!self.interstitialAd || ![self.interstitialAd isAdValid]) {
+        [self log:@"Show ignored: 插屏尚未 ready 或已失效"];
         [self updateStatus:@"请先等待 ready 回调" color:UIColor.systemRedColor];
         [self setShowButtonEnabled:NO];
         return;
     }
 
-    IFLYSplashAdConfig *config = [[IFLYSplashAdConfig alloc] init];
-    config.traceDuration = 5;
-    config.mediumBottomView = [self bottomLogoView];
+    IFLYInterstitialAdConfig *config = [[IFLYInterstitialAdConfig alloc] init];
+    config.presentationStyle = self.styleControl.selectedSegmentIndex == 1
+                                   ? IFLYInterstitialPresentationStyleFullScreen
+                                   : IFLYInterstitialPresentationStyleHalfScreen;
     config.muteOnStart = YES;
     config.muteButtonHidden = NO;
-    [self log:@"调用 showAdFromRootViewController:config:"];
+    [self log:[NSString stringWithFormat:@"调用 show，style=%@", self.styleControl.selectedSegmentIndex == 1 ? @"全屏" : @"半屏"]];
     [self setShowButtonEnabled:NO];
-    [self.splashAd showAdFromRootViewController:self config:config];
-}
-
-- (UIView *)bottomLogoView {
-    UIView *view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, UIScreen.mainScreen.bounds.size.width, 90)];
-    view.backgroundColor = UIColor.whiteColor;
-    UILabel *label = [[UILabel alloc] initWithFrame:view.bounds];
-    label.text = @"媒体 App Logo / 品牌区";
-    label.textAlignment = NSTextAlignmentCenter;
-    label.textColor = UIColor.darkTextColor;
-    label.font = [UIFont systemFontOfSize:17 weight:UIFontWeightMedium];
-    [view addSubview:label];
-    return view;
+    [self.interstitialAd showAdFromRootViewController:self config:config];
 }
 
 - (void)destroyAd {
@@ -144,17 +131,17 @@
 
 - (void)checkStatus {
     [self log:[NSString stringWithFormat:@"状态 isAdValid=%@ ecpm=%.2f",
-                                      (self.splashAd && [self.splashAd isAdValid]) ? @"YES" : @"NO",
-                                      self.splashAd ? [self.splashAd ecpm] : -1.0]];
+                                      (self.interstitialAd && [self.interstitialAd isAdValid]) ? @"YES" : @"NO",
+                                      self.interstitialAd ? [self.interstitialAd ecpm] : -1.0]];
 }
 
 - (void)destroyAdSilently {
-    if (!self.splashAd) {
+    if (!self.interstitialAd) {
         return;
     }
-    self.splashAd.delegate = nil;
-    [self.splashAd destroy];
-    self.splashAd = nil;
+    self.interstitialAd.delegate = nil;
+    [self.interstitialAd destroy];
+    self.interstitialAd = nil;
     [self setShowButtonEnabled:NO];
 }
 
@@ -170,54 +157,59 @@
 
 - (void)log:(NSString *)text {
     [IFLYADUtil appendLog:text toTextView:self.logView];
-    IFLYSampleLogInfo(@"Splash", @"%@", text);
+    IFLYSampleLogInfo(@"Interstitial", @"%@", text);
 }
 
-#pragma mark - IFLYSplashAdDelegate
+#pragma mark - IFLYInterstitialAdDelegate
 
-- (void)splashAdDidLoad:(IFLYSplashAd *)ad {
-    [self log:[NSString stringWithFormat:@"splashAdDidLoad video=%@ landscape=%@ ecpm=%.2f",
+- (void)interstitialAdDidLoad:(IFLYInterstitialAd *)ad {
+    [self log:[NSString stringWithFormat:@"interstitialAdDidLoad video=%@ landscape=%@ ecpm=%.2f",
                                       ad.hasVideoTemplate ? @"YES" : @"NO",
                                       ad.isLandscapeTemplate ? @"YES" : @"NO",
                                       [ad ecpm]]];
     [self updateStatus:@"已加载，等待素材 ready" color:UIColor.systemIndigoColor];
 }
 
-- (void)splashAdDidReady:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidReady"];
-    [self updateStatus:@"开屏已 ready，可展示" color:UIColor.systemGreenColor];
-    [self setShowButtonEnabled:ad == self.splashAd && [ad isAdValid]];
+- (void)interstitialAdDidReady:(IFLYInterstitialAd *)ad {
+    [self log:@"interstitialAdDidReady"];
+    [self updateStatus:@"插屏已 ready，可展示" color:UIColor.systemGreenColor];
+    [self setShowButtonEnabled:ad == self.interstitialAd && [ad isAdValid]];
 }
 
-- (void)splashAdDidShow:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidShow"];
+- (void)interstitialAdDidShow:(IFLYInterstitialAd *)ad {
+    [self log:@"interstitialAdDidShow"];
 }
 
-- (void)splashAdDidExpose:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidExpose"];
+- (void)interstitialAdDidRender:(IFLYInterstitialAd *)ad {
+    [self log:@"interstitialAdDidRender"];
 }
 
-- (void)splashAdDidClick:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidClick"];
+- (void)interstitialAdDidExpose:(IFLYInterstitialAd *)ad {
+    [self log:@"interstitialAdDidExpose"];
+    [self updateStatus:@"插屏已曝光" color:UIColor.systemGreenColor];
 }
 
-- (void)splashAdDidClose:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidClose"];
-    [self updateStatus:@"开屏已关闭" color:UIColor.systemTealColor];
+- (void)interstitialAdDidClick:(IFLYInterstitialAd *)ad {
+    [self log:@"interstitialAdDidClick"];
 }
 
-- (void)splashAdDidSkip:(IFLYSplashAd *)ad {
-    [self log:@"splashAdDidSkip"];
+- (void)interstitialAdDidClose:(IFLYInterstitialAd *)ad {
+    [self log:@"interstitialAdDidClose"];
+    [self updateStatus:@"插屏已关闭" color:UIColor.systemTealColor];
 }
 
-- (void)splashAd:(IFLYSplashAd *)ad didFailWithError:(IFLYAdError *)error {
-    [self log:[NSString stringWithFormat:@"splashAd didFailWithError %@", [IFLYADUtil summaryForError:error]]];
-    [self updateStatus:@"开屏加载或展示失败" color:UIColor.systemRedColor];
+- (void)interstitialAd:(IFLYInterstitialAd *)ad didFailWithError:(IFLYAdError *)error {
+    [self log:[NSString stringWithFormat:@"interstitialAd didFailWithError %@", [IFLYADUtil summaryForError:error]]];
+    [self updateStatus:@"插屏加载或展示失败" color:UIColor.systemRedColor];
     [self setShowButtonEnabled:NO];
 }
 
-- (void)splashAd:(IFLYSplashAd *)ad didJumpWithSuccess:(BOOL)success {
-    [self log:[NSString stringWithFormat:@"splashAd didJumpWithSuccess=%@", success ? @"YES" : @"NO"]];
+- (void)interstitialAd:(IFLYInterstitialAd *)ad didFailToRenderWithError:(IFLYAdError *)error {
+    [self log:[NSString stringWithFormat:@"interstitialAd didFailToRender %@", [IFLYADUtil summaryForError:error]]];
+}
+
+- (void)interstitialAd:(IFLYInterstitialAd *)ad didJumpWithSuccess:(BOOL)success {
+    [self log:[NSString stringWithFormat:@"interstitialAd didJumpWithSuccess=%@", success ? @"YES" : @"NO"]];
 }
 
 @end

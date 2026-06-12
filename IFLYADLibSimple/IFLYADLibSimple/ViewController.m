@@ -5,12 +5,15 @@
 //  Created by admin on 3.3.25.
 //
 
+#import "IFLYBannerViewController.h"
+#import "IFLYInterstitialViewController.h"
 #import "IFLYNativeViewController.h"
+#import "IFLYRewardVideoViewController.h"
 #import "IFLYSplashViewController.h"
-#import "IFLYVideoViewController.h"
 #import "ViewController.h"
 
 #import "IFLYADUtil.h"
+#import <IFLYADLib/IFLYADLib.h>
 
 @interface ViewController ()
 
@@ -20,22 +23,54 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.title = @"讯飞广告 SDK 示例";
     self.view.backgroundColor = UIColor.whiteColor;
     [self initADTypeListView];
 }
 
 - (void)initADTypeListView {
-    UIButton *splashButton = [IFLYADUtil createADTypeButtonWithFrame:CGRectMake(40, 200, self.view.frame.size.width - 80, 50) title:@"开屏广告" target:self action:@selector(splashADTypeClick:)];
+    UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:scrollView];
 
-    [self.view addSubview:splashButton];
+    CGFloat width = self.view.bounds.size.width;
+    CGFloat margin = 24;
+    CGFloat contentWidth = width - margin * 2;
+    CGFloat y = 24;
 
-    UIButton *nativeButton = [IFLYADUtil createADTypeButtonWithFrame:CGRectMake(40, 300, self.view.frame.size.width - 80, 50) title:@"图片广告" target:self action:@selector(nativeADTypeClick:)];
+    UILabel *versionLabel =
+        [IFLYADUtil createSectionTitleWithText:[NSString stringWithFormat:@"SDK Version: %@", [IFLYAdTool sdkVersion]]
+                                         frame:CGRectMake(margin, y, contentWidth, 20)];
+    versionLabel.textAlignment = NSTextAlignmentCenter;
+    [scrollView addSubview:versionLabel];
+    y += 36;
 
-    [self.view addSubview:nativeButton];
+    UILabel *descLabel = [IFLYADUtil
+        createSectionTitleWithText:@"本工程演示媒体侧常用接入流程：初始化、加载、展示、回调、销毁。示例代码只使用 SDK 公开 API。"
+                             frame:CGRectMake(margin, y, contentWidth, 52)];
+    descLabel.textAlignment = NSTextAlignmentCenter;
+    [scrollView addSubview:descLabel];
+    y += 72;
 
-    UIButton *videoButton = [IFLYADUtil createADTypeButtonWithFrame:CGRectMake(40, 400, self.view.frame.size.width - 80, 50) title:@"视频广告" target:self action:@selector(videoADTypeClick:)];
+    NSArray<NSDictionary<NSString *, NSString *> *> *items = @[
+        @{@"title" : @"开屏广告", @"selector" : @"splashADTypeClick:"},
+        @{@"title" : @"Banner 广告", @"selector" : @"bannerADTypeClick:"},
+        @{@"title" : @"插屏广告", @"selector" : @"interstitialADTypeClick:"},
+        @{@"title" : @"自渲染信息流", @"selector" : @"nativeADTypeClick:"},
+        @{@"title" : @"激励视频广告", @"selector" : @"rewardADTypeClick:"},
+    ];
 
-    [self.view addSubview:videoButton];
+    for (NSDictionary<NSString *, NSString *> *item in items) {
+        SEL selector = NSSelectorFromString(item[@"selector"]);
+        UIButton *button = [IFLYADUtil createADTypeButtonWithFrame:CGRectMake(margin, y, contentWidth, 48)
+                                                             title:item[@"title"]
+                                                            target:self
+                                                            action:selector];
+        [scrollView addSubview:button];
+        y += 62;
+    }
+
+    scrollView.contentSize = CGSizeMake(width, y + 24);
 }
 
 - (void)splashADTypeClick:(UIButton *)sender {
@@ -46,8 +81,16 @@
     [self.navigationController pushViewController:IFLYNativeViewController.alloc.init animated:YES];
 }
 
-- (void)videoADTypeClick:(UIButton *)sender {
-    [self.navigationController pushViewController:IFLYVideoViewController.alloc.init animated:YES];
+- (void)bannerADTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYBannerViewController.alloc.init animated:YES];
+}
+
+- (void)interstitialADTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYInterstitialViewController.alloc.init animated:YES];
+}
+
+- (void)rewardADTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYRewardVideoViewController.alloc.init animated:YES];
 }
 
 @end
