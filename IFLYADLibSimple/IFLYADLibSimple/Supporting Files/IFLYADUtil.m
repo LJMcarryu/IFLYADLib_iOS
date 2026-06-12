@@ -7,6 +7,8 @@
 
 #import "IFLYADUtil.h"
 
+#import <AdSupport/AdSupport.h>
+#import <AppTrackingTransparency/AppTrackingTransparency.h>
 #import <IFLYADLib/IFLYADLib.h>
 
 @implementation IFLYADUtil
@@ -92,7 +94,41 @@
     config.appName = NSBundle.mainBundle.infoDictionary[@"CFBundleDisplayName"] ?: @"IFLYADLibSimple";
     config.appVersion = NSBundle.mainBundle.infoDictionary[@"CFBundleShortVersionString"] ?: @"1.0";
     config.requestTimeout = @5;
+    config.idfa = [self currentIDFAString];
+    IFLYSampleLogInfo(@"RequestConfig", @"IDFA %@", config.idfa.length > 0 ? @"已设置" : @"为空");
     return config;
+}
+
++ (nullable NSString *)currentIDFAString {
+    if (@available(iOS 14, *)) {
+        if (ATTrackingManager.trackingAuthorizationStatus != ATTrackingManagerAuthorizationStatusAuthorized) {
+            return nil;
+        }
+    } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+        if (!ASIdentifierManager.sharedManager.advertisingTrackingEnabled) {
+            return nil;
+        }
+#pragma clang diagnostic pop
+    }
+
+    NSString *idfa = ASIdentifierManager.sharedManager.advertisingIdentifier.UUIDString;
+    if ([self isEmptyIDFA:idfa]) {
+        return nil;
+    }
+    return idfa;
+}
+
++ (BOOL)isEmptyIDFA:(nullable NSString *)idfa {
+    if (![idfa isKindOfClass:NSString.class] || idfa.length == 0) {
+        return YES;
+    }
+    NSString *trimmed = [idfa stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    if (trimmed.length == 0) {
+        return YES;
+    }
+    return [[trimmed lowercaseString] isEqualToString:@"00000000-0000-0000-0000-000000000000"];
 }
 
 + (NSString *)summaryForError:(nullable IFLYAdError *)error {
