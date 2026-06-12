@@ -26,6 +26,8 @@
 
     /// 设置是否开启个性化推荐
     [IFLYAdConfig setPersonalizedEnabled:YES];
+    /// 示例工程默认开启日志，媒体正式上线前可关闭。
+    [IFLYAdConfig setLogEnabled:YES];
 
     return YES;
 }

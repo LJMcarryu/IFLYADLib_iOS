@@ -1,10 +1,11 @@
-platform :ios, '12.0'
+# CocoaPods CDN 的版本索引可能存在延迟；Git Specs 源已可解析 IFLYADLib 6.0.0。
+# CDN 索引同步后，可切回：source 'https://cdn.cocoapods.org/'
+source 'https://github.com/CocoaPods/Specs.git'
+
+platform :ios, '13.0'
 
 target 'IFLYADLibSimple' do
-use_frameworks!
+  use_frameworks!
 
-pod 'IFLYADLib'
-
-pod 'Ads-CN-Beta','6.7.0.3', :subspecs => ['BUAdSDK', 'CSJMediation']
-
+  pod 'IFLYADLib', '6.0.0'
 end

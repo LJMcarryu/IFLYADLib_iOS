@@ -1,6 +1,6 @@
 //
 //  IFLYSplashViewController.h
-//  IFLYADLibDemo
+//  IFLYADLibSimple
 //
 //  Created by admin on 6.3.25.
 //
