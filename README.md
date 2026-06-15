@@ -61,6 +61,10 @@ open IFLYADLibSimple.xcworkspace
 
 ### CocoaPods（可组合 subspec）
 
+> 标准写法 `pod 'IFLYADLib/Splash', '6.0.1'` 需要 `6.0.1` 已发布到 CocoaPods trunk（或你配置的私有 Specs repo）。trunk 上若尚无 `6.0.1`，请用下方「`:podspec` 直连」立即接入。
+
+**已发布到 trunk 后（推荐，零配置）：**
+
 ```ruby
 platform :ios, '13.0'
 
@@ -75,6 +79,21 @@ target 'YOUR_APP_TARGET' do
   # pod 'IFLYADLib', '6.0.1'
 end
 ```
+
+**尚未发布到 trunk 时 —— `:podspec` 直连（无需 trunk，立即可用）：**
+
+```ruby
+platform :ios, '13.0'
+
+target 'YOUR_APP_TARGET' do
+  use_frameworks!
+
+  pod 'IFLYADLib/Splash',
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.1/IFLYADLib.podspec'
+end
+```
+
+> 二进制照常从本仓库 Release 的合并 zip 下载，subspec 选择照常生效；URL 请钉死到 tag `6.0.1`（勿指向分支）。**不要改用 `:git` / `:path`** —— 二进制在 Release zip、不在 git 仓代码里，这两种外部源会跳过 zip 下载导致缺 `xcframework`。
 
 可选 subspec：`Core`（必选，自动带入）、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full`（默认）。其中 `Splash` / `Interstitial` / `Reward` 会自动带入 `VideoUI`。
 
