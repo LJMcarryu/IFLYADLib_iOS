@@ -7,5 +7,15 @@ platform :ios, '13.0'
 target 'IFLYADLibSimple' do
   use_frameworks!
 
+  # 示例默认用 6.0.0 单包 Full（已发布到 CocoaPods 官方源；为真机 arm64，不跑模拟器）。
   pod 'IFLYADLib', '6.0.0'
+
+  # —— 体验 6.0.1「按广告形式可组合」（模型 A，含模拟器切片）可改用下列任一写法 ——
+  # 1) 官方源（需 6.0.1 已 pod trunk push 后才可用）：
+  #    pod 'IFLYADLib/Splash', '6.0.1'
+  #    pod 'IFLYADLib/Banner', '6.0.1'
+  # 2) 无需 trunk、立即可用（:podspec 直连，二进制走本仓 Release）：
+  #    pod 'IFLYADLib/Splash',
+  #        :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.1/IFLYADLib.podspec'
+  # 详见仓库 README「按广告形式可组合接入（模型 A）」。
 end
