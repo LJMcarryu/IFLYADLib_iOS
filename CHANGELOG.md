@@ -2,6 +2,14 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.3] - 2026-06-15
+
+### 修复
+- 伞头 `IFLYADLib.h` 的各格式头 import 改用 `#if __has_include(...)` 守卫：按广告形式部分安装（模型 A）时也可直接 `#import <IFLYADLib/IFLYADLib.h>`（此前部分安装用伞头会因缺少未安装格式的头而编译失败，只能 import 具体格式头）。全量 `Full` 行为不变。
+
+### 说明
+- 仅头文件变更：各模块二进制与 `6.0.2` 一致（`Core` 的 xcframework checksum 因伞头改动而变化，其余 6 个模块不变）。
+
 ## [6.0.2] - 2026-06-15
 
 ### 修复
@@ -38,6 +46,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.0.3]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.3
 [6.0.2]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.2
 [6.0.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.1
 [6.0.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.0
