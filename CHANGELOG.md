@@ -2,6 +2,14 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.2] - 2026-06-15
+
+### 修复
+- 模型 A 产物补齐 `PrivacyInfo.xcprivacy`（修复相对 6.0.0 单包的隐私清单回归）。静态库无法内嵌隐私清单，故随 `Core` 资源经 `IFLYADLibCoreResources` 资源 bundle 交付；SPM 接入方需手动包含（见 README「隐私清单」）。
+
+### 说明
+- 公开 API 与 `Full` 行为与 `6.0.1` / `6.0.0` 一致；SPM 各模块二进制与 `6.0.1` 字节一致（仅 CocoaPods 合并包新增隐私清单与资源）。
+
 ## [6.0.1] - 2026-06-15
 
 ### 新增
@@ -30,6 +38,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.0.2]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.2
 [6.0.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.1
 [6.0.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.0
 [5.5.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/5.5.1
