@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-distribution:
+    name: 校验分发清单与产物
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Package.swift 解析
+        run: swift package dump-package > /dev/null
+
+      - name: 校验 SPM binaryTarget 的 url + checksum 一致
+        run: |
+          python3 - <<'PY'
+          import re, sys, urllib.request, hashlib
+          src = open("Package.swift", encoding="utf-8").read()
+          pairs = re.findall(r'url:\s*"([^"]+)"\s*,\s*checksum:\s*"([0-9a-fA-F]{64})"', src)
+          if not pairs:
+              print("未在 Package.swift 找到 url+checksum 对"); sys.exit(1)
+          bad = 0
+          for url, declared in pairs:
+              data = urllib.request.urlopen(url, timeout=180).read()
+              actual = hashlib.sha256(data).hexdigest()
+              ok = actual.lower() == declared.lower()
+              print(("OK  " if ok else "FAIL") + f"  {url.split('/')[-1]}  declared={declared[:12]}.. actual={actual[:12]}..")
+              bad += 0 if ok else 1
+          print(f"共校验 {len(pairs)} 个二进制，失败 {bad}")
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: 校验 podspec 合并 zip 可下载且结构完整
+        run: |
+          python3 - <<'PY'
+          import re, sys, urllib.request, io, zipfile
+          src = open("IFLYADLib.podspec", encoding="utf-8").read()
+          m = re.search(r':http\s*=>\s*[\'"]([^\'"]+)[\'"]', src)
+          if not m:
+              print("podspec 未找到 :http source"); sys.exit(1)
+          data = urllib.request.urlopen(m.group(1), timeout=180).read()
+          z = zipfile.ZipFile(io.BytesIO(data))
+          names = z.namelist()
+          fw = [n for n in names if n.endswith(".xcframework/Info.plist")]
+          has_license = any(n.rstrip("/").split("/")[-1] == "LICENSE" for n in names)
+          print(f"合并 zip：{len(fw)} 个 xcframework，LICENSE={has_license}")
+          sys.exit(0 if fw and has_license else 1)
+          PY
+
+  lint-podspec:
+    name: pod spec lint（结构）
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: pod spec lint
+        run: pod spec lint IFLYADLib.podspec --quick --allow-warnings
+
+# 说明：以上为只读校验门禁（无需任何密钥）。
+# 更重的检查（全量 pod spec lint 真实编译、示例工程 pod install + xcodebuild build）
+# 耗时较长，可按需在单独 workflow 增加。
