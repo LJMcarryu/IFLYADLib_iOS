@@ -10,6 +10,7 @@
 
 | 版本 | 日期 | 说明 |
 | --- | --- | --- |
+| 6.0.1 | 2026-06-15 | 新增「按广告形式可组合接入」（模型 A）：CocoaPods subspec + Swift Package Manager，产物（各模块独立 xcframework）托管于 GitHub Releases `6.0.1`；`Full` 行为与 6.0.0 一致。 |
 | 6.0.0 | 2026-06-12 | SDK API 大版本升级；公开 `IFLYSplashAd`、`IFLYBannerAd`、`IFLYInterstitialAd`、`IFLYNativeFeedAd`、`IFLYRewardVideoAd`；统一请求配置 `IFLYAdRequestConfig` 和展示配置；重写媒体侧示例工程。 |
 | 5.5.1 | 2026-04-14 | 修复 CAID 字段为空未过滤、CAID 缓存过期未生效问题。 |
 | 5.4.x | 2025-09-24 ~ 2025-11-21 | 优化窗口获取、点击/回调、包体等旧版能力。 |
@@ -51,6 +52,37 @@ cd IFLYADLibSimple
 pod install --repo-update
 open IFLYADLibSimple.xcworkspace
 ```
+
+## 按广告形式可组合接入（模型 A）
+
+`6.0.1` 起支持「按广告形式可组合」接入：`Core` 必选，`Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` 各格式按需选用，`VideoUI` 与资源由依赖图自动带入。只接入需要的格式可减小包体。产物为各模块独立 `xcframework`（含 device + simulator 切片），托管在本仓库 GitHub Releases `6.0.1`。
+
+> `Full`（默认）等价于五种广告全开，行为与 6.0.0 单包一致。
+
+### CocoaPods（可组合 subspec）
+
+```ruby
+platform :ios, '13.0'
+
+target 'YOUR_APP_TARGET' do
+  use_frameworks!
+
+  # 例：只接开屏 + Banner（VideoUI/Core 自动带入）
+  pod 'IFLYADLib/Splash', '6.0.1'
+  pod 'IFLYADLib/Banner', '6.0.1'
+
+  # 或全量：
+  # pod 'IFLYADLib', '6.0.1'
+end
+```
+
+可选 subspec：`Core`（必选，自动带入）、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full`（默认）。其中 `Splash` / `Interstitial` / `Reward` 会自动带入 `VideoUI`。
+
+### Swift Package Manager
+
+在 Xcode「Add Packages」填入仓库地址 `https://github.com/LJMcarryu/IFLYADLib_iOS`，选 `6.0.1`，按需勾选 product：`Core` / `Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` / `Full`。
+
+> ⚠️ **SPM 接入方需在 App target 的 Other Linker Flags（`OTHER_LDFLAGS`）添加 `-ObjC`**，否则静态库 category / `+load` 会被剥离导致运行异常。CocoaPods 的 podspec 已内置 `-ObjC`，无需手动添加。
 
 ## 权限与隐私配置
 
