@@ -28,7 +28,9 @@
 
 ## CocoaPods 接入
 
-`6.0.0` 已发布到 CocoaPods。若 CocoaPods CDN 版本索引尚未同步，可优先使用 Git Specs 源。
+> **推荐使用最新 `6.0.2`**（按广告形式可组合、含模拟器切片）——见「[按广告形式可组合接入（模型 A）](#按广告形式可组合接入模型-a)」。下面的 `6.0.0` 为单包 `Full`（仅真机 arm64），仍可用。
+
+`6.0.0` / `6.0.2` 均已发布到 CocoaPods 官方源。若 CDN 版本索引尚未同步，可先 `pod repo update` 或临时使用 Git Specs 源。
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
@@ -66,7 +68,7 @@ open IFLYADLibSimple.xcworkspace
 
 ### CocoaPods（可组合 subspec）
 
-> 标准写法 `pod 'IFLYADLib/Splash', '6.0.2'` 需要 `6.0.2` 已发布到 CocoaPods trunk（或你配置的私有 Specs repo）。trunk 上若尚无 `6.0.2`，请用下方「`:podspec` 直连」立即接入。
+> `6.0.2` 已发布到 CocoaPods 官方源，标准写法 `pod 'IFLYADLib/Splash', '6.0.2'` 可直接使用（若索引未同步先 `pod repo update`）。下方「`:podspec` 直连」为可选的免 trunk 备用方式。
 
 **已发布到 trunk 后（推荐，零配置）：**
 
@@ -569,7 +571,7 @@ open IFLYADLibSimple.xcworkspace
 - **改用 SPM**：见「按广告形式可组合接入（模型 A）」→「Swift Package Manager」，注意 `-ObjC` 与资源两条说明。
 - **subspec ↔ 格式**：`Splash` / `Banner` / `Interstitial` / `NativeFeed` / `Reward`。
 
-> `6.0.2` 经 GitHub Releases + SPM + CocoaPods `:podspec` 直连分发。若用 `pod 'IFLYADLib', '6.0.2'` 从 CocoaPods 官方源拉取，需确认该版本已发布到 trunk；否则请用「按广告形式可组合接入（模型 A）」中的 **`:podspec` 直连**写法。
+> `6.0.2` 已发布到 CocoaPods 官方源（trunk）+ GitHub Releases + SPM，`pod 'IFLYADLib', '6.0.2'` 可直接使用。
 
 ## 问题反馈与支持
 
