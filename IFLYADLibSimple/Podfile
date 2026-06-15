@@ -1,21 +1,23 @@
-# CocoaPods CDN 的版本索引可能存在延迟；Git Specs 源已可解析 IFLYADLib 6.0.0。
-# CDN 索引同步后，可切回：source 'https://cdn.cocoapods.org/'
-source 'https://github.com/CocoaPods/Specs.git'
+# IFLYADLib 6.0.2 已发布到 CocoaPods 官方源（trunk/CDN）。
+# 若 CDN 版本索引尚未同步、报找不到 6.0.2：先 `pod install --repo-update`，
+# 或临时用下方 :podspec 直连（拉本仓 Release 产物，无需等 CDN）。
+source 'https://cdn.cocoapods.org/'
 
 platform :ios, '13.0'
 
 target 'IFLYADLibSimple' do
   use_frameworks!
 
-  # 示例默认用 6.0.0 单包 Full（已发布到 CocoaPods 官方源；为真机 arm64，不跑模拟器）。
-  pod 'IFLYADLib', '6.0.0'
+  # 本示例用全量 Full（覆盖开屏/Banner/插屏/信息流/激励五种广告）。
+  # 6.0.2 为按广告形式可组合的 xcframework，含 device + 模拟器切片，可在模拟器运行。
+  pod 'IFLYADLib', '6.0.2'
 
-  # —— 体验 6.0.2「按广告形式可组合」（模型 A，含模拟器切片）可改用下列任一写法 ——
-  # 1) 官方源（需 6.0.2 已 pod trunk push 后才可用）：
-  #    pod 'IFLYADLib/Splash', '6.0.2'
-  #    pod 'IFLYADLib/Banner', '6.0.2'
-  # 2) 无需 trunk、立即可用（:podspec 直连，二进制走本仓 Release）：
-  #    pod 'IFLYADLib/Splash',
-  #        :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.2/IFLYADLib.podspec'
-  # 详见仓库 README「按广告形式可组合接入（模型 A）」。
+  # —— 按广告形式可组合接入（模型 A）：只接所需格式可减小包体，例如 ——
+  #   pod 'IFLYADLib/Splash', '6.0.2'
+  #   pod 'IFLYADLib/Banner', '6.0.2'
+  # 重要：部分接入时请 import 具体格式头（如 <IFLYADLib/IFLYSplashAd.h>）；
+  #       伞头 <IFLYADLib/IFLYADLib.h> 汇总全部格式，仅在全量 Full 下可用。
+  # CDN 未同步时的 :podspec 直连写法（subspec 同样可选）：
+  #   pod 'IFLYADLib/Splash',
+  #       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.2/IFLYADLib.podspec'
 end

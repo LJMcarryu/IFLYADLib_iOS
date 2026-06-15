@@ -104,6 +104,8 @@ end
 
 可选 subspec：`Core`（必选，自动带入）、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full`（默认）。其中 `Splash` / `Interstitial` / `Reward` 会自动带入 `VideoUI`。
 
+> **导入头文件（重要）**：全量 `Full` 用伞头 `#import <IFLYADLib/IFLYADLib.h>`；**按格式部分接入**时请 import 对应的具体格式头（如 `<IFLYADLib/IFLYSplashAd.h>` / `<IFLYADLib/IFLYBannerAd.h>` / `<IFLYADLib/IFLYInterstitialAd.h>` / `<IFLYADLib/IFLYNativeFeedAd.h>` / `<IFLYADLib/IFLYRewardVideoAd.h>`）。伞头汇总了全部格式入口，仅在安装了全部格式（`Full`）时可用；部分安装下使用伞头会因缺少未安装格式的头而编译失败。
+
 ### Swift Package Manager
 
 在 Xcode「Add Packages」填入仓库地址 `https://github.com/LJMcarryu/IFLYADLib_iOS`，选 `6.0.2`，按需勾选 product：`Core` / `Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` / `Full`。
