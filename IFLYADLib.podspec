@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
 6.0.1 起支持按广告形式可组合接入（模型 A）：Core 必选 + Banner/Splash/Interstitial/NativeFeed/Reward 各格式按需选用，VideoUI 与资源由依赖图自动带入。
                    DESC
   s.homepage     = 'https://github.com/LJMcarryu/IFLYADLib_iOS'
-  s.license      = { :type => 'MIT' }
+  s.license      = { :type => 'MIT', :file => 'LICENSE' }
   s.author       = { 'jmliu6' => 'jmliu6@iflytek.com' }
   s.source       = { :http => 'https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.1/IFLYADLib-modelA-6.0.1.zip' }
 
