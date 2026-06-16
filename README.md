@@ -527,8 +527,8 @@ if (ad.bidInfo.winNoticeAvailable) {
 
 | 现象 | 排查建议 |
 | --- | --- |
-| `pod install` 找不到 `6.0.0` | 执行 `pod repo update` 或在 Podfile 中使用 `https://github.com/CocoaPods/Specs.git`。 |
-| 模拟器无法运行 | 当前 framework 建议使用真机调试。 |
+| `pod install` 找不到 `6.0.3` | 执行 `pod install --repo-update`；或临时用 `:podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.3/IFLYADLib.podspec'` 直连本仓 Release。 |
+| 模拟器无法运行 | `6.0.3`（模型 A）含模拟器切片，可直接在模拟器调试；仅旧 `6.0.0` 单包不含模拟器切片需真机。 |
 | IDFA 为空 | 确认 `NSUserTrackingUsageDescription` 已配置；用户已允许 ATT；在授权完成后再读取 `ASIdentifierManager`；过滤全零 UUID。 |
 | `isAdValid` 为 NO | 确认已收到 `DidReady` 回调；广告未过期、未展示过、实例未销毁。 |
 | 展示失败 | 确认 `rootViewController` 已在 window 上，当前没有正在 present 的控制器。 |
@@ -555,7 +555,7 @@ pod install --repo-update
 open IFLYADLibSimple.xcworkspace
 ```
 
-> 说明：示例当前固定 `pod 'IFLYADLib', '6.0.0'`（CocoaPods 官方源），为单包 `Full`、**仅真机调试**（不含模拟器切片）。如需体验 `6.0.3` 的按广告形式可组合接入或 SPM，参见「按广告形式可组合接入（模型 A）」。示例覆盖五种广告的基础用法；**S2S 服务端竞价与 Header Bidding 仅在本文档说明，示例工程未内置端到端演示**（端到端需媒体服务端配合下发 `rspToken`）。真机运行请在 Xcode「Signing & Capabilities」选择你自己的开发者 Team（示例已置空 `DEVELOPMENT_TEAM`）。
+> 说明：示例当前固定 `pod 'IFLYADLib', '6.0.3'`（CocoaPods 官方源），默认 `Full`（五种广告全开），为模型 A 可组合的 `xcframework`、**含模拟器切片**（可直接在模拟器运行）。如需体验按广告形式部分接入（如 `pod 'IFLYADLib/Splash'`）或 SPM，参见「按广告形式可组合接入（模型 A）」。示例覆盖五种广告的基础用法；**S2S 服务端竞价与 Header Bidding 仅在本文档说明，示例工程未内置端到端演示**（端到端需媒体服务端配合下发 `rspToken`）。真机运行请在 Xcode「Signing & Capabilities」选择你自己的开发者 Team（示例已置空 `DEVELOPMENT_TEAM`）。
 
 ## 接入建议
 
