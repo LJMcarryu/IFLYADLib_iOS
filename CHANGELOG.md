@@ -2,6 +2,14 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.4] - 2026-06-16
+
+### 变更
+- 运行期日志行前缀去品牌：`[IFLYAd <时间戳>]` → `[AdSDK <时间戳>]`（合规去名）。仅日志输出文本变化，公开 API、`Full` 行为、各格式能力均与 `6.0.3` 一致。
+
+### 说明
+- 7 个模块二进制相对 `6.0.3` 均因日志字符串改动而重建，`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 的合并 zip 源已同步更新到 `6.0.4`。
+
 ## [6.0.3] - 2026-06-15
 
 ### 修复
