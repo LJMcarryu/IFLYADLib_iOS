@@ -2,6 +2,16 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.5] - 2026-06-17
+
+### 修复
+- **资源加载器跨域兜底**：请求域未命中时回退其余域 bundle，修复边界资产（`IFLYFPlayer_slider` 归 VideoUI 域却经 Core 交互域请求）在按广告形式分包（模型 A）下的"域内缺图"。
+- 开屏交互图标改用统一资源加载器（按域定位 + 密度选择），替换裸文件路径加载。
+
+### 变更
+- SDK 版本号常量（随广告请求上报的 `sdk_ver`）由 `6.0.1` 对齐到发版号 `6.0.5`（此前 6.0.2–6.0.4 为打包型发版，未同步该常量）。
+- 7 个模块二进制相对 `6.0.4` 重新构建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.5`。
+
 ## [6.0.4] - 2026-06-16
 
 ### 变更
@@ -54,6 +64,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.0.5]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.5
 [6.0.3]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.3
 [6.0.2]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.2
 [6.0.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.1
