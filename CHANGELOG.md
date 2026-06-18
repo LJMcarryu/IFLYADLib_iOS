@@ -2,6 +2,14 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.7] - 2026-06-18
+
+### 变更
+- **服务端竞价（S2S）正式环境域名切换**：生产环境 `/ad/sdk-s2s/bid`、`/ad/sdk-s2s/load` 地址由 `msdk.voiceads.cn` 切换为 `sdk-adx.voiceads.cn`；灰度调试地址 `sdk-grey.voiceads.cn` 不变。`PrivacyInfo.xcprivacy` 的 `NSPrivacyTrackingDomains` 新增 `sdk-adx.voiceads.cn`。公开 API、`Full` 行为、各格式能力均与 `6.0.6` 一致。
+
+### 说明
+- 7 个模块二进制相对 `6.0.6` 因 S2S 生产地址改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.7`。
+
 ## [6.0.6] - 2026-06-17
 
 ### 变更
@@ -73,6 +81,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.0.7]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.7
 [6.0.6]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.6
 [6.0.5]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.5
 [6.0.3]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.3
