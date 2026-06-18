@@ -1,5 +1,5 @@
-# IFLYADLib 6.0.6 已发布到 CocoaPods 官方源（trunk/CDN）。
-# 若 CDN 版本索引尚未同步、报找不到 6.0.6：先 `pod install --repo-update`，
+# IFLYADLib 6.0.7 已发布到 CocoaPods 官方源（trunk/CDN）。
+# 若 CDN 版本索引尚未同步、报找不到 6.0.7：先 `pod install --repo-update`，
 # 或临时用下方 :podspec 直连（拉本仓 Release 产物，无需等 CDN）。
 source 'https://cdn.cocoapods.org/'
 
@@ -9,15 +9,15 @@ target 'IFLYADLibSimple' do
   use_frameworks!
 
   # 本示例用全量 Full（覆盖开屏/Banner/插屏/信息流/激励五种广告）。
-  # 6.0.6 为按广告形式可组合的 xcframework，含 device + 模拟器切片，可在模拟器运行。
-  pod 'IFLYADLib', :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.6/IFLYADLib.podspec'
+  # 6.0.7 为按广告形式可组合的 xcframework，含 device + 模拟器切片，可在模拟器运行。
+  pod 'IFLYADLib', :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.7/IFLYADLib.podspec'
 
   # —— 按广告形式可组合接入（模型 A）：只接所需格式可减小包体，例如 ——
-  #   pod 'IFLYADLib/Splash', '6.0.6'
-  #   pod 'IFLYADLib/Banner', '6.0.6'
+  #   pod 'IFLYADLib/Splash', '6.0.7'
+  #   pod 'IFLYADLib/Banner', '6.0.7'
   # 导入：6.0.3 起伞头 <IFLYADLib/IFLYADLib.h> 用 __has_include 守卫，全量与部分安装均可用；
   #       也可按需 import 具体格式头（如 <IFLYADLib/IFLYSplashAd.h>）。
   # CDN 未同步时的 :podspec 直连写法（subspec 同样可选）：
   #   pod 'IFLYADLib/Splash',
-  #       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.6/IFLYADLib.podspec'
+  #       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.7/IFLYADLib.podspec'
 end
