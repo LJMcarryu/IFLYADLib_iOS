@@ -2,6 +2,14 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.8] - 2026-06-22
+
+### 变更
+- **SDK 内部日志整体清除，仅保留关键节点 `error`**：`info` / `warn` / 调试 / JSON 日志宏整体置为无操作（不再产生任何输出），仅保留各失败关键节点的 `error` 日志（请求 / 渲染 / 播放 / 监测失败等）；`error` 日志内容仅含错误码与脱敏文案，不打印内部类名（`NSStringFromClass`）或裸 `NSError`。彻底杜绝运行期日志外泄内部符号。公开 API、`Full` 行为、各格式能力均与 `6.0.7` 一致。
+
+### 说明
+- 7 个模块二进制相对 `6.0.7` 因日志改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.8`。
+
 ## [6.0.7] - 2026-06-18
 
 ### 变更
@@ -81,6 +89,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.0.8]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.8
 [6.0.7]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.7
 [6.0.6]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.6
 [6.0.5]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.5
