@@ -4,7 +4,7 @@
 // SwiftPM 的 binaryTarget 不能直接声明 target 间依赖，因此这里使用轻量伞 target 表达依赖图。
 // 静态库 category / +load 依赖 -ObjC：本清单不用 .unsafeFlags 注入 -ObjC（unsafeFlags 会让本包
 // 无法作为带版本号的依赖被标准 SwiftPM 消费）。消费方需在自己 App target 的 OTHER_LDFLAGS 加 -ObjC。
-// binaryTarget url 指向本仓库 GitHub Releases tag 6.0.7 的各 IFLYAd<模块>.xcframework.zip（device ios-arm64 + simulator 双切片），checksum 为其 sha256。
+// binaryTarget url 指向本仓库 GitHub Releases tag 6.0.8 的各 IFLYAd<模块>.xcframework.zip（device ios-arm64 + simulator 双切片），checksum 为其 sha256。
 // 资源 bundle 限制：SwiftPM 的 binaryTarget 不能像 CocoaPods 那样挂 resource_bundles；需要
 //   Core/VideoUI/Reward 资源的消费方请走 CocoaPods（podspec 已配 resource_bundles），或把资源 .bundle 嵌进对应 xcframework。
 
@@ -27,38 +27,38 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "IFLYAdCore",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.7/IFLYAdCore.xcframework.zip",
-            checksum: "d89e4c7f704dad282a592b56e226e027710863fe3f856b933dedb2e226a66798"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.8/IFLYAdCore.xcframework.zip",
+            checksum: "b7e6d7687874c1d5b33abd62e73772a14a53bcbfc10db68400ead81d44327a10"
         ),
         .binaryTarget(
             name: "IFLYAdVideoUI",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.7/IFLYAdVideoUI.xcframework.zip",
-            checksum: "b7b48ea71c18ba60c75c1f801d82221dda48741475a8ffd4940f6cb8db903b8b"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.8/IFLYAdVideoUI.xcframework.zip",
+            checksum: "9c98310a267da6b970ba693c89e412cefe6f1d788a3d5eeb4a30c54cfdb7daa3"
         ),
         .binaryTarget(
             name: "IFLYAdBanner",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.7/IFLYAdBanner.xcframework.zip",
-            checksum: "a40e7d93e6760ec6e6aa3aae166477c78f7dfc3b8a55dffd58e22fcd5fbf66c3"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.8/IFLYAdBanner.xcframework.zip",
+            checksum: "e13422929f8a13dd1ee38f471a6be3b078396427b33546095c8d1d5701c09379"
         ),
         .binaryTarget(
             name: "IFLYAdSplash",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.7/IFLYAdSplash.xcframework.zip",
-            checksum: "f9a08c9b65d8419cc94f18fa5aecef8bd023bdb17f41fe940edabd18d5cfe4f2"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.8/IFLYAdSplash.xcframework.zip",
+            checksum: "42acfb567d40b8dff648a4faa5c9b8e09b65e6ab8eba08b900ef1b6f05117f05"
         ),
         .binaryTarget(
             name: "IFLYAdInterstitial",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.7/IFLYAdInterstitial.xcframework.zip",
-            checksum: "04237e64ceec41f8ee53901231ea1c19d7a749ddb60cfca7c5b063b801cdd0ca"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.8/IFLYAdInterstitial.xcframework.zip",
+            checksum: "62f7529c802405aea222b0ee2f882837299540e20bcce46e18f2ae04da0a4032"
         ),
         .binaryTarget(
             name: "IFLYAdNativeFeed",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.7/IFLYAdNativeFeed.xcframework.zip",
-            checksum: "09db564d826ae4cdcacb53c90e1d2f3f40135dc806be0c3165f669479b44c8f9"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.8/IFLYAdNativeFeed.xcframework.zip",
+            checksum: "bf8a15ac9b756b62ea841a182853fdae56d9cd36f05b6dd9c2d689925c3e869b"
         ),
         .binaryTarget(
             name: "IFLYAdReward",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.7/IFLYAdReward.xcframework.zip",
-            checksum: "4588a72cebb40bb6d324888a211173f7c2c438b4430f1185b528e0ef81494aa1"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.8/IFLYAdReward.xcframework.zip",
+            checksum: "95ae712b3948dd790b69cfd6c41240b07acd71f540d8bddec05b9b0d7160a4af"
         ),
         .target(
             name: "Core",
