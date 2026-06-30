@@ -2,6 +2,15 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.9] - 2026-06-30
+
+### 变更
+- **自渲染信息流（NativeFeed）放宽素材完整性判定**：广告标题、视频封面图均改为**非必填**；`isMaterialComplete` 仅按素材类型校验核心素材（单图 ≥1 张图 / 视频含可播放 `videoURL` / 三图 ≥3 张图），与开屏 / 插屏 / Banner / 激励的原生视频素材口径对齐。缺标题或缺视频封面的素材不再被判为不完整而加载失败。公开 API、`Full` 行为、各格式能力均与 `6.0.8` 一致。
+- **服务端竞价（S2S）测试环境域名对齐**：测试环境（`IFLYAd_TEST_ENVIRONMENT`）`/ad/sdk-s2s/bid`、`/ad/sdk-s2s/load` 由 `sdk-grey.voiceads.cn` 对齐为 `sdk-adx.voiceads.cn`；生产环境本就为 `sdk-adx.voiceads.cn`，故发布二进制无变化。
+
+### 说明
+- 7 个模块二进制相对 `6.0.8` 因素材判定改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.9`。
+
 ## [6.0.8] - 2026-06-22
 
 ### 变更
@@ -89,6 +98,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.0.9]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.9
 [6.0.8]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.8
 [6.0.7]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.7
 [6.0.6]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.6
