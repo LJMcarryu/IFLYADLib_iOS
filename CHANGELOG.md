@@ -2,6 +2,14 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.10] - 2026-07-01
+
+### 新增
+- **自渲染信息流（NativeFeed）新增落地页关闭前回调 `nativeFeedAdWillDismissLandingPage:`**：在内嵌落地页关闭动画开始前**同步**回调，作为「落地页露出前的最后确认点」，供媒体在落地页收起、广告重新露出前做最后一次确认；随后仍会照常回调 `nativeFeedAdDidDismissLandingPage:`。该方法桥接 SDK 内部已有的落地页 dismiss-will-start 时机，是 `IFLYNativeFeedAdDelegate` 新增的**可选**方法。公开 API 其余部分、`Full` 行为、各格式能力均与 `6.0.9` 一致。
+
+### 说明
+- 仅 NativeFeed 暴露该回调；基类桥接对其它 4 格式为 no-op，公开头集合不变。7 个模块二进制相对 `6.0.9` 因新增回调重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.10`。
+
 ## [6.0.9] - 2026-06-30
 
 ### 变更
@@ -98,6 +106,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.0.10]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.10
 [6.0.9]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.9
 [6.0.8]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.8
 [6.0.7]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.7
