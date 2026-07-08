@@ -2,6 +2,14 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.11] - 2026-07-08
+
+### 修复
+- **移除跳转黑名单中的 `itms-services` / `itms-apps` 字面量，改为 `itms` 前缀拦截**：自定义 scheme 跳转的危险 scheme 黑名单原以完整字面量列举 `itms` / `itms-apps` / `itms-services`（用于**拦截**这类 App Store / 企业分发（OTA）链接，SDK 自身从不构造、不调起），现改为按 `itms` 前缀统一拦截。效果：编译产物中不再出现 `itms-services` 完整字符串（避免被应用市场 / 审核的二进制静态扫描误判为企业分发 / 侧载），拦截行为完全不变且更严（覆盖整个 `itms` 家族）。公开 API、`Full` 行为、各格式能力均与 `6.0.10` 一致。
+
+### 说明
+- 7 个模块二进制相对 `6.0.10` 因该改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.11`。
+
 ## [6.0.10] - 2026-07-01
 
 ### 新增

@@ -1,16 +1,16 @@
 # IFLYADLibSimple — IFLYADLib 接入示例
 
-面向媒体接入方的最小示例，仅使用公开 API，演示开屏 / Banner / 插屏 / 自渲染信息流 / 激励视频五种广告的加载与展示。基于 `IFLYADLib 6.0.10`。
+面向媒体接入方的最小示例，仅使用公开 API，演示开屏 / Banner / 插屏 / 自渲染信息流 / 激励视频五种广告的加载与展示。基于 `IFLYADLib 6.0.11`。
 
 ## 运行
 
 ```bash
-pod install --repo-update     # 拉取 IFLYADLib 6.0.10
+pod install --repo-update     # 拉取 IFLYADLib 6.0.11
 open IFLYADLibSimple.xcworkspace
 ```
 
-- `6.0.10` 含模拟器切片，可直接在**模拟器**运行；**真机**运行请在「Signing & Capabilities」选择你自己的开发者 Team（示例的 `DEVELOPMENT_TEAM` 已置空）。
-- 若 `pod install` 报找不到 `6.0.10`（CocoaPods CDN 索引尚未同步），按 `Podfile` 注释里的 `:podspec` 直连写法接入，或稍后重试 `pod install --repo-update`。
+- `6.0.11` 含模拟器切片，可直接在**模拟器**运行；**真机**运行请在「Signing & Capabilities」选择你自己的开发者 Team（示例的 `DEVELOPMENT_TEAM` 已置空）。
+- 若 `pod install` 报找不到 `6.0.11`（CocoaPods CDN 索引尚未同步），按 `Podfile` 注释里的 `:podspec` 直连写法接入，或稍后重试 `pod install --repo-update`。
 
 ## 演示内容
 
