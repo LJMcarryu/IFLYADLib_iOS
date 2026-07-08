@@ -2,6 +2,12 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.12] - 2026-07-08
+
+### 说明
+- **版本对齐发版，标准版无行为变化**：公开 API、`Full` 行为、各格式能力、交付形态（模型 A 静态 xcframework + 三域资源 bundle）均与 `6.0.11` 一致。本版本随 YS 定制仓 `YSIFLYADLib 6.0.12`（交付形态动态 framework → 静态 framework）三仓对齐版本号发布。
+- 7 个模块二进制随版本号重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.12`。
+
 ## [6.0.11] - 2026-07-08
 
 ### 修复
