@@ -1,6 +1,6 @@
 # 模型 A 可组合分发 podspec。
 # 每个 vendored xcframework 只含自身 .o；对 Core/VideoUI 符号保留未定义引用，在 App link 时统一解析。
-# 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：s.source 指向其 GitHub Releases tag 6.0.12 的合并 zip
+# 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：s.source 指向其 GitHub Releases tag 6.0.13 的合并 zip
 #   （含 7 个 xcframework device+simulator 切片与三域资源 bundle）；vendored_frameworks / resource_bundles 路径相对该 zip 根。
 #   本仓库私有，仅承载源码/构建脚本；此 podspec 与公开仓一致。
 # 换版本/主机时：重跑 scripts/package-model-a-release.sh 产合并 zip 与 7 个单模块 zip，更新两仓 :http URL 与版本。
@@ -8,11 +8,11 @@
 
 Pod::Spec.new do |s|
   s.name = 'IFLYADLib'
-  s.version = '6.0.12'
+  s.version = '6.0.13'
   s.summary = 'IFLYADLib model A composable SDK distribution.'
   s.homepage = 'https://github.com/LJMcarryu/IFLYADLib_iOS'
   s.author = { 'IFLY' => 'placeholder@example.com' }
-  s.source = { :http => 'https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.12/IFLYADLib-modelA-6.0.12.zip' }
+  s.source = { :http => 'https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.13/IFLYADLib-modelA-6.0.13.zip' }
   s.license = { :type => 'MIT', :file => 'LICENSE' }
 
   s.platform = :ios, '13.0'

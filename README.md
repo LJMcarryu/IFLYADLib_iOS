@@ -2,7 +2,7 @@
 
 `IFLYADLib` 是讯飞广告 iOS SDK，提供开屏、Banner、插屏、自渲染信息流、激励视频等广告能力。
 
-当前文档覆盖 `IFLYADLib 6.0.12`（推荐，按广告形式可组合）与 `6.0.0`（单包 Full）；示例工程见 [IFLYADLibSimple](./IFLYADLibSimple)。
+当前文档覆盖 `IFLYADLib 6.0.13`（推荐，按广告形式可组合）与 `6.0.0`（单包 Full）；示例工程见 [IFLYADLibSimple](./IFLYADLibSimple)。
 
 > 文档以中文为主。如需用英文反馈问题，请直接在 [Issues](https://github.com/LJMcarryu/IFLYADLib_iOS/issues) 提交。
 
@@ -12,6 +12,7 @@
 
 | 版本 | 日期 | 说明 |
 | --- | --- | --- |
+| 6.0.13 | 2026-07-09 | 自渲染信息流（NativeFeed）新增摇一摇提示控件：交互类型为「点击+摇一摇」的广告在 `bindAdWithViewBinder:error:` 成功后，由 SDK 自动在容器右下角添加「摇一摇查看详情」提示（避让关闭按钮、放不下则不添加、非独立点击区域，普通点击广告不展示）；自渲染素材校验失败（71501）新增 error 级诊断日志（template_id / 素材类型 / 图片数 / videoURL 有无）。公开 API 签名不变，其它格式与 `Full` 行为不变。 |
 | 6.0.12 | 2026-07-08 | 版本对齐发版（公开 API 与各格式行为不变，二进制随版本号重建）：本仓（标准版模型 A，静态 xcframework，交付形态不变）随 YS 定制仓 6.0.12（交付形态动态→静态）三仓对齐版本号。 |
 | 6.0.11 | 2026-07-08 | 移除跳转黑名单中 `itms-services` / `itms-apps` 字面量，改为 `itms` 前缀拦截：编译产物不再出现 `itms-services` 完整字符串（避免应用市场 / 审核静态扫描误判为企业分发 / 侧载），拦截行为不变且更严；公开 API 与各格式行为不变，二进制因该改动重建。 |
 | 6.0.10 | 2026-07-01 | 自渲染信息流（NativeFeed）新增可选回调 `nativeFeedAdWillDismissLandingPage:`：内嵌落地页关闭动画开始前**同步**回调，作为「落地页露出前的最后确认点」，随后仍照常回调 `nativeFeedAdDidDismissLandingPage:`。仅 NativeFeed 暴露、公开头集合不变；其它格式与 `Full` 行为不变，二进制因新增回调重建。 |
@@ -33,14 +34,14 @@
 
 - iOS 13.0 及以上。
 - Xcode 14.1 及以上，建议使用较新 Xcode 构建。
-- 交付形态：`6.0.12` 为各模块 `xcframework`（含 **device + 模拟器** 切片，**可在模拟器调试**，见「按广告形式可组合接入（模型 A）」）；`6.0.0` 为单一 `IFLYADLib.framework`（**仅真机 arm64、不含模拟器切片**，模拟器无法运行）。
+- 交付形态：`6.0.13` 为各模块 `xcframework`（含 **device + 模拟器** 切片，**可在模拟器调试**，见「按广告形式可组合接入（模型 A）」）；`6.0.0` 为单一 `IFLYADLib.framework`（**仅真机 arm64、不含模拟器切片**，模拟器无法运行）。
 - 统一入口头文件：`#import <IFLYADLib/IFLYADLib.h>`。
 
 ## CocoaPods 接入
 
-> **推荐使用最新 `6.0.12`**（按广告形式可组合、含模拟器切片）——见「[按广告形式可组合接入（模型 A）](#按广告形式可组合接入模型-a)」。下面的 `6.0.0` 为单包 `Full`（仅真机 arm64），仍可用。
+> **推荐使用最新 `6.0.13`**（按广告形式可组合、含模拟器切片）——见「[按广告形式可组合接入（模型 A）](#按广告形式可组合接入模型-a)」。下面的 `6.0.0` 为单包 `Full`（仅真机 arm64），仍可用。
 
-`6.0.0` / `6.0.12` 均已发布到 CocoaPods 官方源。若 CDN 版本索引尚未同步，可先 `pod repo update` 或临时使用 Git Specs 源。
+`6.0.0` / `6.0.13` 均已发布到 CocoaPods 官方源。若 CDN 版本索引尚未同步，可先 `pod repo update` 或临时使用 Git Specs 源。
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
@@ -70,7 +71,7 @@ open IFLYADLibSimple.xcworkspace
 
 ## 按广告形式可组合接入（模型 A）
 
-`6.0.1` 起支持「按广告形式可组合」接入：`Core` 必选，`Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` 各格式按需选用，`VideoUI` 由依赖图自动带入。只接入需要的格式可减小包体。产物为各模块独立 `xcframework`（含 device + simulator 切片），托管在本仓库 GitHub Releases `6.0.12`。
+`6.0.1` 起支持「按广告形式可组合」接入：`Core` 必选，`Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` 各格式按需选用，`VideoUI` 由依赖图自动带入。只接入需要的格式可减小包体。产物为各模块独立 `xcframework`（含 device + simulator 切片），托管在本仓库 GitHub Releases `6.0.13`。
 
 > **资源依赖**：`CocoaPods` 接入时，图像/视频控件等资源经 `resource_bundles` 随依赖自动带入；**`Swift Package Manager` 接入时资源不会自动带入**（SPM `binaryTarget` 不支持 `resource_bundles`），详见下方「Swift Package Manager」的资源说明。
 
@@ -78,7 +79,7 @@ open IFLYADLibSimple.xcworkspace
 
 ### CocoaPods（可组合 subspec）
 
-> `6.0.12` 已发布到 CocoaPods 官方源，标准写法 `pod 'IFLYADLib/Splash', '6.0.12'` 可直接使用（若索引未同步先 `pod repo update`）。下方「`:podspec` 直连」为可选的免 trunk 备用方式。
+> `6.0.13` 已发布到 CocoaPods 官方源，标准写法 `pod 'IFLYADLib/Splash', '6.0.13'` 可直接使用（若索引未同步先 `pod repo update`）。下方「`:podspec` 直连」为可选的免 trunk 备用方式。
 
 **已发布到 trunk 后（推荐，零配置）：**
 
@@ -89,11 +90,11 @@ target 'YOUR_APP_TARGET' do
   use_frameworks!
 
   # 例：只接开屏 + Banner（VideoUI/Core 自动带入）
-  pod 'IFLYADLib/Splash', '6.0.12'
-  pod 'IFLYADLib/Banner', '6.0.12'
+  pod 'IFLYADLib/Splash', '6.0.13'
+  pod 'IFLYADLib/Banner', '6.0.13'
 
   # 或全量：
-  # pod 'IFLYADLib', '6.0.12'
+  # pod 'IFLYADLib', '6.0.13'
 end
 ```
 
@@ -106,11 +107,11 @@ target 'YOUR_APP_TARGET' do
   use_frameworks!
 
   pod 'IFLYADLib/Splash',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.12/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.13/IFLYADLib.podspec'
 end
 ```
 
-> 二进制照常从本仓库 Release 的合并 zip 下载，subspec 选择照常生效；URL 请钉死到 tag `6.0.12`（勿指向分支）。**不要改用 `:git` / `:path`** —— 二进制在 Release zip、不在 git 仓代码里，这两种外部源会跳过 zip 下载导致缺 `xcframework`。
+> 二进制照常从本仓库 Release 的合并 zip 下载，subspec 选择照常生效；URL 请钉死到 tag `6.0.13`（勿指向分支）。**不要改用 `:git` / `:path`** —— 二进制在 Release zip、不在 git 仓代码里，这两种外部源会跳过 zip 下载导致缺 `xcframework`。
 
 可选 subspec：`Core`（必选，自动带入）、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full`（默认）。其中 `Splash` / `Interstitial` / `Reward` 会自动带入 `VideoUI`。
 
@@ -118,11 +119,11 @@ end
 
 ### Swift Package Manager
 
-在 Xcode「Add Packages」填入仓库地址 `https://github.com/LJMcarryu/IFLYADLib_iOS`，选 `6.0.12`，按需勾选 product：`Core` / `Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` / `Full`。
+在 Xcode「Add Packages」填入仓库地址 `https://github.com/LJMcarryu/IFLYADLib_iOS`，选 `6.0.13`，按需勾选 product：`Core` / `Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` / `Full`。
 
 > ⚠️ **SPM 接入方需在 App target 的 Other Linker Flags（`OTHER_LDFLAGS`）添加 `-ObjC`**，否则静态库 category / `+load` 会被剥离导致运行异常。CocoaPods 的 podspec 已内置 `-ObjC`，无需手动添加。
 >
-> ⚠️ **SPM 不携带资源 bundle**：SPM 的 `binaryTarget` 无法像 CocoaPods 那样随包分发 `resource_bundles`。因此用到内置素材的格式（开屏/插屏交互图、视频播放控件、激励 UI 等）经 **SPM** 接入时，运行期会找不到对应图片/资源而降级（图标缺失等）。**需要这些资源的接入方请优先使用 CocoaPods**；若必须用 SPM，需自行把对应 `.bundle` 资源加入 App target（资源见 Release 合并包 `IFLYADLib-modelA-6.0.12.zip` 内 `resources/` 目录的 `Core` / `VideoUI` / `Reward` 三域）。纯 `Banner`、纯 `NativeFeed`（图片）等不依赖内置素材的组合不受影响。
+> ⚠️ **SPM 不携带资源 bundle**：SPM 的 `binaryTarget` 无法像 CocoaPods 那样随包分发 `resource_bundles`。因此用到内置素材的格式（开屏/插屏交互图、视频播放控件、激励 UI 等）经 **SPM** 接入时，运行期会找不到对应图片/资源而降级（图标缺失等）。**需要这些资源的接入方请优先使用 CocoaPods**；若必须用 SPM，需自行把对应 `.bundle` 资源加入 App target（资源见 Release 合并包 `IFLYADLib-modelA-6.0.13.zip` 内 `resources/` 目录的 `Core` / `VideoUI` / `Reward` 三域）。纯 `Banner`、纯 `NativeFeed`（图片）等不依赖内置素材的组合不受影响。
 
 ## 权限与隐私配置
 
@@ -134,7 +135,7 @@ SDK 自带 Apple 隐私清单，声明以下隐私特征。**接入方须在 App
 - **收集的数据类型**：设备 ID（DeviceID）、产品交互（ProductInteraction）、广告数据（AdvertisingData）——均关联用户且用于追踪，用途为第三方广告与分析；其他诊断数据（OtherDiagnosticData）——不关联、不用于追踪，用途为 App 功能与分析。
 - **Required Reason API**：UserDefaults（`CA92.1`）、文件时间戳（`C617.1`）、系统启动时间（`35F9.1`）、磁盘可用空间（`E174.1`）。
 
-CocoaPods 接入会经资源 bundle 自动带入该隐私清单（`6.0.0` 随框架、`6.0.2+` 随 `Core` 资源 `IFLYADLibCoreResources`）；**Swift Package Manager 接入方需自行把隐私清单随工程提交**（可从 Release 合并包 `IFLYADLib-modelA-6.0.12.zip` 内 `resources/Core/PrivacyInfo.xcprivacy` 取用），以满足 App Store 审核对第三方 SDK 隐私清单的要求。
+CocoaPods 接入会经资源 bundle 自动带入该隐私清单（`6.0.0` 随框架、`6.0.2+` 随 `Core` 资源 `IFLYADLibCoreResources`）；**Swift Package Manager 接入方需自行把隐私清单随工程提交**（可从 Release 合并包 `IFLYADLib-modelA-6.0.13.zip` 内 `resources/Core/PrivacyInfo.xcprivacy` 取用），以满足 App Store 审核对第三方 SDK 隐私清单的要求。
 
 ### ATT 与 IDFA
 
@@ -538,8 +539,8 @@ if (ad.bidInfo.winNoticeAvailable) {
 
 | 现象 | 排查建议 |
 | --- | --- |
-| `pod install` 找不到 `6.0.12` | 执行 `pod install --repo-update`；或临时用 `:podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.12/IFLYADLib.podspec'` 直连本仓 Release。 |
-| 模拟器无法运行 | `6.0.12`（模型 A）含模拟器切片，可直接在模拟器调试；仅旧 `6.0.0` 单包不含模拟器切片需真机。 |
+| `pod install` 找不到 `6.0.13` | 执行 `pod install --repo-update`；或临时用 `:podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.0.13/IFLYADLib.podspec'` 直连本仓 Release。 |
+| 模拟器无法运行 | `6.0.13`（模型 A）含模拟器切片，可直接在模拟器调试；仅旧 `6.0.0` 单包不含模拟器切片需真机。 |
 | IDFA 为空 | 确认 `NSUserTrackingUsageDescription` 已配置；用户已允许 ATT；在授权完成后再读取 `ASIdentifierManager`；过滤全零 UUID。 |
 | `isAdValid` 为 NO | 确认已收到 `DidReady` 回调；广告未过期、未展示过、实例未销毁。 |
 | 展示失败 | 确认 `rootViewController` 已在 window 上，当前没有正在 present 的控制器。 |
@@ -566,7 +567,7 @@ pod install --repo-update
 open IFLYADLibSimple.xcworkspace
 ```
 
-> 说明：示例当前固定 `pod 'IFLYADLib', '6.0.12'`（CocoaPods 官方源），默认 `Full`（五种广告全开），为模型 A 可组合的 `xcframework`、**含模拟器切片**（可直接在模拟器运行）。如需体验按广告形式部分接入（如 `pod 'IFLYADLib/Splash'`）或 SPM，参见「按广告形式可组合接入（模型 A）」。示例覆盖五种广告的基础用法；**S2S 服务端竞价与 Header Bidding 仅在本文档说明，示例工程未内置端到端演示**（端到端需媒体服务端配合下发 `rspToken`）。真机运行请在 Xcode「Signing & Capabilities」选择你自己的开发者 Team（示例已置空 `DEVELOPMENT_TEAM`）。
+> 说明：示例当前固定 `pod 'IFLYADLib', '6.0.13'`（CocoaPods 官方源），默认 `Full`（五种广告全开），为模型 A 可组合的 `xcframework`、**含模拟器切片**（可直接在模拟器运行）。如需体验按广告形式部分接入（如 `pod 'IFLYADLib/Splash'`）或 SPM，参见「按广告形式可组合接入（模型 A）」。示例覆盖五种广告的基础用法；**S2S 服务端竞价与 Header Bidding 仅在本文档说明，示例工程未内置端到端演示**（端到端需媒体服务端配合下发 `rspToken`）。真机运行请在 Xcode「Signing & Capabilities」选择你自己的开发者 Team（示例已置空 `DEVELOPMENT_TEAM`）。
 
 ## 接入建议
 
@@ -576,16 +577,16 @@ open IFLYADLibSimple.xcworkspace
 - 单个广告实例通常为一次性消费，展示/关闭/销毁后请重新创建实例。
 - 正式上线前请替换为平台分配的真实广告位 ID，并关闭排查用日志。
 
-## 从 6.0.0 升级到 6.0.12
+## 从 6.0.0 升级到 6.0.13
 
-`6.0.12` 是**接入形态**升级，公开 API 与 `Full` 行为与 `6.0.0` 完全一致，业务代码无需改动；头文件引用不变：`#import <IFLYADLib/IFLYADLib.h>`。
+`6.0.13` 是**接入形态**升级，公开 API 与 `Full` 行为与 `6.0.0` 完全一致，业务代码无需改动；头文件引用不变：`#import <IFLYADLib/IFLYADLib.h>`。
 
-- **CocoaPods · 保持全量**：`pod 'IFLYADLib'` → `pod 'IFLYADLib', '6.0.12'`（默认 `Full` 即五种广告全开）。
+- **CocoaPods · 保持全量**：`pod 'IFLYADLib'` → `pod 'IFLYADLib', '6.0.13'`（默认 `Full` 即五种广告全开）。
 - **CocoaPods · 改为按需**：把 `pod 'IFLYADLib'` 换成所需格式 subspec，例如 `pod 'IFLYADLib/Splash'`、`pod 'IFLYADLib/Banner'`；`Core` 必选、`VideoUI` 与资源按依赖自动带入。
 - **改用 SPM**：见「按广告形式可组合接入（模型 A）」→「Swift Package Manager」，注意 `-ObjC` 与资源两条说明。
 - **subspec ↔ 格式**：`Splash` / `Banner` / `Interstitial` / `NativeFeed` / `Reward`。
 
-> `6.0.12` 已发布到 CocoaPods 官方源（trunk）+ GitHub Releases + SPM，`pod 'IFLYADLib', '6.0.12'` 可直接使用。
+> `6.0.13` 已发布到 CocoaPods 官方源（trunk）+ GitHub Releases + SPM，`pod 'IFLYADLib', '6.0.13'` 可直接使用。
 
 ## 问题反馈与支持
 
