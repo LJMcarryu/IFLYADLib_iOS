@@ -125,7 +125,7 @@
 
 - (void)destroyAd {
     [self destroyAdSilently];
-    [self updateStatus:@"已销毁" color:UIColor.systemTealColor];
+    [self updateStatus:@"已销毁" color:[IFLYADUtil demoTealColor]];
     [self log:@"Destroy"];
 }
 
@@ -167,7 +167,7 @@
                                       ad.hasVideoTemplate ? @"YES" : @"NO",
                                       ad.isLandscapeTemplate ? @"YES" : @"NO",
                                       [ad ecpm]]];
-    [self updateStatus:@"已加载，等待素材 ready" color:UIColor.systemIndigoColor];
+    [self updateStatus:@"已加载，等待素材 ready" color:[IFLYADUtil demoIndigoColor]];
 }
 
 - (void)interstitialAdDidReady:(IFLYInterstitialAd *)ad {
@@ -195,7 +195,7 @@
 
 - (void)interstitialAdDidClose:(IFLYInterstitialAd *)ad {
     [self log:@"interstitialAdDidClose"];
-    [self updateStatus:@"插屏已关闭" color:UIColor.systemTealColor];
+    [self updateStatus:@"插屏已关闭" color:[IFLYADUtil demoTealColor]];
 }
 
 - (void)interstitialAd:(IFLYInterstitialAd *)ad didFailWithError:(IFLYAdError *)error {

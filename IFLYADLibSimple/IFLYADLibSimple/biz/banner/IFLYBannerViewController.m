@@ -130,7 +130,7 @@
 - (void)destroyBannerAd {
     [self destroyBannerAdSilently];
     [self resetBannerPlaceholder];
-    [self updateStatus:@"已销毁" color:UIColor.systemTealColor];
+    [self updateStatus:@"已销毁" color:[IFLYADUtil demoTealColor]];
     [self log:@"Destroy"];
 }
 
@@ -157,7 +157,7 @@
     UILabel *label = [[UILabel alloc] initWithFrame:self.bannerContainer.bounds];
     label.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     label.text = @"Banner 展示区域";
-    label.textColor = UIColor.secondaryLabelColor;
+    label.textColor = [IFLYADUtil demoSecondaryLabelColor];
     label.textAlignment = NSTextAlignmentCenter;
     label.font = [UIFont systemFontOfSize:14];
     [self.bannerContainer addSubview:label];
@@ -182,7 +182,7 @@
 
 - (void)bannerAdDidLoad:(IFLYBannerAd *)ad {
     [self log:[NSString stringWithFormat:@"bannerAdDidLoad ecpm=%.2f", [ad ecpm]]];
-    [self updateStatus:@"已加载，等待素材 ready" color:UIColor.systemIndigoColor];
+    [self updateStatus:@"已加载，等待素材 ready" color:[IFLYADUtil demoIndigoColor]];
 }
 
 - (void)bannerAdDidReady:(IFLYBannerAd *)ad {
@@ -206,7 +206,7 @@
 
 - (void)bannerAdDidClose:(IFLYBannerAd *)ad {
     [self log:@"bannerAdDidClose"];
-    [self updateStatus:@"Banner 已关闭" color:UIColor.systemTealColor];
+    [self updateStatus:@"Banner 已关闭" color:[IFLYADUtil demoTealColor]];
 }
 
 - (void)bannerAd:(IFLYBannerAd *)ad didFailWithError:(IFLYAdError *)error {

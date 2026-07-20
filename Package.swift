@@ -4,7 +4,7 @@
 // SwiftPM 的 binaryTarget 不能直接声明 target 间依赖，因此这里使用轻量伞 target 表达依赖图。
 // 静态库 category / +load 依赖 -ObjC：本清单【不再】用 .unsafeFlags 注入 -ObjC（unsafeFlags 会让本包
 // 无法作为带版本号的依赖被标准 SwiftPM 消费）。改由【消费方】在自己 App target 的 OTHER_LDFLAGS 加 -ObjC。
-// 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：binaryTarget url 指向其 GitHub Releases tag 6.0.13 的
+// 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：binaryTarget url 指向其 GitHub Releases tag 6.0.14 的
 //   各 IFLYAd<模块>.xcframework.zip（checksum 为 sha256）。本仓库私有，仅承载源码/构建脚本；此清单与公开仓一致。
 // 产物用 scripts/package-model-a-release.sh 打包并算 checksum（device(ios-arm64)+simulator 双切片）；
 //   换版本/主机时重跑该脚本（--base-url <新主机>）后据 release/checksums.txt 同步更新此处与公开仓 url/checksum。
@@ -15,8 +15,9 @@ import PackageDescription
 
 let package = Package(
     name: "IFLYADLib",
+    // 6.0.14 的 binaryTarget 已按 iOS 11 重新构建并与本声明同步发布。
     platforms: [
-        .iOS(.v13),
+        .iOS("11.0"),
     ],
     products: [
         .library(name: "Core", targets: ["Core"]),
@@ -30,38 +31,38 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "IFLYAdCore",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.13/IFLYAdCore.xcframework.zip",
-            checksum: "aea1a4443fbd24f245e195f8d0de23756e620c5eba3ad78c8c8481ed145e5d77"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.14/IFLYAdCore.xcframework.zip",
+            checksum: "7271cd7eefd3bbe98007dddd0eba6cee747c6dd86249aea7223299eab970a1f6"
         ),
         .binaryTarget(
             name: "IFLYAdVideoUI",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.13/IFLYAdVideoUI.xcframework.zip",
-            checksum: "5c8451d08147c059bc4a2fb5f85a540896198e14a7a7ec8cb55561b1e97745fa"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.14/IFLYAdVideoUI.xcframework.zip",
+            checksum: "2f559fb21f8fef67ccf1fc9d728bf1e6675bb4d123ade4c7ba893ff33134e469"
         ),
         .binaryTarget(
             name: "IFLYAdBanner",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.13/IFLYAdBanner.xcframework.zip",
-            checksum: "3b3f342e14440819d6f67541d991cec61ce1e2cd31a5448172fbf5c9450c12f0"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.14/IFLYAdBanner.xcframework.zip",
+            checksum: "37e0a287687513c812bfeeceb08eb41ad3a240ce351d817aaf1a3a29e15c5803"
         ),
         .binaryTarget(
             name: "IFLYAdSplash",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.13/IFLYAdSplash.xcframework.zip",
-            checksum: "7afce885122f496cedd7007cdd7725b95713cd435ba776718463158e616b819d"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.14/IFLYAdSplash.xcframework.zip",
+            checksum: "59ab260e29f42efbbb55bdb6e61e0dd4117d895c74b5390b21de9343106146c7"
         ),
         .binaryTarget(
             name: "IFLYAdInterstitial",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.13/IFLYAdInterstitial.xcframework.zip",
-            checksum: "1f54aa8c9bc69c12b9c09ccbc4b1c9cd9c7973ba29107942b564114c90e0e290"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.14/IFLYAdInterstitial.xcframework.zip",
+            checksum: "61b5f2fac173c6c56c0641838077edef967f8ab1e2f727bbc7bc6831818e3de6"
         ),
         .binaryTarget(
             name: "IFLYAdNativeFeed",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.13/IFLYAdNativeFeed.xcframework.zip",
-            checksum: "1de37c3e36c0b6e2f3f5e3800a1e0799fee76d266ee553f00359194dbb6ab78a"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.14/IFLYAdNativeFeed.xcframework.zip",
+            checksum: "45981edb2d1db4e0bd0e67afbcaf6f8db4965de31f4ad0559baaf6ec589104c3"
         ),
         .binaryTarget(
             name: "IFLYAdReward",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.13/IFLYAdReward.xcframework.zip",
-            checksum: "22483b8b9dadd8b485cc9bd7feda67eee893bd21c7fde50154b84374cd286a2c"
+            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.0.14/IFLYAdReward.xcframework.zip",
+            checksum: "d9ce7ec479c4cfa55477ed85ab9c7fb1062ff2ed6945bb6dbbb8ff4a6091eaa0"
         ),
         .target(
             name: "Core",

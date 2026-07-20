@@ -25,6 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
                                   action:(SEL)action;
 + (UILabel *)createSectionTitleWithText:(NSString *)text frame:(CGRect)frame;
 + (UITextView *)createLogTextViewWithFrame:(CGRect)frame;
++ (UIColor *)demoSecondaryLabelColor;
++ (UIColor *)demoIndigoColor;
++ (UIColor *)demoTealColor;
 + (void)appendLog:(NSString *)text toTextView:(UITextView *)textView;
 + (IFLYAdRequestConfig *)mediaSampleRequestConfig;
 + (NSString *)summaryForError:(nullable IFLYAdError *)error;
