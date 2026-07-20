@@ -2,6 +2,23 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.0.14] - 2026-07-20
+
+### 新增
+- 插屏和激励视频素材同时包含图片时，视频播放结束后展示图片完播页；开屏仍按原语义在视频结束后关闭，不增加完播页。
+- 请求链路补齐客户端竞价时间戳、曝光宏和设备调试状态字段，并实现分格式点击回调丢弃策略。
+
+### 变更
+- SDK、公开 Podspec、Swift Package、示例工程与全部重新构建的 device / simulator 二进制最低系统统一为 iOS 11.0；历史 `6.0.13` 及更早产物不追溯扩大支持范围。
+- 请求字段 `lts` 从顶层移入 `device` 对象；公开 API 签名不变。
+- 7 个模块二进制按 iOS 11 重新构建；`Package.swift` 的 7 个 URL/checksum 与 `IFLYADLib.podspec` 合并 zip 源同步到 `6.0.14`。
+
+## [6.0.13] - 2026-07-09
+
+### 新增
+- 自渲染信息流的「点击+摇一摇」广告绑定成功后，由 SDK 在容器右下角自动添加「摇一摇查看详情」提示，并避让关闭按钮。
+- 自渲染素材校验失败时增加脱敏诊断日志；公开 API 签名不变。
+
 ## [6.0.12] - 2026-07-08
 
 ### 说明
@@ -120,6 +137,10 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.0.14]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.14
+[6.0.13]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.13
+[6.0.12]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.12
+[6.0.11]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.11
 [6.0.10]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.10
 [6.0.9]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.9
 [6.0.8]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.8

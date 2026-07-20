@@ -179,7 +179,7 @@
 - (void)destroyAd {
     [self destroyAdSilently];
     [self resetAdCard];
-    [self updateStatus:@"已销毁" color:UIColor.systemTealColor];
+    [self updateStatus:@"已销毁" color:[IFLYADUtil demoTealColor]];
     [self log:@"Destroy"];
 }
 
@@ -289,7 +289,7 @@
     if (ad != self.nativeAd) {
         return;
     }
-    [self updateStatus:@"加载成功，媒体侧开始渲染" color:UIColor.systemIndigoColor];
+    [self updateStatus:@"加载成功，媒体侧开始渲染" color:[IFLYADUtil demoIndigoColor]];
     [self renderAndBindAd:ad];
 }
 
@@ -313,7 +313,7 @@
 
 - (void)nativeFeedAdDidClose:(IFLYNativeFeedAd *)ad {
     [self log:@"nativeFeedAdDidClose"];
-    [self updateStatus:@"信息流已关闭" color:UIColor.systemTealColor];
+    [self updateStatus:@"信息流已关闭" color:[IFLYADUtil demoTealColor]];
     if (ad == self.nativeAd) {
         [self destroyAdSilently];
         [self resetAdCard];

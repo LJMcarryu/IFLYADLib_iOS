@@ -115,7 +115,7 @@
 
 - (void)destroyAd {
     [self destroyAdSilently];
-    [self updateStatus:@"已销毁" color:UIColor.systemTealColor];
+    [self updateStatus:@"已销毁" color:[IFLYADUtil demoTealColor]];
     [self log:@"Destroy"];
 }
 
@@ -157,7 +157,7 @@
                                       ad.hasVideoTemplate ? @"YES" : @"NO",
                                       ad.isLandscapeTemplate ? @"YES" : @"NO",
                                       [ad ecpm]]];
-    [self updateStatus:@"已加载，等待素材 ready" color:UIColor.systemIndigoColor];
+    [self updateStatus:@"已加载，等待素材 ready" color:[IFLYADUtil demoIndigoColor]];
 }
 
 - (void)rewardVideoAdDidReady:(IFLYRewardVideoAd *)ad {
@@ -193,7 +193,7 @@
 
 - (void)rewardVideoAdDidClose:(IFLYRewardVideoAd *)ad {
     [self log:@"rewardVideoAdDidClose"];
-    [self updateStatus:@"激励视频已关闭" color:UIColor.systemTealColor];
+    [self updateStatus:@"激励视频已关闭" color:[IFLYADUtil demoTealColor]];
 }
 
 - (void)rewardVideoAd:(IFLYRewardVideoAd *)ad didFailWithError:(IFLYAdError *)error {
