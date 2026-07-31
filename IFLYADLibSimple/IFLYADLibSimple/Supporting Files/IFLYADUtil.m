@@ -159,6 +159,11 @@
     return [NSString stringWithFormat:@"code=%d desc=%@", error.errorCode, error.errorDescription ?: @"无"];
 }
 
++ (double)priceForAd:(nullable IFLYAdBase *)ad {
+    NSNumber *price = ad.bidInfo.price;
+    return [price respondsToSelector:@selector(doubleValue)] ? price.doubleValue : -1.0;
+}
+
 + (void)loadImageWithURLString:(NSString *)urlString
                     completion:(void (^)(UIImage *_Nullable image, NSError *_Nullable error))completion {
     NSURL *url = urlString.length > 0 ? [NSURL URLWithString:urlString] : nil;

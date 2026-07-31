@@ -1,0 +1,140 @@
+{
+  "schemaVersion": 1,
+  "package": "IFLYADLib",
+  "binaryTargets": [
+    "IFLYAdCore",
+    "IFLYAdVideoUI",
+    "IFLYAdBanner",
+    "IFLYAdSplash",
+    "IFLYAdInterstitial",
+    "IFLYAdNativeFeed",
+    "IFLYAdReward"
+  ],
+  "products": {
+    "Core": [
+      "Core"
+    ],
+    "Banner": [
+      "Banner"
+    ],
+    "Splash": [
+      "Splash"
+    ],
+    "Interstitial": [
+      "Interstitial"
+    ],
+    "NativeFeed": [
+      "NativeFeed"
+    ],
+    "Reward": [
+      "Reward"
+    ],
+    "Full": [
+      "Full"
+    ]
+  },
+  "targets": {
+    "Core": {
+      "path": "spm/Core",
+      "dependencies": [
+        "IFLYAdCore"
+      ],
+      "resources": [
+        {
+          "rule": "process",
+          "path": "Resources",
+          "fileCount": 1
+        },
+        {
+          "rule": "copy",
+          "path": "IFLYADLibCoreResources.bundle",
+          "fileCount": 6
+        }
+      ]
+    },
+    "VideoUI": {
+      "path": "spm/VideoUI",
+      "dependencies": [
+        "IFLYAdVideoUI",
+        "Core"
+      ],
+      "resources": [
+        {
+          "rule": "copy",
+          "path": "IFLYADLibVideoUIResources.bundle",
+          "fileCount": 19
+        }
+      ]
+    },
+    "Banner": {
+      "path": "spm/Banner",
+      "dependencies": [
+        "IFLYAdBanner",
+        "Core"
+      ],
+      "resources": []
+    },
+    "Splash": {
+      "path": "spm/Splash",
+      "dependencies": [
+        "IFLYAdSplash",
+        "Core",
+        "VideoUI"
+      ],
+      "resources": []
+    },
+    "Interstitial": {
+      "path": "spm/Interstitial",
+      "dependencies": [
+        "IFLYAdInterstitial",
+        "Core",
+        "VideoUI"
+      ],
+      "resources": []
+    },
+    "NativeFeed": {
+      "path": "spm/NativeFeed",
+      "dependencies": [
+        "IFLYAdNativeFeed",
+        "Core"
+      ],
+      "resources": []
+    },
+    "Reward": {
+      "path": "spm/Reward",
+      "dependencies": [
+        "IFLYAdReward",
+        "Core",
+        "VideoUI"
+      ],
+      "resources": [
+        {
+          "rule": "copy",
+          "path": "IFLYADLibRewardResources.bundle",
+          "fileCount": 36
+        }
+      ]
+    },
+    "Full": {
+      "path": "spm/Full",
+      "dependencies": [
+        "Banner",
+        "Splash",
+        "Interstitial",
+        "NativeFeed",
+        "Reward"
+      ],
+      "resources": []
+    }
+  },
+  "privacyManifest": {
+    "ownerTarget": "Core",
+    "path": "spm/Core/Resources/PrivacyInfo.xcprivacy",
+    "cocoaPodsPath": "resources/Core/PrivacyInfo.xcprivacy",
+    "requiredAccessedAPIs": {
+      "NSPrivacyAccessedAPICategoryUserDefaults": [
+        "CA92.1"
+      ]
+    }
+  }
+}

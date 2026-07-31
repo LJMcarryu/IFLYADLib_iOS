@@ -2,6 +2,26 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.1.0] - 2026-07-31
+
+### 新增
+
+- NativeFeed `IFLYNativeFeedAdData` 新增 `appName`，对应服务端 `app_name`；仅 NativeFeed 暴露，空字符串和纯空白归一为 `nil`。
+- NativeFeed Binder 支持 `Exposure` / `Unknown` 显式传空 `clickViews` 完成仅曝光绑定；补齐视频 start / pause / resume / finish / fail 回调驱动的封面状态示例。
+- 公开示例新增单图、视频、多图三条直达路径；多图支持两至三张。
+
+### 变更
+
+- 五种广告格式通用响应字段严格收敛为 `bidInfo.price` 和 `bidInfo.dealId`；创意 ID 仅通过 NativeFeed 的 `adData.creativeId` 暴露。
+- NativeFeed CTA 改为服务端原始 `ctaText`；`templateId/materialType` 统一为 `0=Unknown`、`1=SingleImage`、`2=Video`、`3=MultipleImages`，按 `video → img1+img2 → img/icon → Unknown` 推导。
+- 多图最低要求由固定三张改为 `img1+img2`，`img3` 可选。绑定成功即消费广告实例；视图复用、替换广告或页面退出前须执行 `unbindAd → delegate=nil → destroy`。
+- NativeFeed 视频由 SDK 在媒体提供的普通 `UIView` 内托管播放器、观察者和监测；媒体不自行创建 `AVPlayer`。SDK 不再向自渲染容器添加摇一摇提示 UI。
+- SwiftPM 的 `Core` / `VideoUI` / `Reward` 伞 target 改为自动投递三域资源；所有 product 经 `Core` 自动携带 `PrivacyInfo.xcprivacy`，媒体不再手工复制资源。
+
+### 移除
+
+- 移除旧的 `ecpm`、`actionText`、`rawAdData`、`sponsored`、`ThreeImages` 和 `winNoticeAvailable` 公开 API。该版本需要业务代码迁移并重新编译，详见 README「从 6.0.14 升级到 6.1.0」。
+
 ## [6.0.14] - 2026-07-20
 
 ### 新增
@@ -137,6 +157,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.1.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.1.0
 [6.0.14]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.14
 [6.0.13]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.13
 [6.0.12]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.12

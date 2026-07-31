@@ -143,9 +143,9 @@
 }
 
 - (void)checkStatus {
-    [self log:[NSString stringWithFormat:@"状态 isAdValid=%@ ecpm=%.2f",
+    [self log:[NSString stringWithFormat:@"状态 isAdValid=%@ price=%.2f",
                                       (self.splashAd && [self.splashAd isAdValid]) ? @"YES" : @"NO",
-                                      self.splashAd ? [self.splashAd ecpm] : -1.0]];
+                                      [IFLYADUtil priceForAd:self.splashAd]]];
 }
 
 - (void)destroyAdSilently {
@@ -176,10 +176,11 @@
 #pragma mark - IFLYSplashAdDelegate
 
 - (void)splashAdDidLoad:(IFLYSplashAd *)ad {
-    [self log:[NSString stringWithFormat:@"splashAdDidLoad video=%@ landscape=%@ ecpm=%.2f",
+    [self log:[NSString stringWithFormat:@"splashAdDidLoad video=%@ landscape=%@ price=%.2f dealId=%@",
                                       ad.hasVideoTemplate ? @"YES" : @"NO",
                                       ad.isLandscapeTemplate ? @"YES" : @"NO",
-                                      [ad ecpm]]];
+                                      [IFLYADUtil priceForAd:ad],
+                                      ad.bidInfo.dealId ?: @"无"]];
     [self updateStatus:@"已加载，等待素材 ready" color:[IFLYADUtil demoIndigoColor]];
 }
 

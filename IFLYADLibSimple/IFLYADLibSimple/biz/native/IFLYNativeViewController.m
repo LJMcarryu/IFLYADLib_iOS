@@ -11,9 +11,11 @@
 @property (nonatomic, strong) UIView *adContainer;
 @property (nonatomic, strong) UIView *videoView;
 @property (nonatomic, strong) UIImageView *imageView;
+@property (nonatomic, copy) NSArray<UIImageView *> *multipleImageViews;
 @property (nonatomic, strong) UILabel *placeholderLabel;
 @property (nonatomic, strong) UILabel *adBadgeLabel;
 @property (nonatomic, strong) UILabel *descLabel;
+@property (nonatomic, strong) UIButton *ctaButton;
 @property (nonatomic, strong) UIButton *closeButton;
 @property (nonatomic, strong) UITextView *logView;
 
@@ -23,14 +25,17 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"自渲染信息流";
+    self.title = @"自渲染信息流示例";
     self.view.backgroundColor = UIColor.whiteColor;
     [self setupUI];
-    [self log:@"信息流示例：Load -> 媒体渲染素材 -> bindAdWithViewBinder"];
+    [self log:@"自渲染信息流示例：Load -> 读取 adData -> 媒体渲染 -> Binder 绑定"];
 }
 
 - (void)dealloc {
-    [self.nativeAd destroy];
+    IFLYNativeFeedAd *ad = self.nativeAd;
+    [ad unbindAd];
+    ad.delegate = nil;
+    [ad destroy];
 }
 
 - (void)setupUI {
@@ -44,7 +49,7 @@
     [self.view addSubview:desc];
     y += 54;
 
-    self.slotControl = [[UISegmentedControl alloc] initWithItems:@[@"图文", @"视频"]];
+    self.slotControl = [[UISegmentedControl alloc] initWithItems:@[@"单图", @"视频", @"多图"]];
     self.slotControl.frame = CGRectMake(margin, y, contentWidth, 32);
     self.slotControl.selectedSegmentIndex = 0;
     [self.view addSubview:self.slotControl];
@@ -122,6 +127,19 @@
     self.imageView.hidden = YES;
     [self.adContainer addSubview:self.imageView];
 
+    NSMutableArray<UIImageView *> *multipleImageViews = [NSMutableArray arrayWithCapacity:3];
+    for (NSInteger index = 0; index < 3; index++) {
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        imageView.backgroundColor = [UIColor colorWithRed:0.95 green:0.95 blue:0.96 alpha:1.0];
+        imageView.contentMode = UIViewContentModeScaleAspectFill;
+        imageView.clipsToBounds = YES;
+        imageView.layer.cornerRadius = 6;
+        imageView.hidden = YES;
+        [self.adContainer addSubview:imageView];
+        [multipleImageViews addObject:imageView];
+    }
+    self.multipleImageViews = multipleImageViews.copy;
+
     CGFloat rowY = CGRectGetMaxY(self.videoView.frame) + 10;
     CGFloat rowH = 28;
     CGFloat badgeW = 40;
@@ -150,8 +168,26 @@
     [self.closeButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
     [self.adContainer addSubview:self.closeButton];
 
+    CGFloat ctaW = 72;
+    self.ctaButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [self.ctaButton setTitle:@"查看详情" forState:UIControlStateNormal];
+    [self.ctaButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    self.ctaButton.backgroundColor = [IFLYADUtil demoIndigoColor];
+    self.ctaButton.layer.cornerRadius = 6;
+    self.ctaButton.clipsToBounds = YES;
+    self.ctaButton.titleLabel.font = [UIFont systemFontOfSize:13 weight:UIFontWeightMedium];
+    self.ctaButton.titleLabel.adjustsFontSizeToFitWidth = YES;
+    self.ctaButton.titleLabel.minimumScaleFactor = 0.75;
+    self.ctaButton.frame = CGRectMake(CGRectGetMinX(self.closeButton.frame) - gap - ctaW,
+                                      rowY,
+                                      ctaW,
+                                      rowH);
+    self.ctaButton.userInteractionEnabled = YES;
+    self.ctaButton.hidden = YES;
+    [self.adContainer addSubview:self.ctaButton];
+
     CGFloat descX = CGRectGetMaxX(self.adBadgeLabel.frame) + gap;
-    CGFloat descW = CGRectGetMinX(self.closeButton.frame) - gap - descX;
+    CGFloat descW = CGRectGetMinX(self.ctaButton.frame) - gap - descX;
     self.descLabel = [[UILabel alloc] initWithFrame:CGRectMake(descX, rowY, descW, rowH)];
     self.descLabel.font = [UIFont systemFontOfSize:13];
     self.descLabel.textColor = UIColor.darkGrayColor;
@@ -164,7 +200,12 @@
     [self destroyAdSilently];
     [self resetAdCard];
 
-    NSString *adUnitId = self.slotControl.selectedSegmentIndex == 1 ? __FEED_VIDEO_AD_UNIT_ID__ : __TYPED_ONE_NATIVE_AD_UNIT_ID__;
+    NSString *adUnitId = __TYPED_ONE_NATIVE_AD_UNIT_ID__;
+    if (self.slotControl.selectedSegmentIndex == 1) {
+        adUnitId = __FEED_VIDEO_AD_UNIT_ID__;
+    } else if (self.slotControl.selectedSegmentIndex == 2) {
+        adUnitId = __TYPED_MORE_NATIVE_AD_UNIT_ID__;
+    }
     [self updateStatus:@"正在加载信息流" color:UIColor.systemBlueColor];
     [self log:[NSString stringWithFormat:@"Load adUnitId=%@", adUnitId]];
 
@@ -184,82 +225,199 @@
 }
 
 - (void)destroyAdSilently {
-    if (!self.nativeAd) {
+    IFLYNativeFeedAd *ad = self.nativeAd;
+    if (!ad) {
         return;
     }
-    self.nativeAd.delegate = nil;
-    [self.nativeAd destroy];
     self.nativeAd = nil;
+    [ad unbindAd];
+    ad.delegate = nil;
+    [ad destroy];
 }
 
 - (void)resetAdCard {
-    // 复位媒体区：移除视频承载视图里临时添加的子视图，保留占位标签
-    for (UIView *subview in [self.videoView.subviews copy]) {
-        if (subview != self.placeholderLabel) {
-            [subview removeFromSuperview];
-        }
-    }
+    // 先由 unbindAd 让 SDK 移除自己的播放器宿主；媒体仅复位自己创建的视图。
     self.videoView.hidden = NO;
     self.placeholderLabel.hidden = NO;
     self.placeholderLabel.text = @"广告素材展示区域";
     self.imageView.hidden = YES;
     self.imageView.image = nil;
+    for (UIImageView *imageView in self.multipleImageViews) {
+        imageView.hidden = YES;
+        imageView.image = nil;
+    }
     self.adBadgeLabel.hidden = YES;
+    self.adBadgeLabel.text = @"广告";
     self.descLabel.text = @"";
+    self.ctaButton.hidden = YES;
+    [self.ctaButton setTitle:nil forState:UIControlStateNormal];
     self.closeButton.hidden = YES;
 }
 
 - (void)renderAndBindAd:(IFLYNativeFeedAd *)ad {
     IFLYNativeFeedAdData *data = ad.adData;
+    if (!data || !data.isMaterialComplete ||
+        data.materialType == IFLYNativeFeedAdMaterialTypeUnknown) {
+        [self log:@"素材不完整或类型未知，不渲染、不绑定"];
+        [self updateStatus:@"素材不可用" color:UIColor.systemRedColor];
+        [self destroyAdSilently];
+        [self resetAdCard];
+        return;
+    }
     self.adBadgeLabel.hidden = NO;
+    self.adBadgeLabel.text = data.adSourceMark.length > 0 ? data.adSourceMark : @"广告";
     self.closeButton.hidden = NO;
-    self.descLabel.text = data.desc.length > 0 ? data.desc : (data.content.length > 0 ? data.content : (data.title.length > 0 ? data.title : @"广告描述"));
+    self.descLabel.text =
+        data.appName.length > 0 ? data.appName :
+        (data.title.length > 0 ? data.title :
+         (data.brand.length > 0 ? data.brand :
+          (data.desc.length > 0 ? data.desc : (data.content.length > 0 ? data.content : @"广告"))));
 
-    [self log:[NSString stringWithFormat:@"素材 materialType=%ld title=%@", (long)data.materialType, data.title ?: @"无"]];
-    if (ad.hasVideoTemplate) {
-        // 视频：深色媒体区承载视频，先显示"视频加载中"占位
-        self.imageView.hidden = YES;
-        self.videoView.hidden = NO;
-        self.placeholderLabel.hidden = NO;
-        self.placeholderLabel.text = @"视频加载中...";
-        [self bindNativeAd:ad video:YES];
+    BOOL clickable =
+        data.interactionType == IFLYNativeFeedAdInteractionTypeRedirect ||
+        data.interactionType == IFLYNativeFeedAdInteractionTypeDownload;
+    self.ctaButton.hidden = !clickable;
+    NSString *fallbackCTA =
+        data.interactionType == IFLYNativeFeedAdInteractionTypeDownload ? @"立即下载" : @"查看详情";
+    [self.ctaButton setTitle:(clickable ? (data.ctaText.length > 0 ? data.ctaText : fallbackCTA) : nil)
+                    forState:UIControlStateNormal];
+
+    [self log:[NSString stringWithFormat:
+                                      @"素材 templateId=%ld materialType=%ld interactionType=%ld interactType=%ld appName=%@",
+                                      (long)data.templateId,
+                                      (long)data.materialType,
+                                      (long)data.interactionType,
+                                      (long)data.interactType,
+                                      data.appName ?: @"无"]];
+
+    switch (data.materialType) {
+        case IFLYNativeFeedAdMaterialTypeVideo:
+            self.imageView.hidden = YES;
+            self.videoView.hidden = NO;
+            self.placeholderLabel.hidden = NO;
+            self.placeholderLabel.text = @"视频加载中...";
+            [self bindNativeAd:ad video:YES mediaViews:@[self.videoView]];
+            return;
+        case IFLYNativeFeedAdMaterialTypeSingleImage:
+            [self renderImagesForAd:ad URLs:@[data.imageURLs.firstObject] multiple:NO];
+            return;
+        case IFLYNativeFeedAdMaterialTypeMultipleImages:
+            [self renderImagesForAd:ad URLs:data.imageURLs multiple:YES];
+            return;
+        case IFLYNativeFeedAdMaterialTypeUnknown:
+        default:
+            [self updateStatus:@"素材类型未知" color:UIColor.systemRedColor];
+            [self destroyAdSilently];
+            [self resetAdCard];
+            return;
+    }
+}
+
+- (void)renderImagesForAd:(IFLYNativeFeedAd *)ad
+                     URLs:(NSArray<NSString *> *)URLs
+                 multiple:(BOOL)multiple {
+    NSUInteger expectedCount = multiple ? MIN(URLs.count, self.multipleImageViews.count) : MIN(URLs.count, 1);
+    if (expectedCount == 0) {
+        [self log:@"图片素材为空，不绑定"];
+        [self updateStatus:@"图片素材为空" color:UIColor.systemRedColor];
+        [self destroyAdSilently];
+        [self resetAdCard];
         return;
     }
 
-    NSString *imageURL = data.imageURLs.firstObject;
+    NSMutableArray *loadedImages = [NSMutableArray arrayWithCapacity:expectedCount];
+    for (NSUInteger index = 0; index < expectedCount; index++) {
+        [loadedImages addObject:NSNull.null];
+    }
+
+    __block NSUInteger remaining = expectedCount;
+    __block NSError *firstError = nil;
     __weak typeof(self) weakSelf = self;
-    [IFLYADUtil loadImageWithURLString:imageURL
-                            completion:^(UIImage *image, NSError *error) {
-                                __strong typeof(weakSelf) self = weakSelf;
-                                if (!self || self.nativeAd != ad) {
-                                    return;
-                                }
-                                if (image) {
-                                    // 图文：图片素材覆盖媒体区，隐藏深色占位
-                                    self.placeholderLabel.hidden = YES;
-                                    self.videoView.hidden = YES;
-                                    self.imageView.hidden = NO;
-                                    self.imageView.image = image;
-                                    [self log:@"图片素材已渲染，开始绑定"];
-                                    [self bindNativeAd:ad video:NO];
-                                } else {
-                                    [self log:[NSString stringWithFormat:@"图片加载失败：%@", error.localizedDescription ?: @"未知"]];
-                                    [self updateStatus:@"图片加载失败，未绑定广告" color:UIColor.systemRedColor];
-                                }
-                            }];
+    for (NSUInteger index = 0; index < expectedCount; index++) {
+        [IFLYADUtil loadImageWithURLString:URLs[index]
+                                completion:^(UIImage *image, NSError *error) {
+                                    __strong typeof(weakSelf) self = weakSelf;
+                                    if (!self || self.nativeAd != ad) {
+                                        return;
+                                    }
+                                    if (image) {
+                                        loadedImages[index] = image;
+                                    } else if (!firstError) {
+                                        firstError =
+                                            error ?: [NSError errorWithDomain:@"IFLYADLibSimple"
+                                                                         code:-2
+                                                                     userInfo:@{
+                                                                         NSLocalizedDescriptionKey : @"图片数据无效"
+                                                                     }];
+                                    }
+                                    remaining -= 1;
+                                    if (remaining > 0) {
+                                        return;
+                                    }
+                                    if (firstError) {
+                                        [self log:[NSString stringWithFormat:@"图片加载失败：%@",
+                                                                            firstError.localizedDescription ?: @"未知"]];
+                                        [self updateStatus:@"图片加载失败，未绑定广告" color:UIColor.systemRedColor];
+                                        [self destroyAdSilently];
+                                        [self resetAdCard];
+                                        return;
+                                    }
+                                    [self showLoadedImages:loadedImages multiple:multiple];
+                                    NSArray<UIView *> *mediaViews =
+                                        multiple ? [self.multipleImageViews subarrayWithRange:NSMakeRange(0, expectedCount)]
+                                                 : @[self.imageView];
+                                    [self log:multiple ? @"多图素材已渲染，开始绑定" : @"单图素材已渲染，开始绑定"];
+                                    [self bindNativeAd:ad video:NO mediaViews:mediaViews];
+                                }];
+    }
 }
 
-- (void)bindNativeAd:(IFLYNativeFeedAd *)ad video:(BOOL)isVideo {
-    UIView *mediaView = isVideo ? self.videoView : self.imageView;
+- (void)showLoadedImages:(NSArray<UIImage *> *)images multiple:(BOOL)multiple {
+    self.placeholderLabel.hidden = YES;
+    self.videoView.hidden = YES;
+    self.imageView.hidden = multiple;
+    if (!multiple) {
+        self.imageView.image = images.firstObject;
+        return;
+    }
+
+    CGFloat spacing = 4;
+    CGFloat width = (CGRectGetWidth(self.videoView.frame) - spacing * (images.count - 1)) / images.count;
+    [images enumerateObjectsUsingBlock:^(UIImage *image, NSUInteger index, BOOL *stop) {
+        (void)stop;
+        UIImageView *imageView = self.multipleImageViews[index];
+        imageView.frame = CGRectMake(CGRectGetMinX(self.videoView.frame) + (width + spacing) * index,
+                                     CGRectGetMinY(self.videoView.frame),
+                                     width,
+                                     CGRectGetHeight(self.videoView.frame));
+        imageView.image = image;
+        imageView.hidden = NO;
+    }];
+}
+
+- (void)bindNativeAd:(IFLYNativeFeedAd *)ad
+                video:(BOOL)isVideo
+           mediaViews:(NSArray<UIView *> *)mediaViews {
+    IFLYNativeFeedAdData *data = ad.adData;
     IFLYNativeFeedAdViewBinder *binder = [[IFLYNativeFeedAdViewBinder alloc] init];
     binder.containerView = self.adContainer;
-    binder.renderViews = @[mediaView, self.adBadgeLabel, self.descLabel, self.closeButton];
-    binder.clickViews = @[mediaView];
+    NSMutableArray<UIView *> *renderViews = [mediaViews mutableCopy];
+    [renderViews addObjectsFromArray:@[self.adBadgeLabel, self.descLabel, self.closeButton]];
+    if (!self.ctaButton.hidden) {
+        [renderViews addObject:self.ctaButton];
+    }
+    binder.renderViews = renderViews.copy;
+    BOOL clickable =
+        data.interactionType == IFLYNativeFeedAdInteractionTypeRedirect ||
+        data.interactionType == IFLYNativeFeedAdInteractionTypeDownload;
+    // nil 会默认整容器可点击；纯曝光与未知行为必须显式传空数组。
+    binder.clickViews = clickable ? @[self.adContainer] : @[];
     binder.closeView = self.closeButton;
     binder.videoView = isVideo ? self.videoView : nil;
-    binder.imageView = isVideo ? nil : self.imageView;
+    binder.imageView = isVideo ? nil : mediaViews.firstObject;
     binder.descView = self.descLabel;
     binder.adSourceView = self.adBadgeLabel;
+    binder.ctaView = self.ctaButton.hidden ? nil : self.ctaButton;
 
     IFLYAdError *error = nil;
     BOOL success = [ad bindAdWithViewBinder:binder error:&error];
@@ -267,6 +425,8 @@
                                       error ? [IFLYADUtil summaryForError:error] : @""]];
     if (!success) {
         [self updateStatus:@"信息流绑定失败" color:UIColor.systemRedColor];
+        [self destroyAdSilently];
+        [self resetAdCard];
     }
 }
 
@@ -283,66 +443,122 @@
 #pragma mark - IFLYNativeFeedAdDelegate
 
 - (void)nativeFeedAdDidLoad:(IFLYNativeFeedAd *)ad {
-    [self log:[NSString stringWithFormat:@"nativeFeedAdDidLoad materialType=%ld ecpm=%.2f",
-                                      (long)ad.materialType,
-                                      [ad ecpm]]];
     if (ad != self.nativeAd) {
         return;
     }
+    [self log:[NSString stringWithFormat:@"nativeFeedAdDidLoad materialType=%ld appName=%@ price=%.2f dealId=%@",
+                                      (long)ad.materialType,
+                                      ad.adData.appName ?: @"无",
+                                      [IFLYADUtil priceForAd:ad],
+                                      ad.bidInfo.dealId ?: @"无"]];
     [self updateStatus:@"加载成功，媒体侧开始渲染" color:[IFLYADUtil demoIndigoColor]];
     [self renderAndBindAd:ad];
 }
 
 - (void)nativeFeedAdDidRender:(IFLYNativeFeedAd *)ad {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:@"nativeFeedAdDidRender"];
     [self updateStatus:@"绑定成功，等待曝光" color:UIColor.systemGreenColor];
-    if (ad == self.nativeAd && ad.hasVideoTemplate) {
+    if (ad.hasVideoTemplate) {
         [ad startPlay];
         [self log:@"视频信息流调用 startPlay"];
     }
 }
 
 - (void)nativeFeedAdDidExpose:(IFLYNativeFeedAd *)ad {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:@"nativeFeedAdDidExpose"];
     [self updateStatus:@"信息流已曝光" color:UIColor.systemGreenColor];
 }
 
 - (void)nativeFeedAdDidClick:(IFLYNativeFeedAd *)ad {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:@"nativeFeedAdDidClick"];
 }
 
 - (void)nativeFeedAdDidClose:(IFLYNativeFeedAd *)ad {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:@"nativeFeedAdDidClose"];
     [self updateStatus:@"信息流已关闭" color:[IFLYADUtil demoTealColor]];
-    if (ad == self.nativeAd) {
-        [self destroyAdSilently];
-        [self resetAdCard];
-    }
+    [self destroyAdSilently];
+    [self resetAdCard];
 }
 
 - (void)nativeFeedAd:(IFLYNativeFeedAd *)ad didFailWithError:(IFLYAdError *)error {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:[NSString stringWithFormat:@"nativeFeedAd didFailWithError %@", [IFLYADUtil summaryForError:error]]];
     [self updateStatus:@"信息流加载失败" color:UIColor.systemRedColor];
+    [self destroyAdSilently];
+    [self resetAdCard];
 }
 
 - (void)nativeFeedAd:(IFLYNativeFeedAd *)ad didFailToRenderWithError:(IFLYAdError *)error {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:[NSString stringWithFormat:@"nativeFeedAd didFailToRender %@", [IFLYADUtil summaryForError:error]]];
     [self updateStatus:@"信息流渲染失败" color:UIColor.systemRedColor];
+    [self destroyAdSilently];
+    [self resetAdCard];
 }
 
 - (void)nativeFeedAdDidStartPlay:(IFLYNativeFeedAd *)ad {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:@"nativeFeedAdDidStartPlay"];
+    self.placeholderLabel.hidden = YES;
+}
+
+- (void)nativeFeedAdDidPausePlay:(IFLYNativeFeedAd *)ad {
+    if (ad != self.nativeAd) {
+        return;
+    }
+    [self log:@"nativeFeedAdDidPausePlay"];
+    self.placeholderLabel.hidden = NO;
+    self.placeholderLabel.text = @"视频已暂停";
+}
+
+- (void)nativeFeedAdDidResumePlay:(IFLYNativeFeedAd *)ad {
+    if (ad != self.nativeAd) {
+        return;
+    }
+    [self log:@"nativeFeedAdDidResumePlay"];
+    self.placeholderLabel.hidden = YES;
 }
 
 - (void)nativeFeedAdDidPlayFinish:(IFLYNativeFeedAd *)ad {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:@"nativeFeedAdDidPlayFinish"];
+    self.placeholderLabel.hidden = NO;
+    self.placeholderLabel.text = @"视频播放完成";
 }
 
 - (void)nativeFeedAd:(IFLYNativeFeedAd *)ad didFailToPlayWithError:(IFLYAdError *)error {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:[NSString stringWithFormat:@"nativeFeedAd didFailToPlay %@", [IFLYADUtil summaryForError:error]]];
+    self.placeholderLabel.hidden = NO;
+    self.placeholderLabel.text = @"视频播放失败";
 }
 
 - (void)nativeFeedAd:(IFLYNativeFeedAd *)ad didJumpWithSuccess:(BOOL)success {
+    if (ad != self.nativeAd) {
+        return;
+    }
     [self log:[NSString stringWithFormat:@"nativeFeedAd didJumpWithSuccess=%@", success ? @"YES" : @"NO"]];
 }
 

@@ -135,9 +135,9 @@
 }
 
 - (void)checkStatus {
-    [self log:[NSString stringWithFormat:@"状态 isAdValid=%@ ecpm=%.2f",
+    [self log:[NSString stringWithFormat:@"状态 isAdValid=%@ price=%.2f",
                                       (self.bannerAd && [self.bannerAd isAdValid]) ? @"YES" : @"NO",
-                                      self.bannerAd ? [self.bannerAd ecpm] : -1.0]];
+                                      [IFLYADUtil priceForAd:self.bannerAd]]];
 }
 
 - (void)destroyBannerAdSilently {
@@ -181,7 +181,9 @@
 #pragma mark - IFLYBannerAdDelegate
 
 - (void)bannerAdDidLoad:(IFLYBannerAd *)ad {
-    [self log:[NSString stringWithFormat:@"bannerAdDidLoad ecpm=%.2f", [ad ecpm]]];
+    [self log:[NSString stringWithFormat:@"bannerAdDidLoad price=%.2f dealId=%@",
+                                      [IFLYADUtil priceForAd:ad],
+                                      ad.bidInfo.dealId ?: @"无"]];
     [self updateStatus:@"已加载，等待素材 ready" color:[IFLYADUtil demoIndigoColor]];
 }
 
