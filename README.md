@@ -43,31 +43,32 @@
 
 > **推荐使用最新 `6.1.0`**（按广告形式可组合、含模拟器切片、最低支持 iOS 11）——见「[按广告形式可组合接入（模型 A）](#按广告形式可组合接入模型-a)」。下面的 `6.0.0` 为历史单包 `Full`（仅真机 arm64）。
 
-`6.1.0` 发布到 CocoaPods 官方源后可按版本号接入。若 CDN 版本索引尚未同步，可先 `pod repo update` 或临时使用 tag 固定的 `:podspec` 直连。
+`6.1.0` 当前尚未发布到 CocoaPods trunk，请使用 tag 固定的 `:podspec` 直连本仓 Release；不要指向 `main` 分支。
 
 ```ruby
-source 'https://github.com/CocoaPods/Specs.git'
+source 'https://cdn.cocoapods.org/'
 
 platform :ios, '11.0'
 
 target 'YOUR_APP_TARGET' do
   use_frameworks!
 
-  pod 'IFLYADLib', '6.1.0'
+  pod 'IFLYADLib',
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.1.0/IFLYADLib.podspec'
 end
 ```
 
 安装：
 
 ```bash
-pod install --repo-update
+pod install
 ```
 
 示例工程的 Podfile 已固定到 `IFLYADLib 6.1.0`：
 
 ```bash
 cd IFLYADLibSimple
-pod install --repo-update
+pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
@@ -81,9 +82,22 @@ open IFLYADLibSimple.xcworkspace
 
 ### CocoaPods（可组合 subspec）
 
-> `6.1.0` 发布到 CocoaPods 官方源后，标准写法 `pod 'IFLYADLib/Splash', '6.1.0'` 可直接使用（若索引未同步先 `pod repo update`）。下方「`:podspec` 直连」为可选的免 trunk 备用方式。
+> `6.1.0` 尚未进入 CocoaPods trunk。当前请使用下方 `:podspec` 直连；待 trunk 发布完成后，才可改用标准版本号写法。
 
-**已发布到 trunk 后（推荐，零配置）：**
+**当前接入方式（免 trunk）：**
+
+```ruby
+platform :ios, '11.0'
+
+target 'YOUR_APP_TARGET' do
+  use_frameworks!
+
+  pod 'IFLYADLib/Splash',
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.1.0/IFLYADLib.podspec'
+end
+```
+
+**发布到 trunk 后的标准写法：**
 
 ```ruby
 platform :ios, '11.0'
@@ -97,19 +111,6 @@ target 'YOUR_APP_TARGET' do
 
   # 或全量：
   # pod 'IFLYADLib', '6.1.0'
-end
-```
-
-**尚未发布到 trunk 时 —— `:podspec` 直连（无需 trunk，立即可用）：**
-
-```ruby
-platform :ios, '11.0'
-
-target 'YOUR_APP_TARGET' do
-  use_frameworks!
-
-  pod 'IFLYADLib/Splash',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.1.0/IFLYADLib.podspec'
 end
 ```
 
@@ -627,7 +628,7 @@ NSString *dealId = ad.bidInfo.dealId;
 
 | 现象 | 排查建议 |
 | --- | --- |
-| `pod install` 找不到 `6.1.0` | 执行 `pod install --repo-update`；或临时用 `:podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.1.0/IFLYADLib.podspec'` 直连本仓 Release。 |
+| `pod install` 找不到 `6.1.0` | `6.1.0` 尚未进入 CocoaPods trunk；使用 `:podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.1.0/IFLYADLib.podspec'` 直连本仓 Release。 |
 | 模拟器无法运行 | `6.1.0`（模型 A）含模拟器切片，可直接在模拟器调试；仅旧 `6.0.0` 单包不含模拟器切片需真机。 |
 | IDFA 为空 | 确认 `NSUserTrackingUsageDescription` 已配置；用户已允许 ATT；在授权完成后再读取 `ASIdentifierManager`；过滤全零 UUID。 |
 | `isAdValid` 为 NO | 确认已收到 `DidReady` 回调；广告未过期、未展示过、实例未销毁。 |
@@ -651,11 +652,11 @@ NSString *dealId = ad.bidInfo.dealId;
 
 ```bash
 cd IFLYADLibSimple
-pod install --repo-update
+pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-> 说明：示例当前固定 `pod 'IFLYADLib', '6.1.0'`，默认 `Full`（五种广告全开），为模型 A 可组合的 `xcframework`、含模拟器切片且工程最低版本为 iOS 11.0。如需体验按广告形式部分接入（如 `pod 'IFLYADLib/Splash'`）或 SPM，参见「按广告形式可组合接入（模型 A）」。示例覆盖五种广告的基础用法；S2S 服务端竞价与 Header Bidding 仅在本文档说明，示例工程未内置端到端演示（端到端需媒体服务端配合下发 `rspToken`）。真机运行请在 Xcode「Signing & Capabilities」选择你自己的开发者 Team（示例已置空 `DEVELOPMENT_TEAM`）。
+> 说明：示例当前通过 tag 固定的 `:podspec` 接入 `IFLYADLib 6.1.0`，默认 `Full`（五种广告全开），为模型 A 可组合的 `xcframework`、含模拟器切片且工程最低版本为 iOS 11.0。如需体验按广告形式部分接入（如 `pod 'IFLYADLib/Splash'`）或 SPM，参见「按广告形式可组合接入（模型 A）」。示例覆盖五种广告的基础用法；S2S 服务端竞价与 Header Bidding 仅在本文档说明，示例工程未内置端到端演示（端到端需媒体服务端配合下发 `rspToken`）。真机运行请在 Xcode「Signing & Capabilities」选择你自己的开发者 Team（示例已置空 `DEVELOPMENT_TEAM`）。
 
 ## 接入建议
 

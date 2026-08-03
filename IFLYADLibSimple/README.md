@@ -5,12 +5,12 @@
 ## 运行
 
 ```bash
-pod install --repo-update     # 拉取 IFLYADLib 6.1.0
+pod install                   # 通过 tag 固定的 :podspec 拉取 IFLYADLib 6.1.0
 open IFLYADLibSimple.xcworkspace
 ```
 
 - `6.1.0` 含 arm64 真机与 arm64/x86_64 模拟器切片，可直接在**模拟器**运行；**真机**运行请在「Signing & Capabilities」选择你自己的开发者 Team（示例的 `DEVELOPMENT_TEAM` 已置空）。
-- 若 `pod install` 报找不到 `6.1.0`（CocoaPods CDN 索引尚未同步），按 `Podfile` 注释里的 `:podspec` 直连写法接入，或稍后重试 `pod install --repo-update`。
+- `6.1.0` 尚未进入 CocoaPods trunk；示例 `Podfile` 已固定到 `6.1.0` tag 的 `:podspec`，无需等待 CDN 索引。
 
 ## 演示内容
 
