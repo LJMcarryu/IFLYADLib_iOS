@@ -25,11 +25,6 @@
     #define IFLYSampleLogError(...) {}
 #endif
 
-#define XH_ScreenW                       [UIScreen mainScreen].bounds.size.width
-#define XH_ScreenH                       [UIScreen mainScreen].bounds.size.height
-
-#define isStringEmpty(string) (string == nil || string == NULL || (![string isKindOfClass:[NSString class]]) || ([string isEqual:@""]) || [string isEqualToString:@""] || [string isEqualToString:@" "] || ([string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]].length == 0) || ([string respondsToSelector:@selector(length)] && [(NSData *)string length] == 0))
-
 #define __SPLASH_NATIVE_AD_UNIT_ID__     @"D65CC066BF3AE066C48F4A101A30005C"
 #define __BANNER_AD_UNIT_ID__            @"3D8783EFD76A167D76E57AC86A41A3E6"
 #define __TYPED_ONE_NATIVE_AD_UNIT_ID__  @"24556006C29E3C51A624F4B704BC7345"

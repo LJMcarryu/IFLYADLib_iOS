@@ -12,30 +12,48 @@
 
 ## 模型 A 发版流程
 
-1. **内部仓构建产物**：在私有源码仓依次运行 `scripts/build-xcframework.sh --variant Full`、`scripts/build-model-a.sh` 和 `scripts/split-resources.sh`，生成 Full 的 device + simulator 切片、7 个按 `.o` 分区的模块 xcframework，以及 Core / VideoUI / Reward 三域资源。新版本必须对 Full 与 7 个模块执行 `scripts/verify-ios11-compatibility.sh --artifact <XCFramework>`，确认最低系统和切片架构满足 iOS 11 发布基线。
-2. **打包 + 算校验和**：
+1. **在私有源码仓生成正式产物**：使用干净的已提交源码、项目批准的 Xcode 版本和稳定签名身份；正式发布命令必须显式设置 `IFLY_NEW_VERSION_RELEASE=1`。
+
    ```bash
-   scripts/package-model-a-release.sh \
-     --version <版本> \
-     --base-url https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/<版本>
+   export DEVELOPER_DIR=/Applications/Xcode_26.2.app/Contents/Developer
+   export IFLY_SDK_CODESIGN_IDENTITY='<已批准的签名身份>'
+   VERSION='<新版本>'
+   MODEL_A_BASE_URL="https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/${VERSION}"
+
+   IFLY_NEW_VERSION_RELEASE=1 scripts/release-gate.sh
+   scripts/build-model-a.sh
+   IFLY_NEW_VERSION_RELEASE=1 scripts/package-model-a-release.sh \
+     --version "${VERSION}" \
+     --base-url "${MODEL_A_BASE_URL}"
    ```
-   产出：7 个单模块 `IFLYAd<模块>.xcframework.zip`、合并 `IFLYADLib-modelA-<版本>.zip`（含全部 xcframework + 三域资源 + `LICENSE` + 隐私清单）、`checksums.txt`、`binary-targets.remote.swift`。
-3. **更新本公开仓清单并提交**：
-   - `Package.swift`：平台保持 `.iOS("11.0")`，7 个 `binaryTarget` 的 `url` / `checksum` 依 `checksums.txt`；
-   - `IFLYADLib.podspec`：平台保持 iOS 11.0，`s.version` 与 `s.source(:http)` 指向新版本合并 zip；
-   - README、CHANGELOG 与示例工程 Podfile/Xcode deployment target 同步版本和 iOS 11 最低系统；
-   - `swift package dump-package` 解析通过后提交、推送。
-4. **建 GitHub Release**：tag = `<版本>`（**无 `v` 前缀**，与历史一致），target 指向上一步的提交；上传 8 个资产（7 单模块 zip + 1 合并 zip）。
+
+   `release-gate.sh` 负责源码、公开头、iOS 11、行为和实际 XCFramework 门禁；打包脚本负责 7 个模块、合并包、签名、资源闭包和最终分发扫描。
+
+2. **更新私有仓与本公开仓的发布元数据**：
+
+   - 按 `build/modelA/release/checksums.txt` 同步两仓 `Package.swift` 的 7 个 `url + checksum`；
+   - 同步 `IFLYADLib.podspec` 的 `s.version` 与合并 zip `s.source(:http)`；
+   - 将 `build/modelA/release/swiftpm-resources/spm/` 同步到本仓 `spm/`，不将该中间目录作为 Release 资产上传；
+   - 同步 README、CHANGELOG、迁移说明和示例工程 Podfile/Xcode deployment target；
+   - 在私有仓执行 `python3 scripts/verify-model-a-release-metadata.py --version "${VERSION}"`，闭环校验产物、checksum 和两个分发清单。
+
+3. **验证并提交本公开仓**：至少执行 `swift package dump-package`、`pod spec lint IFLYADLib.podspec --quick --allow-warnings`、示例工程 `pod install` 与构建。Release tag 必须指向这个已包含新清单和资源的提交。
+
+4. **创建 GitHub Release**：tag = `<版本>`（**无 `v` 前缀**），target 指向上一步提交。上传打包脚本产生的 10 个文件：7 个单模块 zip、1 个合并 zip、`checksums.txt` 和 `binary-targets.remote.swift`。
+
 5. **发版后校验**：
-   - `pod cache clean IFLYADLib --all` 后 `pod spec lint IFLYADLib.podspec`，并构建示例 workspace；
-   - 匿名 `curl` 下载任一资产，`shasum -a 256` 与 `Package.swift` 中 checksum 比对一致；
-   - （CI 也会做以上 checksum 比对，见 `.github/workflows/ci.yml`）。
-6. **（可选）发布到 CocoaPods 官方 trunk**：`pod trunk push IFLYADLib.podspec`。需 owner 的 trunk 会话（owner：`LJMcarryu`、`jmliu6`）。push 后 `pod 'IFLYADLib', '<版本>'` 可零配置使用。
+
+   - 确认 tag 与 Release 的 target commit 就是第 3 步提交；
+   - 匿名下载 7 个单模块 zip 并与 `Package.swift` checksum 全量比对，同时校验合并 zip 的 7 个 XCFramework、三域资源、`PrivacyInfo.xcprivacy` 和 `LICENSE`；
+   - `pod cache clean IFLYADLib --all` 后重跑完整 `pod spec lint`、`pod install` 与示例 workspace 构建；
+   - 确认 `.github/workflows/ci.yml` 在发布提交上通过。
+
+6. **（可选）发布到 CocoaPods 官方 trunk**：`pod trunk push IFLYADLib.podspec`。需 owner 的 trunk 会话（owner：`LJMcarryu`、`jmliu6`）。push 成功且 CDN 可查后，再把 README/Podfile 从 tag 固定的 `:podspec` 直连改为 `pod 'IFLYADLib', '<版本>'`。
 
 ## 注意事项
 
 - **不要重打已上传的 zip**——内容变了 SPM checksum 就变，会让已下载者校验失败；换版本一律另起新 tag。
-- Release 的 tag 必须指向**已含新 `Package.swift`** 的提交，否则 SPM 消费方会解析到旧清单。
+- Release 的 tag 必须指向**已含新 `Package.swift` 与 `spm/` 资源**的提交，否则 SPM 消费方会解析到旧清单或旧资源。
 - 隐私清单 `PrivacyInfo.xcprivacy` 必须随 `Core` 资源进合并 zip（静态库不能内嵌到 Mach-O）。
 - 版本号需四处一致：`Package.swift` 的 URL、podspec 的 version 与 source、Release tag、合并 zip 文件名；最低系统在 Package、podspec、示例 Podfile/Xcode 工程和二进制 load command 中保持 iOS 11.0。
 - 公开仓为私有源码仓的分发面，**不接受外部代码 PR**；版本只能由维护者经上述流程发布。
