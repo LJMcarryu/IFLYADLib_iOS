@@ -9,12 +9,46 @@ on:
 jobs:
   verify-distribution:
     name: 校验分发清单与产物
-    runs-on: macos-14
+    # Demo 工程由 Xcode 16.2 创建（objectVersion 77），需使用 Xcode 16+ runner。
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
 
       - name: Package.swift 解析
         run: swift package dump-package > /dev/null
+
+      - name: 校验 CocoaPods 最终 App 链接契约
+        run: |
+          pod ipc spec IFLYADLib.podspec > /tmp/ifly-podspec.json
+          python3 - <<'PY'
+          import json
+          import shlex
+          from pathlib import Path
+
+          spec = json.loads(Path("/tmp/ifly-podspec.json").read_text(encoding="utf-8"))
+
+          def has_objc_flag(config):
+              flags = (config or {}).get("OTHER_LDFLAGS", "")
+              return "-ObjC" in shlex.split(flags)
+
+          assert has_objc_flag(spec.get("pod_target_xcconfig")), (
+              "pod target 未声明 -ObjC"
+          )
+          assert has_objc_flag(spec.get("user_target_xcconfig")), (
+              "aggregate/user target 未声明 -ObjC"
+          )
+          core = next(item for item in spec.get("subspecs", []) if item.get("name") == "Core")
+          frameworks = core.get("frameworks", [])
+          weak_frameworks = core.get("weak_frameworks", [])
+          if isinstance(frameworks, str):
+              frameworks = [frameworks]
+          if isinstance(weak_frameworks, str):
+              weak_frameworks = [weak_frameworks]
+          assert "AdSupport" in frameworks, "Core 缺少 AdSupport 强链接声明"
+          assert "AppTrackingTransparency" in weak_frameworks, (
+              "Core 缺少 AppTrackingTransparency 弱链接声明"
+          )
+          PY
 
       - name: 校验 SwiftPM 资源文件权限
         run: |
@@ -63,6 +97,63 @@ jobs:
           has_license = any(n.rstrip("/").split("/")[-1] == "LICENSE" for n in names)
           print(f"合并 zip：{len(fw)} 个 xcframework，LICENSE={has_license}")
           sys.exit(0 if fw and has_license else 1)
+          PY
+
+      - name: 真实校验 CocoaPods 将 -ObjC 传播到最终 App
+        run: |
+          (
+            cd IFLYADLibSimple
+            pod install
+          )
+
+          python3 - <<'PY'
+          import shlex
+          from pathlib import Path
+
+          support_root = Path("IFLYADLibSimple/Pods/Target Support Files")
+          configs = {
+              "pod target": support_root / "IFLYADLib/IFLYADLib.debug.xcconfig",
+              "aggregate target": (
+                  support_root
+                  / "Pods-IFLYADLibSimple/Pods-IFLYADLibSimple.debug.xcconfig"
+              ),
+          }
+          for label, path in configs.items():
+              if not path.is_file():
+                  raise SystemExit(f"缺少 {label} xcconfig: {path}")
+              values = [
+                  line.split("=", 1)[1].strip()
+                  for line in path.read_text(encoding="utf-8").splitlines()
+                  if line.strip().startswith("OTHER_LDFLAGS") and "=" in line
+              ]
+              if not any("-ObjC" in shlex.split(value) for value in values):
+                  raise SystemExit(f"{label} 未传播 -ObjC: {path}")
+              print(f"OK {label}: {path}")
+          PY
+
+          xcodebuild \
+            -workspace IFLYADLibSimple/IFLYADLibSimple.xcworkspace \
+            -scheme IFLYADLibSimple \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -showBuildSettings \
+            -json > /tmp/ifly-build-settings.json
+
+          python3 - <<'PY'
+          import json
+          import shlex
+          from pathlib import Path
+
+          records = json.loads(
+              Path("/tmp/ifly-build-settings.json").read_text(encoding="utf-8")
+          )
+          apps = [item for item in records if item.get("target") == "IFLYADLibSimple"]
+          if len(apps) != 1:
+              raise SystemExit(f"无法唯一定位最终 App build settings: {len(apps)}")
+          flags = apps[0].get("buildSettings", {}).get("OTHER_LDFLAGS", "")
+          if "-ObjC" not in shlex.split(flags):
+              raise SystemExit(f"最终 App OTHER_LDFLAGS 未包含 -ObjC: {flags}")
+          print(f"OK 最终 App OTHER_LDFLAGS: {flags}")
           PY
 
   lint-podspec:

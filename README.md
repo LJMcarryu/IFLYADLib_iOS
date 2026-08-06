@@ -2,7 +2,9 @@
 
 `IFLYADLib` 是讯飞广告 iOS SDK，提供开屏、Banner、插屏、自渲染信息流、激励视频等广告能力。
 
-当前文档覆盖 `IFLYADLib 6.1.0`（推荐，按广告形式可组合并最低支持 iOS 11）与 `6.0.0`（历史单包 Full）；示例工程见 [IFLYADLibSimple](./IFLYADLibSimple)。
+当前文档覆盖 `IFLYADLib 6.2.0`（推荐，按广告形式可组合并最低支持 iOS 11）与 `6.0.0`（历史单包 Full）；示例工程见 [IFLYADLibSimple](./IFLYADLibSimple)。
+
+> **最新正式版本**：`6.2.0`。请固定到不可变 tag 接入，不要引用 `main` 分支的分发清单。
 
 > 文档以中文为主。如需用英文反馈问题，请直接在 [Issues](https://github.com/LJMcarryu/IFLYADLib_iOS/issues) 提交。
 
@@ -12,6 +14,7 @@
 
 | 版本 | 日期 | 说明 |
 | --- | --- | --- |
+| 6.2.0 | 2026-08-06 | 全渠道共享基线优化：iOS 14+ 仅在 ATT `authorized` 时读取、缓存和发送 IDFA，未授权阶段显式传入的 IDFA 直接丢弃且授权后须重新设置；跳转链路删除 `canOpenURL:` 预检并按系统 completion 保留落地页 fallback，`jumpDirectly` 降为兼容 no-op；NativeFeed 新增统一方法 `reportMediaShakeTriggeredWithError:`，通用模型 A 固定返回 `71512` 表示能力未启用；Core 显式链接 `AdSupport` 并弱链接 `AppTrackingTransparency`，继续支持 iOS 11。 |
 | 6.1.0 | 2026-07-31 | 收紧广告响应公开边界：五种格式通用竞价信息仅保留 `bidInfo.price/dealId`，创意与渲染字段仅由 NativeFeed 的裁剪模型提供；NativeFeed 新增 `appName`，CTA 改为 `ctaText`，素材枚举归一为单图/视频/多图并支持两至三图；完善 Binder 的仅曝光空点击区、一次性绑定/解绑和 SDK 托管视频生命周期。SwiftPM 同时自动投递三域资源与 Core 隐私清单。该版本含破坏性 API 迁移，升级前必须阅读本文末尾迁移说明。 |
 | 6.0.14 | 2026-07-20 | 最低系统版本由 iOS 13.0 下调为 iOS 11.0，7 个模块的 device / simulator 二进制全部重建并通过最低版本门禁；插屏和激励视频在服务端同时下发图片时于视频完播后展示图片完播页（开屏保持原关闭语义）；请求字段 `lts` 移入 `device`，并补齐客户端竞价时间戳、曝光宏和设备调试状态字段。公开 API 签名不变。 |
 | 6.0.13 | 2026-07-09 | 自渲染信息流（NativeFeed）新增摇一摇提示控件：交互类型为「点击+摇一摇」的广告在 `bindAdWithViewBinder:error:` 成功后，由 SDK 自动在容器右下角添加「摇一摇查看详情」提示（避让关闭按钮、放不下则不添加、非独立点击区域，普通点击广告不展示）；自渲染素材校验失败（71501）新增 error 级诊断日志（template_id / 素材类型 / 图片数 / videoURL 有无）。公开 API 签名不变，其它格式与 `Full` 行为不变。 |
@@ -34,16 +37,16 @@
 
 ## 环境要求
 
-- iOS 11.0 及以上（`6.1.0` 的真机与模拟器二进制均按该最低版本重新构建；历史 `6.0.13` 及更早二进制不追溯扩大支持范围）。
-- Xcode 15.0 及以上（`Package.swift` 使用 Swift tools 5.9）；6.1.0 正式二进制使用 Xcode 26.2 构建。
-- 交付形态：`6.1.0` 为各模块 `xcframework`（含 **arm64 真机 + arm64/x86_64 模拟器**切片，可在模拟器调试，见「按广告形式可组合接入（模型 A）」）；`6.0.0` 为单一 `IFLYADLib.framework`（仅真机 arm64、不含模拟器切片）。
+- iOS 11.0 及以上（`6.2.0` 正式二进制按该最低版本构建；历史 `6.0.13` 及更早二进制不追溯扩大支持范围）。
+- Xcode 15.0 及以上（`Package.swift` 使用 Swift tools 5.9）；`6.2.0` 正式二进制使用 Xcode 26.2 构建。
+- 交付形态：`6.2.0` 延续各模块 `xcframework`（含 **arm64 真机 + arm64/x86_64 模拟器**切片，可在模拟器调试，见「按广告形式可组合接入（模型 A）」）；`6.0.0` 为单一 `IFLYADLib.framework`（仅真机 arm64、不含模拟器切片）。
 - 统一入口头文件：`#import <IFLYADLib/IFLYADLib.h>`。
 
 ## CocoaPods 接入
 
-> **推荐使用最新 `6.1.0`**（按广告形式可组合、含模拟器切片、最低支持 iOS 11）——见「[按广告形式可组合接入（模型 A）](#按广告形式可组合接入模型-a)」。下面的 `6.0.0` 为历史单包 `Full`（仅真机 arm64）。
+> **推荐使用 `6.2.0`**（按广告形式可组合、含模拟器切片、最低支持 iOS 11）——见「[按广告形式可组合接入（模型 A）](#按广告形式可组合接入模型-a)」。下面的 `6.0.0` 为历史单包 `Full`（仅真机 arm64）。
 
-`6.1.0` 当前尚未发布到 CocoaPods trunk，请使用 tag 固定的 `:podspec` 直连本仓 Release；不要指向 `main` 分支。
+`6.2.0` 当前尚未进入 CocoaPods trunk，请使用 tag 固定的 `:podspec` 直连本仓 Release；不要指向 `main` 分支。
 
 ```ruby
 source 'https://cdn.cocoapods.org/'
@@ -54,7 +57,7 @@ target 'YOUR_APP_TARGET' do
   use_frameworks!
 
   pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.1.0/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.0/IFLYADLib.podspec'
 end
 ```
 
@@ -64,7 +67,7 @@ end
 pod install
 ```
 
-示例工程的 Podfile 已固定到 `IFLYADLib 6.1.0`：
+示例工程的 Podfile 已固定到 `IFLYADLib 6.2.0` tag，可直接执行安装：
 
 ```bash
 cd IFLYADLibSimple
@@ -74,15 +77,15 @@ open IFLYADLibSimple.xcworkspace
 
 ## 按广告形式可组合接入（模型 A）
 
-`6.0.1` 起支持「按广告形式可组合」接入：`Core` 必选，`Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` 各格式按需选用，`VideoUI` 由依赖图自动带入。只接入需要的格式可减小包体。当前 `6.1.0` 产物为各模块独立 `xcframework`（含 device + simulator 切片），最低支持 iOS 11.0。
+`6.0.1` 起支持「按广告形式可组合」接入：`Core` 必选，`Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` 各格式按需选用，`VideoUI` 由依赖图自动带入。只接入需要的格式可减小包体。`6.2.0` 延续各模块独立 `xcframework`（含 device + simulator 切片），最低支持 iOS 11.0。
 
 > **资源依赖**：CocoaPods 经 `resource_bundles`、Swift Package Manager 经 `Core` / `VideoUI` / `Reward` 伞 target 的受版本控制资源规则自动带入所需资源。所有 SwiftPM product 都经 `Core` 依赖闭包携带 `PrivacyInfo.xcprivacy`。
 
-> `Full`（默认）等价于五种广告全开，行为与 6.0.0 单包一致。
+> `Full`（默认）表示五种广告能力全开；具体 API 与行为以当前版本公开头、变更记录和迁移说明为准，不追溯等同于历史 `6.0.0` 二进制。
 
 ### CocoaPods（可组合 subspec）
 
-> `6.1.0` 尚未进入 CocoaPods trunk。当前请使用下方 `:podspec` 直连；待 trunk 发布完成后，才可改用标准版本号写法。
+> `6.2.0` 尚未进入 CocoaPods trunk，请使用下方 `:podspec` 直连；只有在 trunk/CDN 确认可查后，才可改用标准版本号写法。
 
 **当前接入方式（免 trunk）：**
 
@@ -93,7 +96,7 @@ target 'YOUR_APP_TARGET' do
   use_frameworks!
 
   pod 'IFLYADLib/Splash',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.1.0/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.0/IFLYADLib.podspec'
 end
 ```
 
@@ -106,15 +109,15 @@ target 'YOUR_APP_TARGET' do
   use_frameworks!
 
   # 例：只接开屏 + Banner（VideoUI/Core 自动带入）
-  pod 'IFLYADLib/Splash', '6.1.0'
-  pod 'IFLYADLib/Banner', '6.1.0'
+  pod 'IFLYADLib/Splash', '6.2.0'
+  pod 'IFLYADLib/Banner', '6.2.0'
 
   # 或全量：
-  # pod 'IFLYADLib', '6.1.0'
+  # pod 'IFLYADLib', '6.2.0'
 end
 ```
 
-> 二进制照常从本仓库 Release 的合并 zip 下载，subspec 选择照常生效；URL 请钉死到 tag `6.1.0`（勿指向分支）。**不要改用 `:git` / `:path`** —— 二进制在 Release zip、不在 git 仓代码里，这两种外部源会跳过 zip 下载导致缺 `xcframework`。
+> 二进制照常从本仓库 Release 的合并 zip 下载，subspec 选择照常生效；URL 请钉死到 tag `6.2.0`（勿指向分支）。**不要改用 `:git` / `:path`** —— 二进制在 Release zip、不在 git 仓代码里，这两种外部源会跳过 zip 下载导致缺 `xcframework`。
 
 可选 subspec：`Core`（必选，自动带入）、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full`（默认）。其中 `Splash` / `Interstitial` / `Reward` 会自动带入 `VideoUI`。
 
@@ -122,7 +125,7 @@ end
 
 ### Swift Package Manager
 
-在 Xcode「Add Packages」填入仓库地址 `https://github.com/LJMcarryu/IFLYADLib_iOS`，选 `6.1.0`，按需勾选 product：`Core` / `Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` / `Full`。
+在 Xcode「Add Packages」填入仓库地址 `https://github.com/LJMcarryu/IFLYADLib_iOS`，选择 `6.2.0`，按需勾选 product：`Core` / `Banner` / `Splash` / `Interstitial` / `NativeFeed` / `Reward` / `Full`。
 
 > ⚠️ **SPM 接入方需在 App target 的 Other Linker Flags（`OTHER_LDFLAGS`）添加 `-ObjC`**，否则静态库中的 Objective-C category 可能被链接器剥离。CocoaPods 的 podspec 已内置 `-ObjC`，无需手动添加。
 >
@@ -195,6 +198,9 @@ iOS 14 及以上读取 IDFA 前必须先请求 App Tracking Transparency 权限�
 
 注意：
 
+- `6.2.0` 起，iOS 14 及以上只有 ATT 状态为 `authorized` 时，SDK 才会读取、缓存或在普通请求与 S2S 请求中发送 IDFA；其他三种状态均按无 IDFA 处理。
+- 未授权阶段通过 `IFLYAdRequestConfig.idfa` 或 `setParamValue:forKey:` 显式传入的 IDFA 会被立即丢弃，不会留到授权后复用。授权完成后如需显式 IDFA，必须重新读取并设置，再创建本次请求配置。
+- 用户撤销 ATT 授权，或 App 回到前台时 SDK 发现状态已不再允许，既有 IDFA 缓存会被清除。媒体仍应在每次请求前按当前授权状态获取值。
 - ATT 已允许不等于请求参数里一定有 IDFA。需要在授权完成后再读取系统 IDFA。
 - 请勿在正式媒体 App 中使用固定测试 IDFA。
 - 若用户在系统设置中关闭“允许 App 请求跟踪”，IDFA 仍可能为空或全零。
@@ -213,7 +219,7 @@ iOS 14 及以上读取 IDFA 前必须先请求 App Tracking Transparency 权限�
 }
 ```
 
-`setPersonalizedEnabled:` 当前用于记录媒体侧个性化状态，不会自动过滤或改写 IDFA、CAID、UA、设备信息、广告填充、展示、点击或监测行为。正式上线建议关闭 SDK 日志，仅在问题排查时临时开启。
+`setPersonalizedEnabled:` 当前用于记录媒体侧个性化状态，不会自行改写 CAID、UA、设备信息、广告填充、展示、点击或监测行为，也不能替代 ATT。`6.2.0` 的 IDFA 授权门控独立生效，媒体不能用个性化开关绕过。正式上线建议关闭 SDK 日志，仅在问题排查时临时开启。
 
 > 自 `6.0.11` 起，SDK 内部日志仅保留**关键节点 `error`**（请求 / 渲染 / 播放 / 监测失败等）；`info` / `warn` / 调试 / JSON 日志已整体移除——即便 `setLogEnabled:YES` 也只会输出 `error`（前缀 `[AdSDK]`），且不打印内部类名或裸 `NSError`。
 
@@ -247,7 +253,7 @@ iOS 14 及以上读取 IDFA 前必须先请求 App Tracking Transparency 权限�
 | `appName` / `appVersion` | 宿主 App 名称和版本号。 |
 | `requestTimeout` | 请求超时时间，单位秒。 |
 | `userAgent` | 自定义浏览器 User-Agent。 |
-| `idfa` | 媒体侧显式传入的 IDFA。 |
+| `idfa` | 媒体侧显式传入的 IDFA；`6.2.0` 起 iOS 14+ 仅在 ATT `authorized` 时接受，未授权传入值会被丢弃且授权后须重新设置。 |
 | `caidList` | 媒体侧显式传入的 CAID 列表。 |
 | `deepLinkDisabled` | 是否禁用 DeepLink。 |
 
@@ -264,6 +270,12 @@ iOS 14 及以上读取 IDFA 前必须先请求 App Tracking Transparency 权限�
 ```
 
 主流程建议优先使用 `IFLYAdRequestConfig`。
+
+### 跳转兼容行为
+
+`6.2.0` 起，SDK 不再以 `canOpenURL:` 预检 DeepLink 或自定义 scheme，而是直接调用系统 `openURL:options:completionHandler:`，根据 completion 判定成功；系统打开失败时仍按广告响应回退到允许的落地页。媒体无需为 SDK 维护 `LSApplicationQueriesSchemes` 探测清单，也不应根据广告响应 URL 自行探测已安装 App。
+
+`IFLYAdRequestConfig.jumpDirectly` 与 `IFLYAdKeyJumpDirectly` 为兼容既有源码和二进制继续保留，但现在是 no-op：无论设置 `YES`、`NO` 还是不设置，都不改变上述统一跳转与 fallback 行为，字段也不会进入广告请求体。迁移时删除依赖该值控制跳转分支的业务逻辑；真正禁用 DeepLink 请继续使用 `deepLinkDisabled`。
 
 ## 开屏广告
 
@@ -530,6 +542,17 @@ iOS 14 及以上读取 IDFA 前必须先请求 App Tracking Transparency 权限�
 - 视频素材必须传普通 `UIView` 作为 `videoView`。SDK 只添加和移除自己的播放器宿主并负责播放监测；媒体不得自行创建 `AVPlayer`。
 - `UITableViewCell` / `UICollectionViewCell` 复用、替换广告或页面退出前按 `unbindAd → delegate=nil → destroy` 清理。绑定成功即视为实例已消费，解绑后也不能再次绑定。
 
+### NativeFeed 媒体摇一摇统一接口
+
+`6.2.0` 的 `IFLYNativeFeedAd` 新增统一公开方法：
+
+```objc
+IFLYAdError *error = nil;
+BOOL accepted = [ad reportMediaShakeTriggeredWithError:&error];
+```
+
+通用模型 A 不启用媒体摇一摇被动采样能力，调用固定返回 `NO`，`error.errorCode` 为 `IFLYAdErrorCodeNativeFeedMediaShakeUnavailable`（`71512`）；不会订阅传感器、产生点击或执行跳转。该方法仅用于保持不同分发变体的公开 API 一致，通用接入方不要把它当作普通点击或 SDK 自主摇一摇入口。
+
 常用只读字段包括：`creativeId`、`title`、`desc`、`content`、`ctaText`、`brand`、`appName`、`adSourceMark`、`adSourceIconURL`、`icon`、`mainImage`、`imageList`、`videoURL`、`videoCoverURL`、`videoDuration`、`videoSize`、`targetURL`、`deeplinkURL`、`marketURL`、`downloadURL`、`packageName`、`closeIconURL`。`IFLYAdRequestConfig.appName` 表示媒体宿主 App 名称，`IFLYNativeFeedAdData.appName` 才是广告响应中的下载类应用名称。
 
 ## 激励视频广告
@@ -628,9 +651,10 @@ NSString *dealId = ad.bidInfo.dealId;
 
 | 现象 | 排查建议 |
 | --- | --- |
-| `pod install` 找不到 `6.1.0` | `6.1.0` 尚未进入 CocoaPods trunk；使用 `:podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.1.0/IFLYADLib.podspec'` 直连本仓 Release。 |
-| 模拟器无法运行 | `6.1.0`（模型 A）含模拟器切片，可直接在模拟器调试；仅旧 `6.0.0` 单包不含模拟器切片需真机。 |
-| IDFA 为空 | 确认 `NSUserTrackingUsageDescription` 已配置；用户已允许 ATT；在授权完成后再读取 `ASIdentifierManager`；过滤全零 UUID。 |
+| `pod install` 找不到 `6.2.0` | `6.2.0` 尚未进入 CocoaPods trunk，请使用 `:podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.0/IFLYADLib.podspec'` 直连本仓 Release，并清理本地旧索引与缓存后重试。 |
+| 模拟器无法运行 | `6.2.0`（模型 A）包含模拟器切片；确认已固定到 `6.2.0` tag、成功下载对应 Release zip，且本地未复用旧缓存。仅旧 `6.0.0` 单包不含模拟器切片需真机。 |
+| IDFA 为空 | 确认 `NSUserTrackingUsageDescription` 已配置、用户已允许 ATT，并在授权完成后重新读取和设置 IDFA；未授权阶段预置的显式值已被丢弃，不能自动延续到授权后。过滤全零 UUID。 |
+| `reportMediaShakeTriggeredWithError:` 返回 `71512` | 通用模型 A 未启用媒体摇一摇上报能力，这是预期结果；不要重试或用该方法代替普通点击。 |
 | `isAdValid` 为 NO | 确认已收到 `DidReady` 回调；广告未过期、未展示过、实例未销毁。 |
 | 展示失败 | 确认 `rootViewController` 已在 window 上，当前没有正在 present 的控制器。 |
 | Banner 不展示 | 确认容器宽度大于 0，布局已完成后再调用 `showInView:`。 |
@@ -656,7 +680,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-> 说明：示例当前通过 tag 固定的 `:podspec` 接入 `IFLYADLib 6.1.0`，默认 `Full`（五种广告全开），为模型 A 可组合的 `xcframework`、含模拟器切片且工程最低版本为 iOS 11.0。如需体验按广告形式部分接入（如 `pod 'IFLYADLib/Splash'`）或 SPM，参见「按广告形式可组合接入（模型 A）」。示例覆盖五种广告的基础用法；S2S 服务端竞价与 Header Bidding 仅在本文档说明，示例工程未内置端到端演示（端到端需媒体服务端配合下发 `rspToken`）。真机运行请在 Xcode「Signing & Capabilities」选择你自己的开发者 Team（示例已置空 `DEVELOPMENT_TEAM`）。
+> 说明：示例通过 tag 固定的 `:podspec` 接入 `IFLYADLib 6.2.0`，默认 `Full`（五种广告全开），为模型 A 可组合的 `xcframework`、含模拟器切片且工程最低版本为 iOS 11.0。如需体验按广告形式部分接入（如 `pod 'IFLYADLib/Splash'`）或 SPM，参见「按广告形式可组合接入（模型 A）」。示例覆盖五种广告的基础用法；S2S 服务端竞价与 Header Bidding 仅在本文档说明，示例工程未内置端到端演示（端到端需媒体服务端配合下发 `rspToken`）。真机运行请在 Xcode「Signing & Capabilities」选择你自己的开发者 Team（示例已置空 `DEVELOPMENT_TEAM`）。
 
 ## 接入建议
 
@@ -665,6 +689,28 @@ open IFLYADLibSimple.xcworkspace
 - 展示类广告通常在 `DidReady` 后再展示，不要在 `DidLoad` 里直接展示。
 - 单个广告实例通常为一次性消费，展示/关闭/销毁后请重新创建实例。
 - 正式上线前请替换为平台分配的真实广告位 ID，并关闭排查用日志。
+
+## 从 6.1.0 升级到 6.2.0
+
+`6.2.0` 的主要变化是全渠道共享的合规门控和跳转语义收敛，并新增一个统一公开方法。现有五种广告加载与展示入口不变，但接入方必须重新编译并检查以下行为：
+
+| `6.1.0` | `6.2.0` | 迁移动作 |
+| --- | --- | --- |
+| iOS 14+ 未对所有 IDFA 来源实施统一的 ATT `authorized` 门控 | 普通请求与 S2S 请求共用门控；未授权不读取、不缓存、不发送 IDFA，撤权后清缓存 | 保证 ATT 完成后再创建请求配置；不要在授权前预置真实或测试 IDFA。 |
+| 未授权阶段显式设置的 IDFA 可能留在请求配置中 | `IFLYAdRequestConfig.idfa` 和 `setParamValue:forKey:` 的未授权值会被丢弃 | 授权成功后重新读取系统 IDFA 并重新设置；不能指望授权前的值延续生效。 |
+| DeepLink / 自定义 scheme 先经 `canOpenURL:` 预检 | 直接调用 `openURL:options:completionHandler:`，按系统 completion 决定成功或落地页 fallback | 删除依赖 `LSApplicationQueriesSchemes` 探测结果的业务判断，按 SDK 跳转回调验证成功与 fallback。 |
+| `jumpDirectly` 可能参与跳转分支 | `jumpDirectly` 仅兼容保留，设置值不改变行为且不进入请求体 | 删除对该字段的逻辑依赖；禁用 DeepLink 使用 `deepLinkDisabled`。 |
+| 通用 `IFLYNativeFeedAd` 无媒体摇一摇统一方法 | 公开 `reportMediaShakeTriggeredWithError:`，但通用模型 A 固定返回 `NO` / `71512` | 如共用多变体代码，可处理能力不可用错误；通用接入不要调用或失败重试。 |
+| 系统广告框架依赖由产物间接表达 | CocoaPods `Core` 显式链接 `AdSupport`、弱链接 `AppTrackingTransparency` | 不要在宿主侧把 ATT 改为强链接；在 iOS 11、iOS 13 与 iOS 14+ 分别做启动和授权回归。 |
+
+升级验收至少覆盖：
+
+- iOS 14+ 的 `notDetermined`、`denied`、`restricted` 和 `authorized` 四种 ATT 状态，以及授权后撤销并回到前台；普通请求和 S2S 请求不得出现门控差异。
+- 授权前显式设置 IDFA、授权后不重设、授权后重新设置三条路径；只有最后一条可按当前系统值发送。
+- 自定义 scheme 成功与失败、Universal Link 失败、危险 scheme 拒绝、HTTP(S) 落地页 fallback；宿主不依赖 `canOpenURL:` 预检。
+- `jumpDirectly=YES`、`NO` 与未设置三种配置的跳转结果一致；`deepLinkDisabled` 仍按原语义生效。
+- 通用模型 A 调用 `reportMediaShakeTriggeredWithError:` 稳定返回 `71512`，且不产生传感器、点击或跳转副作用。
+- CocoaPods / SPM 依赖更新到 `6.2.0`，清除旧二进制缓存后使用正式 Release 资产重新编译。
 
 ## 从 6.0.14 升级到 6.1.0
 

@@ -1,29 +1,33 @@
 # 模型 A 可组合分发 podspec。
 # 每个 vendored xcframework 只含自身 .o；对 Core/VideoUI 符号保留未定义引用，在 App link 时统一解析。
-# 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：s.source 指向其 GitHub Releases tag 6.1.0 的合并 zip
+# 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：s.source 指向其 GitHub Releases tag 6.2.0 的合并 zip
 #   （含 7 个 xcframework device+simulator 切片与三域资源 bundle）；vendored_frameworks / resource_bundles 路径相对该 zip 根。
-#   本仓库私有，仅承载源码/构建脚本；此 podspec 与公开仓一致。
-# 换版本/主机时：重跑 scripts/package-model-a-release.sh 产合并 zip 与 7 个单模块 zip，更新两仓 :http URL 与版本。
+#   本仓库是公开分发仓；SDK 源码与构建脚本位于内部私有源码仓，两仓 podspec 保持一致。
+# 换版本/主机时：在私有源码仓重跑 package-model-a-release.sh，生成合并 zip 与 7 个单模块 zip，再同步两仓 URL、checksum 与版本。
 # 资源已从 IFLYPlayer.bundle 物理三拆；运行时由 IFLYAdResourceLoader 按域定位同名 .bundle。
 
 Pod::Spec.new do |s|
   s.name = 'IFLYADLib'
-  s.version = '6.1.0'
+  s.version = '6.2.0'
   s.summary = 'IFLYADLib model A composable SDK distribution.'
   s.homepage = 'https://github.com/LJMcarryu/IFLYADLib_iOS'
   s.author = 'LJMcarryu'
-  s.source = { :http => 'https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.1.0/IFLYADLib-modelA-6.1.0.zip' }
+  s.source = { :http => 'https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.2.0/IFLYADLib-modelA-6.2.0.zip' }
   s.license = { :type => 'MIT', :file => 'LICENSE' }
 
   # iOS 11 声明只可随重新构建并验证过的新版本二进制发布；不得套用到旧 release 产物。
   s.platform = :ios, '11.0'
   s.static_framework = true
   s.default_subspecs = 'Full'
-  s.pod_target_xcconfig = { 'OTHER_LDFLAGS' => '-ObjC' }
+  s.pod_target_xcconfig = { 'OTHER_LDFLAGS' => '$(inherited) -ObjC' }
+  # 静态 XCFramework 最终由宿主 App 链接，必须同步传播到 aggregate/user target。
+  s.user_target_xcconfig = { 'OTHER_LDFLAGS' => '$(inherited) -ObjC' }
 
   s.subspec 'Core' do |ss|
     ss.vendored_frameworks = 'IFLYAdCore.xcframework'
     ss.resource_bundles = { 'IFLYADLibCoreResources' => ['resources/Core/**/*'] }
+    ss.frameworks = 'AdSupport'
+    ss.weak_frameworks = 'AppTrackingTransparency'
   end
 
   s.subspec 'VideoUI' do |ss|

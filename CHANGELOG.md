@@ -2,6 +2,19 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.2.0] - 2026-08-06
+
+### 新增
+
+- NativeFeed 统一公开 `reportMediaShakeTriggeredWithError:`。通用模型 A 仅保留统一 API 契约，不启用媒体摇一摇采样能力；调用会返回 `NO`，并通过 `IFLYAdErrorCodeNativeFeedMediaShakeUnavailable` 返回错误码 `71512`。
+
+### 变更
+
+- 收紧 ATT / IDFA 门控：iOS 14 及以上仅在 ATT 状态为 `authorized` 时读取、缓存或随普通请求及 S2S 请求发送 IDFA；用户撤销授权或 App 回到前台发现未授权时清除缓存。
+- 未授权阶段通过 `IFLYAdRequestConfig.idfa` 或 `setParamValue:forKey:` 显式设置的 IDFA 会被丢弃，不跨授权状态保留；授权成功后如需显式 IDFA，媒体必须重新读取并设置。
+- DeepLink 与自定义 scheme 跳转删除 `canOpenURL:` 预检，统一直接调用 `openURL:options:completionHandler:`，按系统 completion 判定成功并保留落地页 fallback。`jumpDirectly` 继续保留用于源码与二进制兼容，但设置值不再改变跳转行为，也不进入请求体。
+- CocoaPods 的 `Core` 显式链接 `AdSupport`，并弱链接 `AppTrackingTransparency`；新二进制继续以 iOS 11.0 为最低系统，避免 iOS 11～13 因 ATT 框架强依赖而无法启动。
+
 ## [6.1.0] - 2026-07-31
 
 ### 新增
@@ -157,6 +170,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.2.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.0
 [6.1.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.1.0
 [6.0.14]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.14
 [6.0.13]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.13

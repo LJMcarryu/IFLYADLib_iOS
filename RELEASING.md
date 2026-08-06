@@ -3,6 +3,12 @@
 > 本仓库 `IFLYADLib_iOS` 是**对外分发仓**：只放分发清单、文档、示例，二进制托管在 GitHub Releases。
 > SDK 源码与构建脚本在**内部私有源码仓**（不在本仓）。
 
+## 当前正式版本
+
+`6.2.0` 于 2026-08-06 正式发布，是当前最新正式版本；正式二进制使用 Xcode 26.2 构建。
+
+正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
+
 ## 仓库角色
 
 | 仓库 | 内容 |
@@ -33,11 +39,13 @@
 
    - 按 `build/modelA/release/checksums.txt` 同步两仓 `Package.swift` 的 7 个 `url + checksum`；
    - 同步 `IFLYADLib.podspec` 的 `s.version` 与合并 zip `s.source(:http)`；
+   - 确认 `IFLYADLib.podspec` 的 `Core` 显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`，且最终 Core Mach-O 在 iOS 11～13 不形成 ATT 强依赖；
    - 将 `build/modelA/release/swiftpm-resources/spm/` 同步到本仓 `spm/`，不将该中间目录作为 Release 资产上传；
    - 同步 README、CHANGELOG、迁移说明和示例工程 Podfile/Xcode deployment target；
+   - 正式资产和 checksum 均已就绪后，才把本轮准备态措辞更新为正式发布日期和“最新正式版本”，并再次检索仓库确认无冲突状态；
    - 在私有仓执行 `python3 scripts/verify-model-a-release-metadata.py --version "${VERSION}"`，闭环校验产物、checksum 和两个分发清单。
 
-3. **验证并提交本公开仓**：至少执行 `swift package dump-package`、`pod spec lint IFLYADLib.podspec --quick --allow-warnings`、示例工程 `pod install` 与构建。Release tag 必须指向这个已包含新清单和资源的提交。
+3. **验证并提交本公开仓**：至少执行 `git diff --check`、`ruby -c IFLYADLib.podspec`、`swift package dump-package`、`pod spec lint IFLYADLib.podspec --quick --allow-warnings`、示例工程 `pod install` 与构建；同时用 iOS 11、iOS 13 和 iOS 14+ 宿主验证 Core 链接与启动。Release tag 必须指向这个已包含新清单、最终 checksum、资源和正式版本措辞的提交。
 
 4. **创建 GitHub Release**：tag = `<版本>`（**无 `v` 前缀**），target 指向上一步提交。上传打包脚本产生的 10 个文件：7 个单模块 zip、1 个合并 zip、`checksums.txt` 和 `binary-targets.remote.swift`。
 
@@ -55,5 +63,6 @@
 - **不要重打已上传的 zip**——内容变了 SPM checksum 就变，会让已下载者校验失败；换版本一律另起新 tag。
 - Release 的 tag 必须指向**已含新 `Package.swift` 与 `spm/` 资源**的提交，否则 SPM 消费方会解析到旧清单或旧资源。
 - 隐私清单 `PrivacyInfo.xcprivacy` 必须随 `Core` 资源进合并 zip（静态库不能内嵌到 Mach-O）。
+- `AdSupport` 必须随 Core 显式链接；`AppTrackingTransparency` 必须保持弱链接，并以实际 Mach-O 依赖和 iOS 11 启动验证为准，不能只检查 podspec 文本。
 - 版本号需四处一致：`Package.swift` 的 URL、podspec 的 version 与 source、Release tag、合并 zip 文件名；最低系统在 Package、podspec、示例 Podfile/Xcode 工程和二进制 load command 中保持 iOS 11.0。
 - 公开仓为私有源码仓的分发面，**不接受外部代码 PR**；版本只能由维护者经上述流程发布。
