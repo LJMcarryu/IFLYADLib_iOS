@@ -5,7 +5,9 @@
 
 ## 当前正式版本
 
-`6.2.0` 于 2026-08-06 正式发布，是当前最新正式版本；正式二进制使用 Xcode 26.2 构建。
+`6.2.1` 于 2026-08-07 完成正式版本内容与产物冻结，是当前最新正式版本；正式二进制使用 Xcode 26.2 构建。7 个单模块 zip、合并 zip、最终 `checksums.txt` 与 `binary-targets.remote.swift` 已生成，`Package.swift` 和 podspec 已回填 `6.2.1` URL/checksum。
+
+不可变 tag、GitHub Release、匿名下载复验与 CI 仍必须按下方流程逐项留证；未取得对应证据前，不得在验收记录中写成已经通过。
 
 正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
 
@@ -42,10 +44,11 @@
    - 确认 `IFLYADLib.podspec` 的 `Core` 显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`，且最终 Core Mach-O 在 iOS 11～13 不形成 ATT 强依赖；
    - 将 `build/modelA/release/swiftpm-resources/spm/` 同步到本仓 `spm/`，不将该中间目录作为 Release 资产上传；
    - 同步 README、CHANGELOG、迁移说明和示例工程 Podfile/Xcode deployment target；
+   - NativeFeed API 变更须同步公开示例的 DisplaySession 列表页，并复验稳定 item ID 持有 `Ad + Session`、Cell 持 Binding、离屏 detach、淘汰 `endDisplaySession → destroy`、活动 Binding 到期不强拆；
    - 正式资产和 checksum 均已就绪后，才把本轮准备态措辞更新为正式发布日期和“最新正式版本”，并再次检索仓库确认无冲突状态；
    - 在私有仓执行 `python3 scripts/verify-model-a-release-metadata.py --version "${VERSION}"`，闭环校验产物、checksum 和两个分发清单。
 
-3. **验证并提交本公开仓**：至少执行 `git diff --check`、`ruby -c IFLYADLib.podspec`、`swift package dump-package`、`pod spec lint IFLYADLib.podspec --quick --allow-warnings`、示例工程 `pod install` 与构建；同时用 iOS 11、iOS 13 和 iOS 14+ 宿主验证 Core 链接与启动。Release tag 必须指向这个已包含新清单、最终 checksum、资源和正式版本措辞的提交。
+3. **验证并提交本公开仓**：至少执行 `git diff --check`、`ruby -c IFLYADLib.podspec`、`swift package dump-package`、`pod spec lint IFLYADLib.podspec --quick --allow-warnings`、示例工程 `pod install` 与构建；NativeFeed 新增 API 还须编译公开列表示例并验证滚出/回屏、快速复用、过期边界和条目淘汰。同时用 iOS 11、iOS 13 和 iOS 14+ 宿主验证 Core 链接与启动。Release tag 必须指向这个已包含新清单、最终 checksum、资源和正式版本措辞的提交。
 
 4. **创建 GitHub Release**：tag = `<版本>`（**无 `v` 前缀**），target 指向上一步提交。上传打包脚本产生的 10 个文件：7 个单模块 zip、1 个合并 zip、`checksums.txt` 和 `binary-targets.remote.swift`。
 

@@ -7,6 +7,7 @@
 
 #import "IFLYBannerViewController.h"
 #import "IFLYInterstitialViewController.h"
+#import "IFLYNativeFeedListViewController.h"
 #import "IFLYNativeViewController.h"
 #import "IFLYRewardVideoViewController.h"
 #import "IFLYSplashViewController.h"
@@ -57,6 +58,7 @@
         @{@"title" : @"Banner 广告", @"selector" : @"bannerADTypeClick:"},
         @{@"title" : @"插屏广告", @"selector" : @"interstitialADTypeClick:"},
         @{@"title" : @"自渲染信息流", @"selector" : @"nativeADTypeClick:"},
+        @{@"title" : @"信息流列表复用（DisplaySession）", @"selector" : @"nativeFeedListTypeClick:"},
         @{@"title" : @"激励视频广告", @"selector" : @"rewardADTypeClick:"},
     ];
 
@@ -79,6 +81,10 @@
 
 - (void)nativeADTypeClick:(UIButton *)sender {
     [self.navigationController pushViewController:IFLYNativeViewController.alloc.init animated:YES];
+}
+
+- (void)nativeFeedListTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYNativeFeedListViewController.alloc.init animated:YES];
 }
 
 - (void)bannerADTypeClick:(UIButton *)sender {

@@ -2,6 +2,20 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.2.1] - 2026-08-07
+
+### 新增
+
+- NativeFeed 新增 `IFLYNativeFeedDisplaySession` 与 `IFLYNativeFeedAdBinding`：数据层可按稳定 item ID 持有 `IFLYNativeFeedAd + DisplaySession`，Cell 只持当前 Binding，从而支持同一逻辑广告条目滚出后再回来继续展示原广告。
+- 新增 `beginDisplaySessionWithError:`、`attachWithViewBinder:error:`、`detach` 和 `endDisplaySession` 完整列表生命周期；旧 `bindAdWithViewBinder:error:` / `unbindAd` 继续保留一次性固定卡片语义，两种模式不能在同一广告实例混用。
+- 公开示例新增真实 `UITableView` 列表复用页面，覆盖稳定 item identity、`willDisplay` / `didEndDisplaying` 乱序、离屏 detach 与条目淘汰时 `endDisplaySession → destroy`。
+
+### 变更
+
+- 同一 DisplaySession 同时只允许一个活动 Binding；旧 Cell 的迟到 detach 由绑定 generation 隔离，不会误伤后来挂载的新 Cell。
+- TTL 或视频投放截止时间在当前 Binding 活动期间到达时，`session.valid` 会变为 `NO`，但不会中途强拆当前展示；正常 detach 后不得再挂载，媒体应结束旧会话并请求新广告。
+- 曝光前重新挂载会重新累计连续可见 `500ms`；已经曝光的逻辑广告不会因 Cell 复用重复曝光。视频进度与播放意图按逻辑条目保留，只有结束会话、关闭、销毁或过期后的 detach 才终止恢复能力。
+
 ## [6.2.0] - 2026-08-06
 
 ### 新增
@@ -170,6 +184,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.2.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.1
 [6.2.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.0
 [6.1.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.1.0
 [6.0.14]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.14
