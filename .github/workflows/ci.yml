@@ -250,18 +250,18 @@ jobs:
             IFLYADLibSimple/IFLYADLibSimple/biz/native/IFLYNativeFeedListViewController.m
           )
           for source in "${sources[@]}"; do
-            rg -q 'attachWithViewBinder:' "$source"
-            rg -q 'detachAdFromContainerView:' "$source"
+            grep -q 'attachWithViewBinder:' "$source"
+            grep -q 'detachAdFromContainerView:' "$source"
           done
 
-          if rg -n             'IFLYNativeFeedDisplaySession|IFLYNativeFeedAdBinding|beginDisplaySessionWithError:|bindAdWithViewBinder:|unbindAd|endDisplaySession'             "${sources[@]}"; then
+          if grep -En 'IFLYNativeFeedDisplaySession|IFLYNativeFeedAdBinding|beginDisplaySessionWithError:|bindAdWithViewBinder:|unbindAd|endDisplaySession' "${sources[@]}"; then
             echo "Demo 仍使用 6.2.1 NativeFeed 历史 API" >&2
             exit 1
           fi
 
           home='IFLYADLibSimple/IFLYADLibSimple/ViewController.m'
-          rg -q '信息流列表复用（SDK 托管）' "$home"
-          if rg -n 'DisplaySession' "$home"; then
+          grep -q '信息流列表复用（SDK 托管）' "$home"
+          if grep -n 'DisplaySession' "$home"; then
             echo "Demo 首页仍出现 DisplaySession 历史标题" >&2
             exit 1
           fi
