@@ -3,9 +3,17 @@
 > 本仓库 `IFLYADLib_iOS` 是**对外分发仓**：只放分发清单、文档、示例，二进制托管在 GitHub Releases。
 > SDK 源码与构建脚本在**内部私有源码仓**（不在本仓）。
 
-## 当前正式版本
+## 当前发布状态
 
-`6.2.1` 于 2026-08-07 完成正式版本内容与产物冻结，是当前最新正式版本；正式二进制使用 Xcode 26.2 构建。7 个单模块 zip、合并 zip、最终 `checksums.txt` 与 `binary-targets.remote.swift` 已生成，`Package.swift` 和 podspec 已回填 `6.2.1` URL/checksum。
+当前最新公开正式版是 `6.2.1`（2026-08-07）。`6.2.2` 的正式签名资产已从提交 A 构建、扫描并冻结，Podspec、Package URL、Demo 与 7 个 SwiftPM checksum 已同步；不可变 tag、GitHub Release、无 Token 匿名下载和最终消费验证尚未完成，对应 URL 当前不可用。
+
+- `releaseState`：`FORMAL`
+- `binarySourceCommit`（SDK 二进制源码提交）：`a8ec925d3731d7d11734647aa02ca7d91d674965`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`eff78263c2d3f65b029f4114de1a9ed00f3827f3`
+
+`releaseState=FORMAL` 只表示正式签名资产与发布元数据已经冻结，不表示本仓已公开发布。合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
+
+正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
 
 不可变 tag、GitHub Release、匿名下载复验与 CI 仍必须按下方流程逐项留证；未取得对应证据前，不得在验收记录中写成已经通过。
 
@@ -44,13 +52,13 @@
    - 确认 `IFLYADLib.podspec` 的 `Core` 显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`，且最终 Core Mach-O 在 iOS 11～13 不形成 ATT 强依赖；
    - 将 `build/modelA/release/swiftpm-resources/spm/` 同步到本仓 `spm/`，不将该中间目录作为 Release 资产上传；
    - 同步 README、CHANGELOG、迁移说明和示例工程 Podfile/Xcode deployment target；
-   - NativeFeed API 变更须同步公开示例的 DisplaySession 列表页，并复验稳定 item ID 持有 `Ad + Session`、Cell 持 Binding、离屏 detach、淘汰 `endDisplaySession → destroy`、活动 Binding 到期不强拆；
-   - 正式资产和 checksum 均已就绪后，才把本轮准备态措辞更新为正式发布日期和“最新正式版本”，并再次检索仓库确认无冲突状态；
+   - NativeFeed API 变更须同步固定页和列表页，并复验数据层只持 Ad、Cell 不持 Session/Binding、进屏 Ad 级 attach、离屏按容器 detach、回屏恢复、最后引用释放自动终止和可选 `destroy`；
+   - 正式资产和 checksum 均已就绪后，将 `releaseState` 切换为 `FORMAL`，但在 tag/Release 与匿名验证完成前继续明确标注“尚未公开发布”；发布闭环后才写入正式发布日期和“最新公开正式版本”；
    - 在私有仓执行 `python3 scripts/verify-model-a-release-metadata.py --version "${VERSION}"`，闭环校验产物、checksum 和两个分发清单。
 
-3. **验证并提交本公开仓**：至少执行 `git diff --check`、`ruby -c IFLYADLib.podspec`、`swift package dump-package`、`pod spec lint IFLYADLib.podspec --quick --allow-warnings`、示例工程 `pod install` 与构建；NativeFeed 新增 API 还须编译公开列表示例并验证滚出/回屏、快速复用、过期边界和条目淘汰。同时用 iOS 11、iOS 13 和 iOS 14+ 宿主验证 Core 链接与启动。Release tag 必须指向这个已包含新清单、最终 checksum、资源和正式版本措辞的提交。
+3. **验证并提交本公开仓**：Release 资产公开前至少执行 `git diff --check`、`ruby -c IFLYADLib.podspec`、`swift package dump-package`、`pod ipc spec IFLYADLib.podspec`、本地 A/B 文档一致性和冻结 10 资产等价校验；完整 `pod spec lint`、示例工程 `pod install` 与真正 `xcodebuild build` 留到 Release 资产公开后执行。CI 必须对 NativeFeed 新 API 做正向头校验、对 `6.2.1` 历史 API 做反向头校验，并在 Release 事件编译固定页与列表页。Release tag 必须指向已包含最终 checksum、资源和正式版本措辞的提交。
 
-4. **创建 GitHub Release**：tag = `<版本>`（**无 `v` 前缀**），target 指向上一步提交。上传打包脚本产生的 10 个文件：7 个单模块 zip、1 个合并 zip、`checksums.txt` 和 `binary-targets.remote.swift`。
+4. **创建 GitHub Release**：tag = `<版本>`（**无 `v` 前缀**），target 指向上一步提交。上传打包脚本产生的 10 个文件：7 个单模块 zip、1 个合并 zip、`checksums.txt` 和 `binary-targets.remote.swift`。Release body 必须各出现一次本节记录的 A/B provenance 声明，并明确“B 仅用于 checksum、扫描汇总和验收事实，不是 SDK 二进制源码提交”。通用库存不含 `delivery-manifest.json`，Release body 不得虚构额外清单声明。
 
 5. **发版后校验**：
 

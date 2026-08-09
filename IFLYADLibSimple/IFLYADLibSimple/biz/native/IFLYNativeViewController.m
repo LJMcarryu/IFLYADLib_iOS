@@ -28,14 +28,12 @@
     self.title = @"自渲染信息流示例";
     self.view.backgroundColor = UIColor.whiteColor;
     [self setupUI];
-    [self log:@"自渲染信息流示例：Load -> 读取 adData -> 媒体渲染 -> Binder 绑定"];
+    [self log:@"自渲染信息流示例：Load -> 读取 adData -> 媒体渲染 -> SDK 托管挂载"];
 }
 
 - (void)dealloc {
-    IFLYNativeFeedAd *ad = self.nativeAd;
-    [ad unbindAd];
-    ad.delegate = nil;
-    [ad destroy];
+    [IFLYNativeFeedAd detachAdFromContainerView:self.adContainer];
+    self.nativeAd.delegate = nil;
 }
 
 - (void)setupUI {
@@ -197,7 +195,7 @@
 }
 
 - (void)loadAd {
-    [self destroyAdSilently];
+    [self clearAdSilently];
     [self resetAdCard];
 
     NSString *adUnitId = __TYPED_ONE_NATIVE_AD_UNIT_ID__;
@@ -218,25 +216,31 @@
 }
 
 - (void)destroyAd {
-    [self destroyAdSilently];
+    IFLYNativeFeedAd *ad = [self takeCurrentAdAndDetach];
+    [ad destroy];
     [self resetAdCard];
     [self updateStatus:@"已销毁" color:[IFLYADUtil demoTealColor]];
     [self log:@"Destroy"];
 }
 
-- (void)destroyAdSilently {
+- (nullable IFLYNativeFeedAd *)takeCurrentAdAndDetach {
     IFLYNativeFeedAd *ad = self.nativeAd;
     if (!ad) {
-        return;
+        return nil;
     }
+    [IFLYNativeFeedAd detachAdFromContainerView:self.adContainer];
     self.nativeAd = nil;
-    [ad unbindAd];
     ad.delegate = nil;
-    [ad destroy];
+    return ad;
+}
+
+- (void)clearAdSilently {
+    // 正常页面替换/条目结束无需显式 destroy；释放最后一个 Ad 强引用即由 SDK 收口资源。
+    (void)[self takeCurrentAdAndDetach];
 }
 
 - (void)resetAdCard {
-    // 先由 unbindAd 让 SDK 移除自己的播放器宿主；媒体仅复位自己创建的视图。
+    // 先按容器 detach 让 SDK 移除自己的播放器宿主；媒体仅复位自己创建的视图。
     self.videoView.hidden = NO;
     self.placeholderLabel.hidden = NO;
     self.placeholderLabel.text = @"广告素材展示区域";
@@ -254,13 +258,13 @@
     self.closeButton.hidden = YES;
 }
 
-- (void)renderAndBindAd:(IFLYNativeFeedAd *)ad {
+- (void)renderAndAttachAd:(IFLYNativeFeedAd *)ad {
     IFLYNativeFeedAdData *data = ad.adData;
     if (!data || !data.isMaterialComplete ||
         data.materialType == IFLYNativeFeedAdMaterialTypeUnknown) {
-        [self log:@"素材不完整或类型未知，不渲染、不绑定"];
+        [self log:@"素材不完整或类型未知，不渲染、不挂载"];
         [self updateStatus:@"素材不可用" color:UIColor.systemRedColor];
-        [self destroyAdSilently];
+        [self clearAdSilently];
         [self resetAdCard];
         return;
     }
@@ -296,7 +300,7 @@
             self.videoView.hidden = NO;
             self.placeholderLabel.hidden = NO;
             self.placeholderLabel.text = @"视频加载中...";
-            [self bindNativeAd:ad video:YES mediaViews:@[self.videoView]];
+            [self attachNativeAd:ad video:YES mediaViews:@[self.videoView]];
             return;
         case IFLYNativeFeedAdMaterialTypeSingleImage:
             [self renderImagesForAd:ad URLs:@[data.imageURLs.firstObject] multiple:NO];
@@ -307,7 +311,7 @@
         case IFLYNativeFeedAdMaterialTypeUnknown:
         default:
             [self updateStatus:@"素材类型未知" color:UIColor.systemRedColor];
-            [self destroyAdSilently];
+            [self clearAdSilently];
             [self resetAdCard];
             return;
     }
@@ -318,9 +322,9 @@
                  multiple:(BOOL)multiple {
     NSUInteger expectedCount = multiple ? MIN(URLs.count, self.multipleImageViews.count) : MIN(URLs.count, 1);
     if (expectedCount == 0) {
-        [self log:@"图片素材为空，不绑定"];
+        [self log:@"图片素材为空，不挂载"];
         [self updateStatus:@"图片素材为空" color:UIColor.systemRedColor];
-        [self destroyAdSilently];
+        [self clearAdSilently];
         [self resetAdCard];
         return;
     }
@@ -357,8 +361,8 @@
                                     if (firstError) {
                                         [self log:[NSString stringWithFormat:@"图片加载失败：%@",
                                                                             firstError.localizedDescription ?: @"未知"]];
-                                        [self updateStatus:@"图片加载失败，未绑定广告" color:UIColor.systemRedColor];
-                                        [self destroyAdSilently];
+                                        [self updateStatus:@"图片加载失败，未挂载广告" color:UIColor.systemRedColor];
+                                        [self clearAdSilently];
                                         [self resetAdCard];
                                         return;
                                     }
@@ -366,8 +370,8 @@
                                     NSArray<UIView *> *mediaViews =
                                         multiple ? [self.multipleImageViews subarrayWithRange:NSMakeRange(0, expectedCount)]
                                                  : @[self.imageView];
-                                    [self log:multiple ? @"多图素材已渲染，开始绑定" : @"单图素材已渲染，开始绑定"];
-                                    [self bindNativeAd:ad video:NO mediaViews:mediaViews];
+                                    [self log:multiple ? @"多图素材已渲染，开始挂载" : @"单图素材已渲染，开始挂载"];
+                                    [self attachNativeAd:ad video:NO mediaViews:mediaViews];
                                 }];
     }
 }
@@ -395,7 +399,7 @@
     }];
 }
 
-- (void)bindNativeAd:(IFLYNativeFeedAd *)ad
+- (void)attachNativeAd:(IFLYNativeFeedAd *)ad
                 video:(BOOL)isVideo
            mediaViews:(NSArray<UIView *> *)mediaViews {
     IFLYNativeFeedAdData *data = ad.adData;
@@ -420,12 +424,12 @@
     binder.ctaView = self.ctaButton.hidden ? nil : self.ctaButton;
 
     IFLYAdError *error = nil;
-    BOOL success = [ad bindAdWithViewBinder:binder error:&error];
-    [self log:[NSString stringWithFormat:@"bindAdWithViewBinder success=%@ %@", success ? @"YES" : @"NO",
+    BOOL success = [ad attachWithViewBinder:binder error:&error];
+    [self log:[NSString stringWithFormat:@"attachWithViewBinder success=%@ %@", success ? @"YES" : @"NO",
                                       error ? [IFLYADUtil summaryForError:error] : @""]];
     if (!success) {
-        [self updateStatus:@"信息流绑定失败" color:UIColor.systemRedColor];
-        [self destroyAdSilently];
+        [self updateStatus:@"信息流挂载失败" color:UIColor.systemRedColor];
+        [self clearAdSilently];
         [self resetAdCard];
     }
 }
@@ -452,7 +456,7 @@
                                       [IFLYADUtil priceForAd:ad],
                                       ad.bidInfo.dealId ?: @"无"]];
     [self updateStatus:@"加载成功，媒体侧开始渲染" color:[IFLYADUtil demoIndigoColor]];
-    [self renderAndBindAd:ad];
+    [self renderAndAttachAd:ad];
 }
 
 - (void)nativeFeedAdDidRender:(IFLYNativeFeedAd *)ad {
@@ -460,7 +464,7 @@
         return;
     }
     [self log:@"nativeFeedAdDidRender"];
-    [self updateStatus:@"绑定成功，等待曝光" color:UIColor.systemGreenColor];
+    [self updateStatus:@"挂载成功，等待曝光" color:UIColor.systemGreenColor];
     if (ad.hasVideoTemplate) {
         [ad startPlay];
         [self log:@"视频信息流调用 startPlay"];
@@ -488,7 +492,7 @@
     }
     [self log:@"nativeFeedAdDidClose"];
     [self updateStatus:@"信息流已关闭" color:[IFLYADUtil demoTealColor]];
-    [self destroyAdSilently];
+    [self clearAdSilently];
     [self resetAdCard];
 }
 
@@ -498,7 +502,7 @@
     }
     [self log:[NSString stringWithFormat:@"nativeFeedAd didFailWithError %@", [IFLYADUtil summaryForError:error]]];
     [self updateStatus:@"信息流加载失败" color:UIColor.systemRedColor];
-    [self destroyAdSilently];
+    [self clearAdSilently];
     [self resetAdCard];
 }
 
@@ -508,7 +512,7 @@
     }
     [self log:[NSString stringWithFormat:@"nativeFeedAd didFailToRender %@", [IFLYADUtil summaryForError:error]]];
     [self updateStatus:@"信息流渲染失败" color:UIColor.systemRedColor];
-    [self destroyAdSilently];
+    [self clearAdSilently];
     [self resetAdCard];
 }
 

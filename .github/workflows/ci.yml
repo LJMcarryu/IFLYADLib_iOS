@@ -3,21 +3,270 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ['6.*']
   pull_request:
     branches: [main]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   verify-distribution:
-    name: 校验分发清单与产物
-    # Demo 工程由 Xcode 16.2 创建（objectVersion 77），需使用 Xcode 16+ runner。
+    name: 校验分发清单、Demo 与正式资产
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref }}
+          fetch-depth: 0
+          fetch-tags: true
 
-      - name: Package.swift 解析
-        run: swift package dump-package > /dev/null
+      - name: 判定准备态或正式发布态
+        id: release-mode
+        shell: bash
+        run: |
+          version='6.2.2'
+          formal=false
+          event_tag=''
 
-      - name: 校验 CocoaPods 最终 App 链接契约
+          if [[ "${{ github.event_name }}" == 'release' ]]; then
+            formal=true
+            event_tag='${{ github.event.release.tag_name }}'
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            formal=true
+            event_tag='${{ github.ref_name }}'
+          fi
+
+          if [[ "$formal" == true && "$event_tag" != "$version" ]]; then
+            echo "正式门禁只接受 tag $version，实际为 $event_tag" >&2
+            exit 1
+          fi
+
+          echo "formal=$formal" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "event_tag=$event_tag" >> "$GITHUB_OUTPUT"
+
+      - name: 校验版本、PENDING/checksum 状态与通用仓 10 资产契约
+        env:
+          FORMAL_RELEASE: ${{ steps.release-mode.outputs.formal }}
+          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          version = os.environ["RELEASE_VERSION"]
+          formal = os.environ["FORMAL_RELEASE"] == "true"
+          expected = {
+              "IFLYAdCore": (
+                  "IFLYAdCore.xcframework.zip",
+                  "__IFLYADLIB_6_2_2_CORE_CHECKSUM_PENDING__",
+              ),
+              "IFLYAdVideoUI": (
+                  "IFLYAdVideoUI.xcframework.zip",
+                  "__IFLYADLIB_6_2_2_VIDEO_UI_CHECKSUM_PENDING__",
+              ),
+              "IFLYAdBanner": (
+                  "IFLYAdBanner.xcframework.zip",
+                  "__IFLYADLIB_6_2_2_BANNER_CHECKSUM_PENDING__",
+              ),
+              "IFLYAdSplash": (
+                  "IFLYAdSplash.xcframework.zip",
+                  "__IFLYADLIB_6_2_2_SPLASH_CHECKSUM_PENDING__",
+              ),
+              "IFLYAdInterstitial": (
+                  "IFLYAdInterstitial.xcframework.zip",
+                  "__IFLYADLIB_6_2_2_INTERSTITIAL_CHECKSUM_PENDING__",
+              ),
+              "IFLYAdNativeFeed": (
+                  "IFLYAdNativeFeed.xcframework.zip",
+                  "__IFLYADLIB_6_2_2_NATIVE_FEED_CHECKSUM_PENDING__",
+              ),
+              "IFLYAdReward": (
+                  "IFLYAdReward.xcframework.zip",
+                  "__IFLYADLIB_6_2_2_REWARD_CHECKSUM_PENDING__",
+              ),
+          }
+          old_621 = {
+              "d7f6931fdc9613bb5497d122c1410b4768094da56e352fa32b0ac2979a07e6e0",
+              "185b6e26b22a12e9776dae0e621e99f4722c42859f6d86ceed63cba51ba67213",
+              "8432807c3c767f7c165de8a9517f70b0ed3e357b4c28ad75cdfd8829a64f4d8c",
+              "58c7aab22624c4cfeda05f20271fa109051af063a50a7e624064fe80f1778427",
+              "8a65097a81f8354a2c4ade78a09fc9e4dac6e3029a2e9990a94386594dc3205d",
+              "6d33bc2876ac7a1f84ff84e1b78ba0ec5fe33cef489e2ad814858a6c845176aa",
+              "2b7b94447fbe50f24c20f25c324cda98285d8ced3050ed8a0c56561d99419a3d",
+          }
+          readme = Path("README.md").read_text(encoding="utf-8")
+          changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
+          releasing = Path("RELEASING.md").read_text(encoding="utf-8")
+          security = Path("SECURITY.md").read_text(encoding="utf-8")
+
+          package = Path("Package.swift").read_text(encoding="utf-8")
+          blocks = re.findall(
+              r'\.binaryTarget\(\s*name:\s*"([^"]+)"\s*,'
+              r'\s*url:\s*"([^"]+)"\s*,'
+              r'\s*checksum:\s*"([^"]+)"\s*\)',
+              package,
+              re.S,
+          )
+          assert len(blocks) == 7, f"binaryTarget 数量不是 7：{len(blocks)}"
+          assert {name for name, _, _ in blocks} == set(expected), blocks
+
+          checksums = {}
+          module_assets = set()
+          for name, url, checksum in blocks:
+              expected_asset, expected_pending = expected[name]
+              asset = Path(urlparse(url).path).name
+              assert asset == expected_asset, (name, asset, expected_asset)
+              assert f"/releases/download/{version}/" in url, (name, url)
+              module_assets.add(asset)
+              checksums[name] = checksum
+
+          all_pending = all(
+              checksums[name] == expected[name][1] for name in expected
+          )
+          all_final = all(
+              re.fullmatch(r"[0-9a-f]{64}", checksums[name])
+              and checksums[name] != "0" * 64
+              and checksums[name] not in old_621
+              for name in expected
+          )
+          assert all_pending or all_final, (
+              "7 个 checksum 必须全部是与私有仓一致的精确 PENDING，"
+              "或全部是本版非零、非 6.2.1 的 64 位小写 SHA-256；不得混用"
+          )
+          if formal:
+              assert all_final, "正式 tag/Release 禁止保留 PENDING checksum"
+
+          if all_pending:
+              assert not formal
+              assert "最新正式版仍是 `6.2.1`" in readme
+              assert re.search(
+                  r"^## \[6\.2\.2\] - 待发布\s*$", changelog, re.M
+              )
+              assert "`main` 正在准备 `6.2.2`" in releasing
+              assert "`6.2.2` 发布准备" in security
+              state = "准备"
+          else:
+              assert "最新公开正式版仍是 `6.2.1`" in readme
+              assert "正式签名资产已从提交 A 构建、扫描并冻结" in readme
+              assert "无 Token 匿名下载和最终消费验证尚未完成" in readme
+              assert re.search(
+                  r"^## \[6\.2\.2\] - 待发布\s*$",
+                  changelog,
+                  re.M,
+              )
+              assert "当前最新公开正式版是 `6.2.1`" in releasing
+              assert "不可变 tag、GitHub Release、无 Token 匿名下载" in releasing
+              assert "`6.2.2` 正式资产准备" in security
+              assert "最新公开正式版本（当前为 `6.2.1`）" in security
+              state = "正式 Release 门禁" if formal else "正式资产待发布"
+
+              combined_sha = (
+                  "f24cf6ea1d4e4319fbcef0fdb79a29aee"
+                  "5906f9bc35d81453052a6341379a673"
+              )
+              for label, document in (
+                  ("README", readme),
+                  ("CHANGELOG", changelog),
+                  ("RELEASING", releasing),
+              ):
+                  assert document.count(combined_sha) == 1, (
+                      f"{label} 必须唯一记录正式合并包 SHA-256"
+                  )
+
+          assert len(set(checksums.values())) == 7, "7 个模块 checksum/PENDING 必须唯一"
+
+          podspec = Path("IFLYADLib.podspec").read_text(encoding="utf-8")
+          pod_version = re.search(r"s\.version\s*=\s*'([^']+)'", podspec)
+          pod_source = re.search(r":http\s*=>\s*'([^']+)'", podspec)
+          assert pod_version and pod_version.group(1) == version, pod_version
+          assert pod_source, "podspec 缺少 :http source"
+          combined = Path(urlparse(pod_source.group(1)).path).name
+          assert combined == f"IFLYADLib-modelA-{version}.zip", combined
+          assert f"/releases/download/{version}/" in pod_source.group(1), pod_source.group(1)
+
+          release_assets = module_assets | {
+              combined,
+              "checksums.txt",
+              "binary-targets.remote.swift",
+          }
+          assert len(release_assets) == 10, release_assets
+
+          podfile = Path("IFLYADLibSimple/Podfile").read_text(encoding="utf-8")
+          expected_podspec_url = (
+              f"https://raw.githubusercontent.com/LJMcarryu/"
+              f"IFLYADLib_iOS/{version}/IFLYADLib.podspec"
+          )
+          assert expected_podspec_url in podfile, expected_podspec_url
+          print(
+              f"OK {state}态："
+              "7 模块 + 合并包 + checksums.txt + binary-targets.remote.swift"
+          )
+          PY
+
+      - name: 校验 Package.swift 可解析
+        run: swift package dump-package > /tmp/ifly-package.json
+
+      - name: 校验 A/B provenance 文档一致性（main/PR 不访问私有仓）
+        if: steps.release-mode.outputs.formal != 'true'
+        run: |
+          python3 scripts/verify_private_release_provenance.py \
+            --readme README.md \
+            --changelog CHANGELOG.md \
+            --releasing RELEASING.md \
+            --skip-compare
+
+      - name: tag/Release 正式态校验 A/B provenance（私有仓 compare）
+        if: steps.release-mode.outputs.formal == 'true'
+        env:
+          IFLY_PRIVATE_SOURCE_TOKEN: ${{ secrets.IFLY_PRIVATE_SOURCE_TOKEN }}
+        run: |
+          python3 scripts/verify_private_release_provenance.py \
+            --readme README.md \
+            --changelog CHANGELOG.md \
+            --releasing RELEASING.md
+
+      - name: 正式态校验不可变 annotated tag 与 checkout 绑定
+        if: steps.release-mode.outputs.formal == 'true'
+        env:
+          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+        run: |
+          test -z "$(git status --porcelain)"
+          test "$(git cat-file -t "refs/tags/$RELEASE_VERSION")" = 'tag'
+          test "$(git rev-parse HEAD)" = "$(git rev-parse "$RELEASE_VERSION^{commit}")"
+          test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_VERSION"
+          test "$(git show "$RELEASE_VERSION:IFLYADLib.podspec" | sed -nE "s/.*s\.version = '([^']+)'.*/\1/p" | head -1)" = "$RELEASE_VERSION"
+
+      - name: 校验 NativeFeed Demo 只使用 SDK 托管公开 API
+        run: |
+          sources=(
+            IFLYADLibSimple/IFLYADLibSimple/biz/native/IFLYNativeViewController.m
+            IFLYADLibSimple/IFLYADLibSimple/biz/native/IFLYNativeFeedListViewController.m
+          )
+          for source in "${sources[@]}"; do
+            rg -q 'attachWithViewBinder:' "$source"
+            rg -q 'detachAdFromContainerView:' "$source"
+          done
+
+          if rg -n             'IFLYNativeFeedDisplaySession|IFLYNativeFeedAdBinding|beginDisplaySessionWithError:|bindAdWithViewBinder:|unbindAd|endDisplaySession'             "${sources[@]}"; then
+            echo "Demo 仍使用 6.2.1 NativeFeed 历史 API" >&2
+            exit 1
+          fi
+
+          home='IFLYADLibSimple/IFLYADLibSimple/ViewController.m'
+          rg -q '信息流列表复用（SDK 托管）' "$home"
+          if rg -n 'DisplaySession' "$home"; then
+            echo "Demo 首页仍出现 DisplaySession 历史标题" >&2
+            exit 1
+          fi
+
+      - name: 校验 CocoaPods 清单与最终 App 链接契约
         run: |
           pod ipc spec IFLYADLib.podspec > /tmp/ifly-podspec.json
           python3 - <<'PY'
@@ -28,78 +277,90 @@ jobs:
           spec = json.loads(Path("/tmp/ifly-podspec.json").read_text(encoding="utf-8"))
 
           def has_objc_flag(config):
-              flags = (config or {}).get("OTHER_LDFLAGS", "")
-              return "-ObjC" in shlex.split(flags)
+              return "-ObjC" in shlex.split(
+                  (config or {}).get("OTHER_LDFLAGS", "")
+              )
 
-          assert has_objc_flag(spec.get("pod_target_xcconfig")), (
-              "pod target 未声明 -ObjC"
-          )
-          assert has_objc_flag(spec.get("user_target_xcconfig")), (
-              "aggregate/user target 未声明 -ObjC"
-          )
-          core = next(item for item in spec.get("subspecs", []) if item.get("name") == "Core")
+          assert spec["version"] == "6.2.2", spec["version"]
+          assert has_objc_flag(spec.get("pod_target_xcconfig"))
+          assert has_objc_flag(spec.get("user_target_xcconfig"))
+          core = next(item for item in spec["subspecs"] if item["name"] == "Core")
           frameworks = core.get("frameworks", [])
-          weak_frameworks = core.get("weak_frameworks", [])
+          weak = core.get("weak_frameworks", [])
           if isinstance(frameworks, str):
               frameworks = [frameworks]
-          if isinstance(weak_frameworks, str):
-              weak_frameworks = [weak_frameworks]
-          assert "AdSupport" in frameworks, "Core 缺少 AdSupport 强链接声明"
-          assert "AppTrackingTransparency" in weak_frameworks, (
-              "Core 缺少 AppTrackingTransparency 弱链接声明"
-          )
+          if isinstance(weak, str):
+              weak = [weak]
+          assert "AdSupport" in frameworks
+          assert "AppTrackingTransparency" in weak
           PY
 
       - name: 校验 SwiftPM 资源文件权限
         run: |
           python3 - <<'PY'
           from pathlib import Path
-
-          executable_resources = [
+          bad = [
               path
               for path in Path("spm").rglob("*")
               if path.is_file() and path.stat().st_mode & 0o111
           ]
-          assert not executable_resources, executable_resources
+          assert not bad, bad
           PY
 
-      - name: 校验 SPM binaryTarget 的 url + checksum 一致
+      - name: 正式态无 Token 匿名下载 10 个 Release 资产
+        if: github.event_name == 'release'
+        env:
+          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets-anonymous
+          RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
         run: |
-          python3 - <<'PY'
-          import re, sys, urllib.request, hashlib
-          src = open("Package.swift", encoding="utf-8").read()
-          pairs = re.findall(r'url:\s*"([^"]+)"\s*,\s*checksum:\s*"([0-9a-fA-F]{64})"', src)
-          if not pairs:
-              print("未在 Package.swift 找到 url+checksum 对"); sys.exit(1)
-          bad = 0
-          for url, declared in pairs:
-              data = urllib.request.urlopen(url, timeout=180).read()
-              actual = hashlib.sha256(data).hexdigest()
-              ok = actual.lower() == declared.lower()
-              print(("OK  " if ok else "FAIL") + f"  {url.split('/')[-1]}  declared={declared[:12]}.. actual={actual[:12]}..")
-              bad += 0 if ok else 1
-          print(f"共校验 {len(pairs)} 个二进制，失败 {bad}")
-          sys.exit(1 if bad else 0)
-          PY
+          env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
+            -u IFLY_PRIVATE_SOURCE_TOKEN \
+            python3 scripts/download_release_anonymously.py \
+              --repository "$RELEASE_REPOSITORY" \
+              --tag "$RELEASE_VERSION" \
+              --destination "$ASSET_DIRECTORY" \
+              --metadata-output "$RELEASE_METADATA"
 
-      - name: 校验 podspec 合并 zip 可下载且结构完整
+      - name: 正式态校验 7 个模块与合并包逐字节同源
+        if: github.event_name == 'release'
+        env:
+          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets-anonymous
         run: |
-          python3 - <<'PY'
-          import re, sys, urllib.request, io, zipfile
-          src = open("IFLYADLib.podspec", encoding="utf-8").read()
-          m = re.search(r':http\s*=>\s*[\'"]([^\'"]+)[\'"]', src)
-          if not m:
-              print("podspec 未找到 :http source"); sys.exit(1)
-          data = urllib.request.urlopen(m.group(1), timeout=180).read()
-          z = zipfile.ZipFile(io.BytesIO(data))
-          names = z.namelist()
-          fw = [n for n in names if n.endswith(".xcframework/Info.plist")]
-          has_license = any(n.rstrip("/").split("/")[-1] == "LICENSE" for n in names)
-          print(f"合并 zip：{len(fw)} 个 xcframework，LICENSE={has_license}")
-          sys.exit(0 if fw and has_license else 1)
-          PY
+          python3 scripts/verify-model-a-asset-equivalence.py \
+            --asset-dir "$ASSET_DIRECTORY" \
+            --repository-root "$GITHUB_WORKSPACE" \
+            --version "$RELEASE_VERSION"
 
-      - name: 真实校验 CocoaPods 将 -ObjC 传播到最终 App
+      - name: 正式态校验 Release body 的 A/B provenance 声明
+        if: github.event_name == 'release'
+        env:
+          RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
+          IFLY_PRIVATE_SOURCE_TOKEN: ${{ secrets.IFLY_PRIVATE_SOURCE_TOKEN }}
+        run: |
+          python3 scripts/verify_private_release_provenance.py \
+            --readme README.md \
+            --changelog CHANGELOG.md \
+            --releasing RELEASING.md \
+            --release-metadata "$RELEASE_METADATA"
+
+      - name: 正式态以独立 SwiftPM 消费端构建 Full 产品
+        if: github.event_name == 'release'
+        run: |
+          (
+            cd .github/fixtures/swiftpm-consumer
+            xcodebuild build \
+              -scheme ReleaseConsumer \
+              -destination 'generic/platform=iOS Simulator' \
+              -derivedDataPath "$RUNNER_TEMP/ifly-swiftpm-consumer-derived-data" \
+              -clonedSourcePackagesDirPath "$RUNNER_TEMP/ifly-swiftpm-consumer-packages" \
+              CODE_SIGNING_ALLOWED=NO
+          )
+
+      - name: 正式态安装 CocoaPods 并校验 NativeFeed 新 API 正向/旧 API 反向
+        if: github.event_name == 'release'
         run: |
           (
             cd IFLYADLibSimple
@@ -107,37 +368,71 @@ jobs:
           )
 
           python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          headers = list(
+              Path("IFLYADLibSimple/Pods").glob(
+                  "**/IFLYAdNativeFeed.xcframework/*/Headers/"
+                  "IFLYADLib/IFLYNativeFeedAd.h"
+              )
+          )
+          assert len(headers) >= 2, headers
+          positive = {
+              "attachWithViewBinder:error:": (
+                  r"-\s*\(BOOL\)\s*attachWithViewBinder:"
+                  r"\s*\([^)]*\)\s*binder\s*error:"
+              ),
+              "detachAdFromContainerView:": (
+                  r"\+\s*\(void\)\s*detachAdFromContainerView:"
+              ),
+          }
+          negative = (
+              "IFLYNativeFeedDisplaySession",
+              "IFLYNativeFeedAdBinding",
+              "beginDisplaySessionWithError:",
+              "bindAdWithViewBinder:",
+              "unbindAd",
+              "endDisplaySession",
+          )
+          for header in headers:
+              source = header.read_text(encoding="utf-8")
+              compact = re.sub(r"\s+", " ", source)
+              for name, pattern in positive.items():
+                  assert re.search(pattern, compact), f"{header} 缺少 {name}"
+              leaked = [token for token in negative if token in source]
+              assert not leaked, f"{header} 残留旧 API：{leaked}"
+          PY
+
+      - name: 正式态校验 CocoaPods 将 -ObjC 传播到最终 App
+        if: github.event_name == 'release'
+        run: |
+          python3 - <<'PY'
           import shlex
           from pathlib import Path
 
-          support_root = Path("IFLYADLibSimple/Pods/Target Support Files")
+          root = Path("IFLYADLibSimple/Pods/Target Support Files")
           configs = {
-              "pod target": support_root / "IFLYADLib/IFLYADLib.debug.xcconfig",
+              "pod target": root / "IFLYADLib/IFLYADLib.debug.xcconfig",
               "aggregate target": (
-                  support_root
+                  root
                   / "Pods-IFLYADLibSimple/Pods-IFLYADLibSimple.debug.xcconfig"
               ),
           }
           for label, path in configs.items():
-              if not path.is_file():
-                  raise SystemExit(f"缺少 {label} xcconfig: {path}")
+              assert path.is_file(), f"缺少 {label}: {path}"
               values = [
                   line.split("=", 1)[1].strip()
                   for line in path.read_text(encoding="utf-8").splitlines()
-                  if line.strip().startswith("OTHER_LDFLAGS") and "=" in line
+                  if line.strip().startswith("OTHER_LDFLAGS")
+                  and "=" in line
               ]
-              if not any("-ObjC" in shlex.split(value) for value in values):
-                  raise SystemExit(f"{label} 未传播 -ObjC: {path}")
-              print(f"OK {label}: {path}")
+              assert any(
+                  "-ObjC" in shlex.split(value) for value in values
+              ), f"{label} 未传播 -ObjC"
           PY
 
-          xcodebuild \
-            -workspace IFLYADLibSimple/IFLYADLibSimple.xcworkspace \
-            -scheme IFLYADLibSimple \
-            -configuration Debug \
-            -sdk iphonesimulator \
-            -showBuildSettings \
-            -json > /tmp/ifly-build-settings.json
+          xcodebuild             -workspace IFLYADLibSimple/IFLYADLibSimple.xcworkspace             -scheme IFLYADLibSimple             -configuration Debug             -sdk iphonesimulator             -showBuildSettings             -json > /tmp/ifly-build-settings.json
 
           python3 - <<'PY'
           import json
@@ -148,22 +443,20 @@ jobs:
               Path("/tmp/ifly-build-settings.json").read_text(encoding="utf-8")
           )
           apps = [item for item in records if item.get("target") == "IFLYADLibSimple"]
-          if len(apps) != 1:
-              raise SystemExit(f"无法唯一定位最终 App build settings: {len(apps)}")
-          flags = apps[0].get("buildSettings", {}).get("OTHER_LDFLAGS", "")
-          if "-ObjC" not in shlex.split(flags):
-              raise SystemExit(f"最终 App OTHER_LDFLAGS 未包含 -ObjC: {flags}")
-          print(f"OK 最终 App OTHER_LDFLAGS: {flags}")
+          assert len(apps) == 1, len(apps)
+          flags = apps[0]["buildSettings"].get("OTHER_LDFLAGS", "")
+          assert "-ObjC" in shlex.split(flags), flags
           PY
 
-  lint-podspec:
-    name: pod spec lint（结构）
-    runs-on: macos-14
-    steps:
-      - uses: actions/checkout@v4
-      - name: pod spec lint
+      - name: 正式态真正编译链接公开 Demo
+        if: github.event_name == 'release'
+        run: |
+          xcodebuild build             -workspace IFLYADLibSimple/IFLYADLibSimple.xcworkspace             -scheme IFLYADLibSimple             -configuration Debug             -destination 'generic/platform=iOS Simulator'             CODE_SIGNING_ALLOWED=NO
+
+      - name: 正式态 pod spec lint
+        if: github.event_name == 'release'
         run: pod spec lint IFLYADLib.podspec --quick --allow-warnings
 
-# 说明：以上为只读校验门禁（无需任何密钥）。
-# 更重的检查（全量 pod spec lint 真实编译、示例工程 pod install + xcodebuild build）
-# 耗时较长，可按需在单独 workflow 增加。
+# main/PR 允许 7 个精确 PENDING 的准备态，或 7 个真实 checksum 与正式文档齐备的待打 tag 态。
+# tag 必须无 PENDING、不得复用 6.2.1 checksum，并绑定不可变 annotated tag；Release 发布事件
+# 再匿名下载并核对全部 10 个资产、真实消费和 Demo 构建，避免 tag push 与资产创建顺序竞争。

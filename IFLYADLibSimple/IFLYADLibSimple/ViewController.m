@@ -58,7 +58,7 @@
         @{@"title" : @"Banner 广告", @"selector" : @"bannerADTypeClick:"},
         @{@"title" : @"插屏广告", @"selector" : @"interstitialADTypeClick:"},
         @{@"title" : @"自渲染信息流", @"selector" : @"nativeADTypeClick:"},
-        @{@"title" : @"信息流列表复用（DisplaySession）", @"selector" : @"nativeFeedListTypeClick:"},
+        @{@"title" : @"信息流列表复用（SDK 托管）", @"selector" : @"nativeFeedListTypeClick:"},
         @{@"title" : @"激励视频广告", @"selector" : @"rewardADTypeClick:"},
     ];
 

@@ -2,6 +2,30 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.2.2] - 待发布
+
+- `releaseState`：`FORMAL`
+- `binarySourceCommit`（SDK 二进制源码提交）：`a8ec925d3731d7d11734647aa02ca7d91d674965`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`eff78263c2d3f65b029f4114de1a9ed00f3827f3`
+- 正式签名资产已从提交 A 构建、扫描并冻结；7 个 SwiftPM checksum 已回填，合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
+- 本节仍为待发布记录：不可变 tag、GitHub Release、无 Token 匿名下载和最终消费验证尚未完成，不构成公开发布证据。
+
+### 新增
+
+- NativeFeed 新增 Ad 级 `attachWithViewBinder:error:` 和容器级 `detachAdFromContainerView:`；SDK 内部管理会话、绑定代次、跨 Cell 串行迁移与同容器原子接管。
+- 公开固定卡片与 `UITableView` 列表示例统一为 SDK 托管模式，CI 新增新 API 正向、旧 API 反向及 Demo 真实 `xcodebuild build` 门禁。
+
+### 变更
+
+- 数据层只持 `IFLYNativeFeedAd`，Cell 不再持 Session、Binding、Binding 集合或首次/复用状态。暂时离屏只 detach 容器，回屏使用原 Ad 重新 attach。
+- 永久淘汰时 detach 已知容器并释放最后一个 Ad 强引用即可自动收口；`destroy` 只保留为仍持有 Ad 时的可选主动提前终止。
+- 曝光、点击和视频节点继续按逻辑内容去重；曝光前迁移在新容器重新累计 `500ms`，视频进度与播放意图跨 detach/attach 保留。
+- 同步带出 Base/S2S 在途 token gate 析构收口修复，并扩展点击回调丢弃灰度联调、S2S 测试环境保护、HTTP transport 测试、Server Bidding Demo 与正式二进制测试标记防污染门禁。
+
+### 移除
+
+- NativeFeed 公开头移除 `IFLYNativeFeedDisplaySession`、`IFLYNativeFeedAdBinding`、`beginDisplaySessionWithError:`、`bindAdWithViewBinder:error:`、`unbindAd` 和 `endDisplaySession`。该版必须迁移媒体代码并重新编译。
+
 ## [6.2.1] - 2026-08-07
 
 ### 新增
@@ -184,6 +208,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.2.2]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.2
 [6.2.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.1
 [6.2.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.0
 [6.1.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.1.0

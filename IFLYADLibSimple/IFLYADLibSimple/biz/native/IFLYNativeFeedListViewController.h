@@ -2,7 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// NativeFeed 可恢复绑定列表示例，仅使用 IFLYADLib 公开 API。
+/// NativeFeed SDK 托管挂载列表示例，数据层只持 Ad，Cell 不持挂载句柄。
 @interface IFLYNativeFeedListViewController : UIViewController
 
 @end
