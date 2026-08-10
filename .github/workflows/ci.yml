@@ -370,6 +370,8 @@ jobs:
 
       - name: 正式态以独立 SwiftPM 消费端构建 Full 产品
         if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+        env:
+          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
         run: |
           (
             cd .github/fixtures/swiftpm-consumer
@@ -379,6 +381,10 @@ jobs:
               -derivedDataPath "$RUNNER_TEMP/ifly-swiftpm-consumer-derived-data" \
               -clonedSourcePackagesDirPath "$RUNNER_TEMP/ifly-swiftpm-consumer-packages" \
               CODE_SIGNING_ALLOWED=NO
+
+            resolved_checkout="$RUNNER_TEMP/ifly-swiftpm-consumer-packages/checkouts/IFLYADLib_iOS"
+            test -d "$resolved_checkout"
+            test "$(git -C "$resolved_checkout" rev-parse HEAD)" = "$(git rev-parse "$RELEASE_VERSION^{commit}")"
           )
 
       - name: 正式态安装 CocoaPods 并校验 NativeFeed 新 API 正向/旧 API 反向
