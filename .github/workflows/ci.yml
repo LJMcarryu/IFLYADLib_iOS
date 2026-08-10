@@ -47,6 +47,10 @@ jobs:
             formal=true
             event_tag='${{ github.ref_name }}'
           elif [[ "${{ github.event_name }}" == 'workflow_dispatch' && -n "$MANUAL_RELEASE_TAG" ]]; then
+            if [[ "${GITHUB_REF}" != 'refs/heads/main' ]]; then
+              echo '手动正式复验只允许从 main 触发' >&2
+              exit 1
+            fi
             formal=true
             event_tag="$MANUAL_RELEASE_TAG"
           fi
