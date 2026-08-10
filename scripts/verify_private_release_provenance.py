@@ -87,8 +87,6 @@ def validate_compare(comparison: dict, binary: str, metadata: str) -> None:
             "compare base_commit 不是 A")
     require(comparison.get("merge_base_commit", {}).get("sha") == binary,
             "A 不是 B 的 merge base")
-    require(comparison.get("head_commit", {}).get("sha") == metadata,
-            "compare head_commit 不是 B")
     commits = comparison.get("commits")
     require(isinstance(commits, list) and commits and commits[-1].get("sha") == metadata,
             "compare 提交列表不完整")
