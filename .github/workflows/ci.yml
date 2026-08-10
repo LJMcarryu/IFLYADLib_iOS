@@ -251,6 +251,7 @@ jobs:
           test -z "$(git status --porcelain)"
           test "$(git cat-file -t "refs/tags/$RELEASE_VERSION")" = 'tag'
           if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
+            test "${GITHUB_REF}" = 'refs/heads/main'
             git merge-base --is-ancestor "$RELEASE_VERSION^{commit}" HEAD
             unexpected_paths=$(git diff --name-only "$RELEASE_VERSION^{commit}" HEAD -- . ':(exclude).github/**')
             if [[ -n "$unexpected_paths" ]]; then
@@ -329,7 +330,7 @@ jobs:
           PY
 
       - name: 正式态无 Token 匿名下载 10 个 Release 资产
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         env:
           RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
           RELEASE_REPOSITORY: ${{ github.repository }}
@@ -345,7 +346,7 @@ jobs:
               --metadata-output "$RELEASE_METADATA"
 
       - name: 正式态校验 7 个模块与合并包逐字节同源
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         env:
           RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
           ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets-anonymous
@@ -356,7 +357,7 @@ jobs:
             --version "$RELEASE_VERSION"
 
       - name: 正式态校验 Release body 的 A/B provenance 声明
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         env:
           RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
           IFLY_PRIVATE_SOURCE_TOKEN: ${{ secrets.IFLY_PRIVATE_SOURCE_TOKEN }}
@@ -368,7 +369,7 @@ jobs:
             --release-metadata "$RELEASE_METADATA"
 
       - name: 正式态以独立 SwiftPM 消费端构建 Full 产品
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         run: |
           (
             cd .github/fixtures/swiftpm-consumer
@@ -381,7 +382,7 @@ jobs:
           )
 
       - name: 正式态安装 CocoaPods 并校验 NativeFeed 新 API 正向/旧 API 反向
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         run: |
           (
             cd IFLYADLibSimple
@@ -426,7 +427,7 @@ jobs:
           PY
 
       - name: 正式态校验 CocoaPods 将 -ObjC 传播到最终 App
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         run: |
           python3 - <<'PY'
           import shlex
@@ -470,12 +471,12 @@ jobs:
           PY
 
       - name: 正式态真正编译链接公开 Demo
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         run: |
           xcodebuild build             -workspace IFLYADLibSimple/IFLYADLibSimple.xcworkspace             -scheme IFLYADLibSimple             -configuration Debug             -destination 'generic/platform=iOS Simulator'             CODE_SIGNING_ALLOWED=NO
 
       - name: 正式态 pod spec lint
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         run: pod spec lint IFLYADLib.podspec --quick --allow-warnings
 
 # main/PR 允许 7 个精确 PENDING 的准备态，或 7 个真实 checksum 与正式文档齐备的待打 tag 态。
