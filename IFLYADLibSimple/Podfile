@@ -1,5 +1,5 @@
-# IFLYADLib 6.2.2 正式资产与 checksum 已冻结；tag/Release 尚未创建，pod install 会因资产未上传失败。
-# 正式发布后，本示例通过不可变 tag 的 :podspec 直连本仓 Release，不依赖 trunk/CDN 索引。
+# IFLYADLib 6.2.2 已正式发布并完成匿名消费复验；本示例固定到不可变 tag。
+# 本示例通过 tag 的 :podspec 直连本仓 Release，不依赖 trunk/CDN 索引。
 source 'https://cdn.cocoapods.org/'
 
 platform :ios, '11.0'

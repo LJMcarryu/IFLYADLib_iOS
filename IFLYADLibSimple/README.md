@@ -1,6 +1,6 @@
 # IFLYADLibSimple — IFLYADLib 接入示例
 
-面向媒体接入方的最小示例，仅使用公开 API，演示开屏、Banner、插屏、自渲染信息流和激励视频。当前 `main` 已切换到 `6.2.2` NativeFeed SDK 托管挂载，正式资产与 checksum 已冻结；公开 tag/Release 和匿名验证完成前，生产项目继续使用已发布的 `6.2.1`。
+面向媒体接入方的最小示例，仅使用公开 API，演示开屏、Banner、插屏、自渲染信息流和激励视频。当前示例固定到已于 2026-08-10 正式发布的 `6.2.2`，NativeFeed 使用 SDK 托管挂载。
 
 ## 运行
 
@@ -9,7 +9,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-- Podfile 已预置为不可变 `6.2.2` tag 的 `:podspec`；正式资产尚未上传时，`pod install` 失败是预期结果。
+- Podfile 已预置为不可变 `6.2.2` tag 的 `:podspec`；若 `pod install` 失败，请检查 Release 网络访问和本地缓存。
 - 正式资产必须包含 arm64 真机及 arm64/x86_64 模拟器切片。真机运行请在「Signing & Capabilities」选择自己的开发者 Team。
 - 工程最低支持 iOS 11.0，默认安装 `Full`。
 

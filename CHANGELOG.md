@@ -2,13 +2,14 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
-## [6.2.2] - 待发布
+## [6.2.2] - 2026-08-10
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`a8ec925d3731d7d11734647aa02ca7d91d674965`
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`eff78263c2d3f65b029f4114de1a9ed00f3827f3`
 - 正式签名资产已从提交 A 构建、扫描并冻结；7 个 SwiftPM checksum 已回填，合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
-- 本节仍为待发布记录：不可变 tag、GitHub Release、无 Token 匿名下载和最终消费验证尚未完成，不构成公开发布证据。
+- 不可变 annotated tag 指向 `d5caeb26794d8000e13e40d4356d2ff79706a3a9`；通用版 10 个资产已在 GitHub Release 正式公开，并通过无 Token 匿名下载、逐字节同源、SwiftPM、CocoaPods、`-ObjC`、Demo 编译链接和 `pod spec lint` 终验（[Run 31347794760](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31347794760)）。
+- 本版按确认范围保留并原样归档既有启发式残余风险，以 `failOn=high`、`failOnWarning=false`、`strict=false`、`requireManual=false` 发布；该发布不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
 
 ### 新增
 

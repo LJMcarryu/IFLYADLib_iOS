@@ -16,8 +16,8 @@ import PackageDescription
 
 let package = Package(
     name: "IFLYADLib",
-    // 下列 checksum 来自提交 A 构建并冻结的 6.2.2 正式签名 zip。
-    // 公开 tag/Release 创建并完成匿名下载复验前，这些 URL 仍不可用于远程依赖解析。
+    // 下列 checksum 来自提交 A 构建并冻结的 6.2.2 正式签名 zip，已与公开 Release
+    // 的匿名下载件逐项核对；这些 URL 固定到不可变 6.2.2 tag。
     platforms: [
         .iOS("11.0"),
     ],

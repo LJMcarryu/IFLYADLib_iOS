@@ -169,19 +169,26 @@ jobs:
               assert "`6.2.2` 发布准备" in security
               state = "准备"
           else:
-              assert "最新公开正式版仍是 `6.2.1`" in readme
-              assert "正式签名资产已从提交 A 构建、扫描并冻结" in readme
-              assert "无 Token 匿名下载和最终消费验证尚未完成" in readme
+              assert "当前最新公开正式版为 `IFLYADLib 6.2.2`" in readme
+              assert "已于 2026-08-10 正式发布" in readme
+              assert "actions/runs/31347794760" in readme
               assert re.search(
-                  r"^## \[6\.2\.2\] - 待发布\s*$",
+                  r"^## \[6\.2\.2\] - 2026-08-10\s*$",
                   changelog,
                   re.M,
               )
-              assert "当前最新公开正式版是 `6.2.1`" in releasing
-              assert "不可变 tag、GitHub Release、无 Token 匿名下载" in releasing
-              assert "`6.2.2` 正式资产准备" in security
-              assert "最新公开正式版本（当前为 `6.2.1`）" in security
-              state = "正式 Release 门禁" if formal else "正式资产待发布"
+              assert "当前最新公开正式版是 [`6.2.2`]" in releasing
+              assert "actions/runs/31347794760" in releasing
+              assert "最新公开正式版本（当前为 `6.2.2`）" in security
+              stale_markers = (
+                  "最新公开正式版仍是 `6.2.1`",
+                  "无 Token 匿名下载和最终消费验证尚未完成",
+                  "6.2.2] - 待发布",
+                  "`6.2.2` 正式资产准备",
+              )
+              for marker in stale_markers:
+                  assert marker not in readme + changelog + releasing + security, marker
+              state = "已发布正式 Release 复验" if formal else "已发布正式资产"
 
               combined_sha = (
                   "f24cf6ea1d4e4319fbcef0fdb79a29aee"
@@ -215,6 +222,14 @@ jobs:
           assert len(release_assets) == 10, release_assets
 
           podfile = Path("IFLYADLibSimple/Podfile").read_text(encoding="utf-8")
+          if all_final:
+              for marker in (
+                  "tag/Release 尚未创建",
+                  "资产未上传",
+                  "公开 tag/Release 创建并完成匿名下载复验前",
+                  "这些 URL 仍不可用于远程依赖解析",
+              ):
+                  assert marker not in package + podfile, marker
           expected_podspec_url = (
               f"https://raw.githubusercontent.com/LJMcarryu/"
               f"IFLYADLib_iOS/{version}/IFLYADLib.podspec"
@@ -258,12 +273,48 @@ jobs:
           if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
             test "${GITHUB_REF}" = 'refs/heads/main'
             git merge-base --is-ancestor "$RELEASE_VERSION^{commit}" HEAD
-            unexpected_paths=$(git diff --name-only "$RELEASE_VERSION^{commit}" HEAD -- . ':(exclude).github/**')
+            unexpected_paths=$(git diff --name-only "$RELEASE_VERSION^{commit}" HEAD -- . \
+              ':(exclude).github/workflows/ci.yml' \
+              ':(exclude).github/fixtures/swiftpm-consumer/Package.swift' \
+              ':(exclude)Package.swift' \
+              ':(exclude)README.md' \
+              ':(exclude)CHANGELOG.md' \
+              ':(exclude)RELEASING.md' \
+              ':(exclude)SECURITY.md' \
+              ':(exclude)IFLYADLibSimple/README.md' \
+              ':(exclude)IFLYADLibSimple/Podfile')
             if [[ -n "$unexpected_paths" ]]; then
-              echo "手动正式复验的 main 相对 tag 修改了非 CI 路径：" >&2
+              echo "手动正式复验的 main 相对 tag 修改了非获准 CI/发布文档路径：" >&2
               echo "$unexpected_paths" >&2
               exit 1
             fi
+            python3 - "$RELEASE_VERSION" <<'PY'
+          import subprocess
+          import sys
+          from pathlib import Path
+
+          tag = sys.argv[1]
+          for path, comment_prefix in (
+              ("Package.swift", "//"),
+              ("IFLYADLibSimple/Podfile", "#"),
+          ):
+              tagged = subprocess.check_output(
+                  ["git", "show", f"{tag}^{{commit}}:{path}"],
+                  text=True,
+              )
+              current = Path(path).read_text(encoding="utf-8")
+
+              def without_full_line_comments(value):
+                  return "\n".join(
+                      line
+                      for line in value.splitlines()
+                      if not line.lstrip().startswith(comment_prefix)
+                  )
+
+              assert without_full_line_comments(current) == without_full_line_comments(tagged), (
+                  f"{path} 相对正式 tag 存在非注释修改"
+              )
+          PY
           else
             test "$(git rev-parse HEAD)" = "$(git rev-parse "$RELEASE_VERSION^{commit}")"
             test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_VERSION"
@@ -490,6 +541,7 @@ jobs:
         if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
         run: pod spec lint IFLYADLib.podspec --quick --allow-warnings
 
-# main/PR 允许 7 个精确 PENDING 的准备态，或 7 个真实 checksum 与正式文档齐备的待打 tag 态。
+# main/PR 允许 7 个精确 PENDING 的准备态，或 7 个真实 checksum 与已发布文档齐备的正式态。
 # tag 必须无 PENDING、不得复用 6.2.1 checksum，并绑定不可变 annotated tag；Release 发布事件
 # 再匿名下载并核对全部 10 个资产、真实消费和 Demo 构建，避免 tag push 与资产创建顺序竞争。
+# 已发布 Release 仅允许从 main 手动全量复验；main 相对 tag 只可包含两项终验 harness 和列明的发布闭环文件。

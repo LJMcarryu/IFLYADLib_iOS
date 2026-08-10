@@ -5,17 +5,19 @@
 
 ## 当前发布状态
 
-当前最新公开正式版是 `6.2.1`（2026-08-07）。`6.2.2` 的正式签名资产已从提交 A 构建、扫描并冻结，Podspec、Package URL、Demo 与 7 个 SwiftPM checksum 已同步；不可变 tag、GitHub Release、无 Token 匿名下载和最终消费验证尚未完成，对应 URL 当前不可用。
+当前最新公开正式版是 [`6.2.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.2)（2026-08-10）。不可变 annotated tag 指向 `d5caeb26794d8000e13e40d4356d2ff79706a3a9`；10 个 Release 资产、Podspec、Package URL、Demo 与 7 个 SwiftPM checksum 已同步并完成无 Token 匿名下载和最终消费验证。
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`a8ec925d3731d7d11734647aa02ca7d91d674965`
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`eff78263c2d3f65b029f4114de1a9ed00f3827f3`
 
-`releaseState=FORMAL` 只表示正式签名资产与发布元数据已经冻结，不表示本仓已公开发布。合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
+`releaseState=FORMAL` 本身只表示正式签名资产与发布元数据已经冻结；`6.2.2` 的公开发布另由不可变 tag、Release 和匿名消费终验证明。合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
 
 正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
 
-不可变 tag、GitHub Release、匿名下载复验与 CI 仍必须按下方流程逐项留证；未取得对应证据前，不得在验收记录中写成已经通过。
+`6.2.2` 的发布后终验证据为 [Run 31347794760](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31347794760)：匿名下载、逐字节同源、Release provenance、SwiftPM、CocoaPods、新旧 API、`-ObjC`、Demo 编译链接与 `pod spec lint` 均通过。后续版本仍必须按下方流程逐项留证；未取得对应证据前，不得在验收记录中写成已经通过。
+
+本版按已确认范围原样归档 `SRC-004`、`SRC-008`、`SRC-009`、`SRC-011`、`NET-001`、`RRA-003`、`TRACK-001`、`TRACK-002`、`ADS-011`、`EXPORT-001` 启发式残余风险，并以 `failOn=high`、`failOnWarning=false`、`strict=false`、`requireManual=false` 发布。该确认不适用于最终宿主，也不代表宿主合规、`Validate App` 或 Apple 审核通过。
 
 正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
 
