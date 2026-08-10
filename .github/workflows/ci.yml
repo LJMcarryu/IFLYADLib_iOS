@@ -9,6 +9,12 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 已发布且需要复验的正式 Release tag；留空时只执行 main 本地门禁
+        required: false
+        default: ''
+        type: string
 
 permissions:
   contents: read
@@ -27,6 +33,8 @@ jobs:
       - name: 判定准备态或正式发布态
         id: release-mode
         shell: bash
+        env:
+          MANUAL_RELEASE_TAG: ${{ inputs.release_tag }}
         run: |
           version='6.2.2'
           formal=false
@@ -38,6 +46,9 @@ jobs:
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             formal=true
             event_tag='${{ github.ref_name }}'
+          elif [[ "${{ github.event_name }}" == 'workflow_dispatch' && -n "$MANUAL_RELEASE_TAG" ]]; then
+            formal=true
+            event_tag="$MANUAL_RELEASE_TAG"
           fi
 
           if [[ "$formal" == true && "$event_tag" != "$version" ]]; then
@@ -239,8 +250,18 @@ jobs:
         run: |
           test -z "$(git status --porcelain)"
           test "$(git cat-file -t "refs/tags/$RELEASE_VERSION")" = 'tag'
-          test "$(git rev-parse HEAD)" = "$(git rev-parse "$RELEASE_VERSION^{commit}")"
-          test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_VERSION"
+          if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
+            git merge-base --is-ancestor "$RELEASE_VERSION^{commit}" HEAD
+            unexpected_paths=$(git diff --name-only "$RELEASE_VERSION^{commit}" HEAD -- . ':(exclude).github/**')
+            if [[ -n "$unexpected_paths" ]]; then
+              echo "手动正式复验的 main 相对 tag 修改了非 CI 路径：" >&2
+              echo "$unexpected_paths" >&2
+              exit 1
+            fi
+          else
+            test "$(git rev-parse HEAD)" = "$(git rev-parse "$RELEASE_VERSION^{commit}")"
+            test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_VERSION"
+          fi
           test "$(git show "$RELEASE_VERSION:IFLYADLib.podspec" | sed -nE "s/.*s\.version = '([^']+)'.*/\1/p" | head -1)" = "$RELEASE_VERSION"
 
       - name: 校验 NativeFeed Demo 只使用 SDK 托管公开 API
@@ -352,7 +373,7 @@ jobs:
           (
             cd .github/fixtures/swiftpm-consumer
             xcodebuild build \
-              -scheme ReleaseConsumer \
+              -scheme IFLYADLibReleaseConsumer \
               -destination 'generic/platform=iOS Simulator' \
               -derivedDataPath "$RUNNER_TEMP/ifly-swiftpm-consumer-derived-data" \
               -clonedSourcePackagesDirPath "$RUNNER_TEMP/ifly-swiftpm-consumer-packages" \

@@ -6,6 +6,9 @@ import PackageDescription
 let package = Package(
     name: "IFLYADLibReleaseConsumer",
     platforms: [.iOS("11.0")],
+    products: [
+        .library(name: "ReleaseConsumer", targets: ["ReleaseConsumer"]),
+    ],
     dependencies: [
         .package(
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS.git",
