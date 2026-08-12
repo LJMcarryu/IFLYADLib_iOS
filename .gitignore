@@ -52,6 +52,10 @@ Podfile.lock
 
 .DS_Store
 
+# Python 本地/离线门禁缓存，不得污染正式候选工作树
+__pycache__/
+*.py[cod]
+
 # 二进制产物经 GitHub Releases 分发，勿提交进仓
 *.framework
 *.xcframework

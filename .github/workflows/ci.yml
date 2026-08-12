@@ -1,5 +1,8 @@
 name: CI
 
+run-name: >-
+  ${{ github.event_name == 'release' && format('formal-release:{0}:{1}', github.event.release.id, github.event.release.tag_name) || github.event_name == 'workflow_dispatch' && inputs.draft_release_id != '' && format('draft-candidate:{0}:{1}:{2}', inputs.candidate_id, inputs.draft_release_id, inputs.dispatch_nonce) || format('ci:{0}:{1}', github.event_name, github.ref_name) }}
+
 on:
   push:
     branches: [main]
@@ -11,7 +14,22 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 已发布且需要复验的正式 Release tag；留空时只执行 main 本地门禁
+        description: 已发布且需要无 Token 复验的正式 Release tag；不得与 draft_release_id 同时填写
+        required: false
+        default: ''
+        type: string
+      draft_release_id:
+        description: 同仓 draft Release 的数字 ID；填写后执行 candidate 预验，不要求 tag 已存在
+        required: false
+        default: ''
+        type: string
+      candidate_id:
+        description: release orchestrator 生成的 64 位小写 candidateId
+        required: false
+        default: ''
+        type: string
+      dispatch_nonce:
+        description: release orchestrator 生成的 32 位小写 dispatch nonce
         required: false
         default: ''
         type: string
@@ -19,233 +37,154 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: >-
+    ${{ github.event_name == 'release' && format('{0}:formal:{1}', github.workflow, github.event.release.tag_name) || github.event_name == 'workflow_dispatch' && inputs.draft_release_id != '' && format('{0}:candidate:{1}:{2}', github.workflow, inputs.candidate_id, inputs.draft_release_id) || github.event_name == 'workflow_dispatch' && inputs.release_tag != '' && format('{0}:formal:{1}', github.workflow, inputs.release_tag) || format('{0}:ci:{1}:{2}', github.workflow, github.event_name, github.ref) }}
+  # 同一候选的复验顺序排队，不取消既有证据；候选与正式 Release 使用不同分组。
+  cancel-in-progress: false
+
 jobs:
-  verify-distribution:
-    name: 校验分发清单、Demo 与正式资产
+  preflight:
+    name: 分发前置门禁
     runs-on: macos-15
+    timeout-minutes: 30
+    outputs:
+      release_mode: ${{ steps.release-mode.outputs.release_mode }}
+      version: ${{ steps.release-mode.outputs.version }}
+      event_tag: ${{ steps.release-mode.outputs.event_tag }}
+      draft_release_id: ${{ steps.release-mode.outputs.draft_release_id }}
+      candidate_id: ${{ steps.release-mode.outputs.candidate_id }}
+      candidate_branch: ${{ steps.release-mode.outputs.candidate_branch }}
+      checkout_sha: ${{ steps.release-mode.outputs.checkout_sha }}
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref }}
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
           fetch-depth: 0
           fetch-tags: true
+          persist-credentials: false
 
-      - name: 判定准备态或正式发布态
+      - name: 判定本地、tag、正式复验或 draft candidate 模式
         id: release-mode
         shell: bash
         env:
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_REF: ${{ github.ref }}
+          EVENT_REF_NAME: ${{ github.ref_name }}
+          EVENT_SHA: ${{ github.sha }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
           MANUAL_RELEASE_TAG: ${{ inputs.release_tag }}
+          MANUAL_DRAFT_RELEASE_ID: ${{ inputs.draft_release_id }}
+          MANUAL_CANDIDATE_ID: ${{ inputs.candidate_id }}
+          MANUAL_DISPATCH_NONCE: ${{ inputs.dispatch_nonce }}
         run: |
+          set -euo pipefail
           version='6.2.2'
-          formal=false
+          release_mode='local'
           event_tag=''
+          draft_release_id=''
+          candidate_id=''
+          candidate_branch=''
 
-          if [[ "${{ github.event_name }}" == 'workflow_dispatch' && "${GITHUB_REF}" != 'refs/heads/main' ]]; then
-            echo '手动执行只允许从 main 触发' >&2
-            exit 1
+          if [[ "$EVENT_NAME" == 'workflow_dispatch' ]]; then
+            if [[ "$DEFAULT_BRANCH" != 'main' ]]; then
+              echo '默认分支必须是 main' >&2
+              exit 1
+            fi
+            if [[ -n "$MANUAL_RELEASE_TAG" && -n "$MANUAL_DRAFT_RELEASE_ID" ]]; then
+              echo 'release_tag 与 draft_release_id 互斥，不得同时填写' >&2
+              exit 1
+            fi
           fi
 
-          if [[ "${{ github.event_name }}" == 'release' ]]; then
-            formal=true
-            event_tag='${{ github.event.release.tag_name }}'
-          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            formal=true
-            event_tag='${{ github.ref_name }}'
-          elif [[ "${{ github.event_name }}" == 'workflow_dispatch' && -n "$MANUAL_RELEASE_TAG" ]]; then
-            formal=true
+          if [[ "$EVENT_NAME" == 'release' ]]; then
+            release_mode='formal'
+            event_tag="$RELEASE_EVENT_TAG"
+          elif [[ "$EVENT_REF" == refs/tags/* ]]; then
+            release_mode='tag'
+            event_tag="$EVENT_REF_NAME"
+          elif [[ "$EVENT_NAME" == 'workflow_dispatch' && -n "$MANUAL_DRAFT_RELEASE_ID" ]]; then
+            release_mode='candidate'
+            event_tag="$version"
+            draft_release_id="$MANUAL_DRAFT_RELEASE_ID"
+          elif [[ "$EVENT_NAME" == 'workflow_dispatch' && -n "$MANUAL_RELEASE_TAG" ]]; then
+            release_mode='formal'
             event_tag="$MANUAL_RELEASE_TAG"
           fi
 
-          if [[ "$formal" == true && "$event_tag" != "$version" ]]; then
+          if [[ "$release_mode" == 'candidate' ]]; then
+            if [[ ! "$draft_release_id" =~ ^[1-9][0-9]*$ ]]; then
+              echo 'draft_release_id 必须是正整数 Release ID' >&2
+              exit 1
+            fi
+            if [[ ! "$MANUAL_CANDIDATE_ID" =~ ^[0-9a-f]{64}$ ]]; then
+              echo 'candidate_id 必须是 64 位小写十六进制' >&2
+              exit 1
+            fi
+            if [[ ! "$MANUAL_DISPATCH_NONCE" =~ ^[0-9a-f]{32}$ ]]; then
+              echo 'dispatch_nonce 必须是 32 位小写十六进制' >&2
+              exit 1
+            fi
+            candidate_id="$MANUAL_CANDIDATE_ID"
+            candidate_branch="release-candidate/$version-$candidate_id"
+            if [[ "$EVENT_REF" != "refs/heads/$candidate_branch" || "$EVENT_REF_NAME" != "$candidate_branch" ]]; then
+              echo "draft candidate 只允许从 $candidate_branch 触发" >&2
+              exit 1
+            fi
+          elif [[ "$release_mode" != 'local' && "$event_tag" != "$version" ]]; then
             echo "正式门禁只接受 tag $version，实际为 $event_tag" >&2
             exit 1
+          else
+            if [[ -n "$MANUAL_CANDIDATE_ID" || -n "$MANUAL_DISPATCH_NONCE" ]]; then
+              echo '非 draft candidate 模式不得提供 candidate_id 或 dispatch_nonce' >&2
+              exit 1
+            fi
+            if [[ "$EVENT_NAME" == 'workflow_dispatch' && "$EVENT_REF" != 'refs/heads/main' ]]; then
+              echo '非 draft candidate 手动执行只允许从 main 触发' >&2
+              exit 1
+            fi
           fi
 
-          echo "formal=$formal" >> "$GITHUB_OUTPUT"
+          checkout_sha=$(git rev-parse HEAD)
+          if [[ ! "$checkout_sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "checkout 不是完整提交 SHA: $checkout_sha" >&2
+            exit 1
+          fi
+          if [[ "$EVENT_NAME" == 'workflow_dispatch' && "$checkout_sha" != "$EVENT_SHA" ]]; then
+            echo "手动执行 checkout 未绑定触发提交: HEAD=$checkout_sha event=$EVENT_SHA" >&2
+            exit 1
+          fi
+          test -z "$(git status --porcelain)"
+
+          echo "release_mode=$release_mode" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "event_tag=$event_tag" >> "$GITHUB_OUTPUT"
+          echo "draft_release_id=$draft_release_id" >> "$GITHUB_OUTPUT"
+          echo "candidate_id=$candidate_id" >> "$GITHUB_OUTPUT"
+          echo "candidate_branch=$candidate_branch" >> "$GITHUB_OUTPUT"
+          echo "checkout_sha=$checkout_sha" >> "$GITHUB_OUTPUT"
+
+      - name: 运行发布脚本离线单元测试
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
 
       - name: 校验版本、PENDING/checksum 状态与通用仓 10 资产契约
         env:
-          FORMAL_RELEASE: ${{ steps.release-mode.outputs.formal }}
+          RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}
           RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
         run: |
-          python3 - <<'PY'
-          import os
-          import re
-          from pathlib import Path
-          from urllib.parse import urlparse
-
-          version = os.environ["RELEASE_VERSION"]
-          formal = os.environ["FORMAL_RELEASE"] == "true"
-          expected = {
-              "IFLYAdCore": (
-                  "IFLYAdCore.xcframework.zip",
-                  "__IFLYADLIB_6_2_2_CORE_CHECKSUM_PENDING__",
-              ),
-              "IFLYAdVideoUI": (
-                  "IFLYAdVideoUI.xcframework.zip",
-                  "__IFLYADLIB_6_2_2_VIDEO_UI_CHECKSUM_PENDING__",
-              ),
-              "IFLYAdBanner": (
-                  "IFLYAdBanner.xcframework.zip",
-                  "__IFLYADLIB_6_2_2_BANNER_CHECKSUM_PENDING__",
-              ),
-              "IFLYAdSplash": (
-                  "IFLYAdSplash.xcframework.zip",
-                  "__IFLYADLIB_6_2_2_SPLASH_CHECKSUM_PENDING__",
-              ),
-              "IFLYAdInterstitial": (
-                  "IFLYAdInterstitial.xcframework.zip",
-                  "__IFLYADLIB_6_2_2_INTERSTITIAL_CHECKSUM_PENDING__",
-              ),
-              "IFLYAdNativeFeed": (
-                  "IFLYAdNativeFeed.xcframework.zip",
-                  "__IFLYADLIB_6_2_2_NATIVE_FEED_CHECKSUM_PENDING__",
-              ),
-              "IFLYAdReward": (
-                  "IFLYAdReward.xcframework.zip",
-                  "__IFLYADLIB_6_2_2_REWARD_CHECKSUM_PENDING__",
-              ),
-          }
-          old_621 = {
-              "d7f6931fdc9613bb5497d122c1410b4768094da56e352fa32b0ac2979a07e6e0",
-              "185b6e26b22a12e9776dae0e621e99f4722c42859f6d86ceed63cba51ba67213",
-              "8432807c3c767f7c165de8a9517f70b0ed3e357b4c28ad75cdfd8829a64f4d8c",
-              "58c7aab22624c4cfeda05f20271fa109051af063a50a7e624064fe80f1778427",
-              "8a65097a81f8354a2c4ade78a09fc9e4dac6e3029a2e9990a94386594dc3205d",
-              "6d33bc2876ac7a1f84ff84e1b78ba0ec5fe33cef489e2ad814858a6c845176aa",
-              "2b7b94447fbe50f24c20f25c324cda98285d8ced3050ed8a0c56561d99419a3d",
-          }
-          readme = Path("README.md").read_text(encoding="utf-8")
-          changelog = Path("CHANGELOG.md").read_text(encoding="utf-8")
-          releasing = Path("RELEASING.md").read_text(encoding="utf-8")
-          security = Path("SECURITY.md").read_text(encoding="utf-8")
-
-          package = Path("Package.swift").read_text(encoding="utf-8")
-          blocks = re.findall(
-              r'\.binaryTarget\(\s*name:\s*"([^"]+)"\s*,'
-              r'\s*url:\s*"([^"]+)"\s*,'
-              r'\s*checksum:\s*"([^"]+)"\s*\)',
-              package,
-              re.S,
-          )
-          assert len(blocks) == 7, f"binaryTarget 数量不是 7：{len(blocks)}"
-          assert {name for name, _, _ in blocks} == set(expected), blocks
-
-          checksums = {}
-          module_assets = set()
-          for name, url, checksum in blocks:
-              expected_asset, expected_pending = expected[name]
-              asset = Path(urlparse(url).path).name
-              assert asset == expected_asset, (name, asset, expected_asset)
-              assert f"/releases/download/{version}/" in url, (name, url)
-              module_assets.add(asset)
-              checksums[name] = checksum
-
-          all_pending = all(
-              checksums[name] == expected[name][1] for name in expected
-          )
-          all_final = all(
-              re.fullmatch(r"[0-9a-f]{64}", checksums[name])
-              and checksums[name] != "0" * 64
-              and checksums[name] not in old_621
-              for name in expected
-          )
-          assert all_pending or all_final, (
-              "7 个 checksum 必须全部是与私有仓一致的精确 PENDING，"
-              "或全部是本版非零、非 6.2.1 的 64 位小写 SHA-256；不得混用"
-          )
-          if formal:
-              assert all_final, "正式 tag/Release 禁止保留 PENDING checksum"
-
-          if all_pending:
-              assert not formal
-              assert "最新正式版仍是 `6.2.1`" in readme
-              assert re.search(
-                  r"^## \[6\.2\.2\] - 待发布\s*$", changelog, re.M
-              )
-              assert "`main` 正在准备 `6.2.2`" in releasing
-              assert "`6.2.2` 发布准备" in security
-              state = "准备"
-          else:
-              assert "当前最新公开正式版为 `IFLYADLib 6.2.2`" in readme
-              assert "已于 2026-08-10 正式发布" in readme
-              assert "actions/runs/31347794760" in readme
-              assert re.search(
-                  r"^## \[6\.2\.2\] - 2026-08-10\s*$",
-                  changelog,
-                  re.M,
-              )
-              assert "当前最新公开正式版是 [`6.2.2`]" in releasing
-              assert "actions/runs/31347794760" in releasing
-              assert "最新公开正式版本（当前为 `6.2.2`）" in security
-              stale_markers = (
-                  "最新公开正式版仍是 `6.2.1`",
-                  "无 Token 匿名下载和最终消费验证尚未完成",
-                  "6.2.2] - 待发布",
-                  "`6.2.2` 正式资产准备",
-              )
-              for marker in stale_markers:
-                  assert marker not in readme + changelog + releasing + security, marker
-              state = "已发布正式 Release 复验" if formal else "已发布正式资产"
-
-              combined_sha = (
-                  "f24cf6ea1d4e4319fbcef0fdb79a29aee"
-                  "5906f9bc35d81453052a6341379a673"
-              )
-              for label, document in (
-                  ("README", readme),
-                  ("CHANGELOG", changelog),
-                  ("RELEASING", releasing),
-              ):
-                  assert document.count(combined_sha) == 1, (
-                      f"{label} 必须唯一记录正式合并包 SHA-256"
-                  )
-
-          assert len(set(checksums.values())) == 7, "7 个模块 checksum/PENDING 必须唯一"
-
-          podspec = Path("IFLYADLib.podspec").read_text(encoding="utf-8")
-          pod_version = re.search(r"s\.version\s*=\s*'([^']+)'", podspec)
-          pod_source = re.search(r":http\s*=>\s*'([^']+)'", podspec)
-          assert pod_version and pod_version.group(1) == version, pod_version
-          assert pod_source, "podspec 缺少 :http source"
-          combined = Path(urlparse(pod_source.group(1)).path).name
-          assert combined == f"IFLYADLib-modelA-{version}.zip", combined
-          assert f"/releases/download/{version}/" in pod_source.group(1), pod_source.group(1)
-
-          release_assets = module_assets | {
-              combined,
-              "checksums.txt",
-              "binary-targets.remote.swift",
-          }
-          assert len(release_assets) == 10, release_assets
-
-          podfile = Path("IFLYADLibSimple/Podfile").read_text(encoding="utf-8")
-          if all_final:
-              for marker in (
-                  "tag/Release 尚未创建",
-                  "资产未上传",
-                  "公开 tag/Release 创建并完成匿名下载复验前",
-                  "这些 URL 仍不可用于远程依赖解析",
-              ):
-                  assert marker not in package + podfile, marker
-          expected_podspec_url = (
-              f"https://raw.githubusercontent.com/LJMcarryu/"
-              f"IFLYADLib_iOS/{version}/IFLYADLib.podspec"
-          )
-          assert expected_podspec_url in podfile, expected_podspec_url
-          print(
-              f"OK {state}态："
-              "7 模块 + 合并包 + checksums.txt + binary-targets.remote.swift"
-          )
-          PY
+          python3 scripts/verify_distribution_manifest.py \
+            --repository-root "$GITHUB_WORKSPACE" \
+            --version "$RELEASE_VERSION" \
+            --mode "$RELEASE_MODE"
 
       - name: 校验 Package.swift 可解析
-        run: swift package dump-package > /tmp/ifly-package.json
+        run: swift package dump-package > "$RUNNER_TEMP/ifly-package.json"
 
       - name: 校验 A/B provenance 文档一致性（main/PR 不访问私有仓）
-        if: steps.release-mode.outputs.formal != 'true'
+        if: steps.release-mode.outputs.release_mode == 'local'
         run: |
           python3 scripts/verify_private_release_provenance.py \
             --readme README.md \
@@ -253,8 +192,8 @@ jobs:
             --releasing RELEASING.md \
             --skip-compare
 
-      - name: tag/Release 正式态校验 A/B provenance（私有仓 compare）
-        if: steps.release-mode.outputs.formal == 'true'
+      - name: Candidate/tag/正式态校验 A/B provenance（私有仓 compare）
+        if: steps.release-mode.outputs.release_mode != 'local'
         env:
           IFLY_PRIVATE_SOURCE_TOKEN: ${{ secrets.IFLY_PRIVATE_SOURCE_TOKEN }}
         run: |
@@ -263,15 +202,20 @@ jobs:
             --changelog CHANGELOG.md \
             --releasing RELEASING.md
 
-      - name: 正式态校验不可变 annotated tag 与 checkout 绑定
-        if: steps.release-mode.outputs.formal == 'true'
+      - name: Tag/正式态校验不可变 annotated tag 与 checkout 绑定
+        if: steps.release-mode.outputs.release_mode == 'tag' || steps.release-mode.outputs.release_mode == 'formal'
+        shell: bash
         env:
+          RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}
           RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_REF: ${{ github.ref }}
         run: |
+          set -euo pipefail
           test -z "$(git status --porcelain)"
           test "$(git cat-file -t "refs/tags/$RELEASE_VERSION")" = 'tag'
-          if [[ "${GITHUB_EVENT_NAME}" == 'workflow_dispatch' ]]; then
-            test "${GITHUB_REF}" = 'refs/heads/main'
+          if [[ "$EVENT_NAME" == 'workflow_dispatch' ]]; then
+            test "$EVENT_REF" = 'refs/heads/main'
             git merge-base --is-ancestor "$RELEASE_VERSION^{commit}" HEAD
             unexpected_paths=$(git diff --name-only "$RELEASE_VERSION^{commit}" HEAD -- . \
               ':(exclude).github/workflows/ci.yml' \
@@ -282,9 +226,16 @@ jobs:
               ':(exclude)RELEASING.md' \
               ':(exclude)SECURITY.md' \
               ':(exclude)IFLYADLibSimple/README.md' \
-              ':(exclude)IFLYADLibSimple/Podfile')
+              ':(exclude)IFLYADLibSimple/Podfile' \
+              ':(exclude)scripts/download_release_anonymously.py' \
+              ':(exclude)scripts/download_draft_release.py' \
+              ':(exclude)scripts/release_asset_downloader.py' \
+              ':(exclude)scripts/prepare_release_consumers.py' \
+              ':(exclude)scripts/verify_distribution_manifest.py' \
+              ':(exclude)tests/test_release_asset_downloader.py' \
+              ':(exclude)tests/test_prepare_release_consumers.py')
             if [[ -n "$unexpected_paths" ]]; then
-              echo "手动正式复验的 main 相对 tag 修改了非获准 CI/发布文档路径：" >&2
+              echo '手动正式复验的 main 相对 tag 修改了非获准 CI/发布文档路径：' >&2
               echo "$unexpected_paths" >&2
               exit 1
             fi
@@ -322,7 +273,9 @@ jobs:
           test "$(git show "$RELEASE_VERSION:IFLYADLib.podspec" | sed -nE "s/.*s\.version = '([^']+)'.*/\1/p" | head -1)" = "$RELEASE_VERSION"
 
       - name: 校验 NativeFeed Demo 只使用 SDK 托管公开 API
+        shell: bash
         run: |
+          set -euo pipefail
           sources=(
             IFLYADLibSimple/IFLYADLibSimple/biz/native/IFLYNativeViewController.m
             IFLYADLibSimple/IFLYADLibSimple/biz/native/IFLYNativeFeedListViewController.m
@@ -333,31 +286,30 @@ jobs:
           done
 
           if grep -En 'IFLYNativeFeedDisplaySession|IFLYNativeFeedAdBinding|beginDisplaySessionWithError:|bindAdWithViewBinder:|unbindAd|endDisplaySession' "${sources[@]}"; then
-            echo "Demo 仍使用 6.2.1 NativeFeed 历史 API" >&2
+            echo 'Demo 仍使用 6.2.1 NativeFeed 历史 API' >&2
             exit 1
           fi
 
           home='IFLYADLibSimple/IFLYADLibSimple/ViewController.m'
           grep -q '信息流列表复用（SDK 托管）' "$home"
           if grep -n 'DisplaySession' "$home"; then
-            echo "Demo 首页仍出现 DisplaySession 历史标题" >&2
+            echo 'Demo 首页仍出现 DisplaySession 历史标题' >&2
             exit 1
           fi
 
       - name: 校验 CocoaPods 清单与最终 App 链接契约
         run: |
-          pod ipc spec IFLYADLib.podspec > /tmp/ifly-podspec.json
-          python3 - <<'PY'
+          pod ipc spec IFLYADLib.podspec > "$RUNNER_TEMP/ifly-podspec.json"
+          python3 - "$RUNNER_TEMP/ifly-podspec.json" <<'PY'
           import json
           import shlex
+          import sys
           from pathlib import Path
 
-          spec = json.loads(Path("/tmp/ifly-podspec.json").read_text(encoding="utf-8"))
+          spec = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 
           def has_objc_flag(config):
-              return "-ObjC" in shlex.split(
-                  (config or {}).get("OTHER_LDFLAGS", "")
-              )
+              return "-ObjC" in shlex.split((config or {}).get("OTHER_LDFLAGS", ""))
 
           assert spec["version"] == "6.2.2", spec["version"]
           assert has_objc_flag(spec.get("pod_target_xcconfig"))
@@ -377,6 +329,7 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+
           bad = [
               path
               for path in Path("spm").rglob("*")
@@ -385,12 +338,35 @@ jobs:
           assert not bad, bad
           PY
 
-      - name: 正式态无 Token 匿名下载 10 个 Release 资产
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+  release-assets:
+    name: ${{ needs.preflight.outputs.release_mode == 'candidate' && 'Draft candidate 资产校验' || '正式 Release 匿名资产校验' }}
+    needs: preflight
+    if: ${{ needs.preflight.outputs.release_mode == 'candidate' || needs.preflight.outputs.release_mode == 'formal' }}
+    runs-on: macos-15
+    timeout-minutes: 55
+    permissions:
+      contents: read
+    outputs:
+      asset_inventory_sha256: ${{ steps.release-inventory.outputs.asset_inventory_sha256 }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.checkout_sha }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: 校验资产 Job 与前置 checkout 一致
         env:
-          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+          EXPECTED_SHA: ${{ needs.preflight.outputs.checkout_sha }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+
+      - name: 正式态无 Token 匿名下载精确 10 个 Release 资产
+        if: needs.preflight.outputs.release_mode == 'formal'
+        env:
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
           RELEASE_REPOSITORY: ${{ github.repository }}
-          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets-anonymous
+          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets
           RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
         run: |
           env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
@@ -401,19 +377,73 @@ jobs:
               --destination "$ASSET_DIRECTORY" \
               --metadata-output "$RELEASE_METADATA"
 
-      - name: 正式态校验 7 个模块与合并包逐字节同源
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+      # 只有整个 preflight Job 成功后才会进入本 Job；Token 仅在这个 draft 下载步骤可见。
+      - name: Candidate 认证下载同仓 draft 的精确 10 个资产
+        if: needs.preflight.outputs.release_mode == 'candidate'
         env:
-          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
-          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets-anonymous
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          DRAFT_RELEASE_ID: ${{ needs.preflight.outputs.draft_release_id }}
+          CANDIDATE_ID: ${{ needs.preflight.outputs.candidate_id }}
+          CANDIDATE_BRANCH: ${{ needs.preflight.outputs.candidate_branch }}
+          EXPECTED_TARGET_COMMIT: ${{ needs.preflight.outputs.checkout_sha }}
+          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets
+          RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
+          ASSET_INVENTORY_SHA256_OUTPUT: ${{ runner.temp }}/ifly-asset-inventory.sha256
+        run: |
+          set -euo pipefail
+          python3 scripts/download_draft_release.py \
+            --repository "$RELEASE_REPOSITORY" \
+            --tag "$RELEASE_VERSION" \
+            --release-id "$DRAFT_RELEASE_ID" \
+            --candidate-id "$CANDIDATE_ID" \
+            --expected-target-commit "$EXPECTED_TARGET_COMMIT" \
+            --target-branch "$CANDIDATE_BRANCH" \
+            --destination "$ASSET_DIRECTORY" \
+            --metadata-output "$RELEASE_METADATA" \
+            --inventory-sha256-output "$ASSET_INVENTORY_SHA256_OUTPUT"
+
+      - name: 固化本次 Release 精确库存身份
+        id: release-inventory
+        env:
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
+          RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          from pathlib import Path
+
+          from scripts.release_asset_downloader import (
+              asset_inventory_sha256,
+              validate_asset_inventory,
+          )
+
+          metadata = json.loads(
+              Path(os.environ["RELEASE_METADATA"]).read_text(encoding="utf-8")
+          )
+          tag = os.environ["RELEASE_VERSION"]
+          assets = validate_asset_inventory(metadata, os.environ["GITHUB_REPOSITORY"], tag)
+          identity = asset_inventory_sha256(assets, tag)
+          assert re.fullmatch(r"[0-9a-f]{64}", identity), identity
+          with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:
+              output.write(f"asset_inventory_sha256={identity}\n")
+          print(f"Release 精确库存身份: {identity}")
+          PY
+
+      - name: 校验 7 个模块与合并包逐字节同源
+        env:
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
+          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets
         run: |
           python3 scripts/verify-model-a-asset-equivalence.py \
             --asset-dir "$ASSET_DIRECTORY" \
             --repository-root "$GITHUB_WORKSPACE" \
             --version "$RELEASE_VERSION"
 
-      - name: 正式态校验 Release body 的 A/B provenance 声明
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+      - name: 校验 Release body 的 A/B provenance 声明
         env:
           RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
           IFLY_PRIVATE_SOURCE_TOKEN: ${{ secrets.IFLY_PRIVATE_SOURCE_TOKEN }}
@@ -424,39 +454,216 @@ jobs:
             --releasing RELEASING.md \
             --release-metadata "$RELEASE_METADATA"
 
-      - name: 正式态以独立 SwiftPM 消费端构建 Full 产品
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+  swiftpm-consumer:
+    name: SwiftPM Full 独立消费
+    needs: [preflight, release-assets]
+    if: ${{ needs.preflight.outputs.release_mode == 'candidate' || needs.preflight.outputs.release_mode == 'formal' }}
+    runs-on: macos-15
+    timeout-minutes: 55
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.checkout_sha }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Candidate 独立认证下载并核对公共库存指纹
+        if: needs.preflight.outputs.release_mode == 'candidate'
         env:
-          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          DRAFT_RELEASE_ID: ${{ needs.preflight.outputs.draft_release_id }}
+          CANDIDATE_ID: ${{ needs.preflight.outputs.candidate_id }}
+          CANDIDATE_BRANCH: ${{ needs.preflight.outputs.candidate_branch }}
+          EXPECTED_TARGET_COMMIT: ${{ needs.preflight.outputs.checkout_sha }}
+          EXPECTED_ASSET_INVENTORY_SHA256: ${{ needs.release-assets.outputs.asset_inventory_sha256 }}
+          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets
+          RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
         run: |
-          (
-            cd .github/fixtures/swiftpm-consumer
-            xcodebuild build \
-              -scheme IFLYADLibReleaseConsumer \
-              -destination 'generic/platform=iOS Simulator' \
-              -derivedDataPath "$RUNNER_TEMP/ifly-swiftpm-consumer-derived-data" \
-              -clonedSourcePackagesDirPath "$RUNNER_TEMP/ifly-swiftpm-consumer-packages" \
-              CODE_SIGNING_ALLOWED=NO
+          python3 scripts/download_draft_release.py \
+            --repository "$RELEASE_REPOSITORY" \
+            --tag "$RELEASE_VERSION" \
+            --release-id "$DRAFT_RELEASE_ID" \
+            --candidate-id "$CANDIDATE_ID" \
+            --expected-target-commit "$EXPECTED_TARGET_COMMIT" \
+            --target-branch "$CANDIDATE_BRANCH" \
+            --destination "$ASSET_DIRECTORY" \
+            --metadata-output "$RELEASE_METADATA" \
+            --expected-inventory-sha256 "$EXPECTED_ASSET_INVENTORY_SHA256"
 
-            resolved_checkout="$RUNNER_TEMP/ifly-swiftpm-consumer-packages/checkouts/IFLYADLib_iOS"
+      - name: 生成 candidate 本地 SwiftPM 独立消费端
+        if: needs.preflight.outputs.release_mode == 'candidate'
+        env:
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
+        run: |
+          python3 scripts/prepare_release_consumers.py \
+            --kind swiftpm \
+            --asset-dir "$RUNNER_TEMP/ifly-release-assets" \
+            --repository-root "$GITHUB_WORKSPACE" \
+            --output "$RUNNER_TEMP/ifly-swiftpm-local" \
+            --version "$RELEASE_VERSION"
+
+      - name: 使用隔离且干净的 SwiftPM 缓存构建 Full 产品
+        shell: bash
+        env:
+          RELEASE_MODE: ${{ needs.preflight.outputs.release_mode }}
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
+        run: |
+          set -euo pipefail
+          isolated_home="$RUNNER_TEMP/ifly-swiftpm-home"
+          derived_data="$RUNNER_TEMP/ifly-swiftpm-derived-data"
+          cloned_packages="$RUNNER_TEMP/ifly-swiftpm-packages"
+          package_cache="$RUNNER_TEMP/ifly-swiftpm-cache"
+          mkdir -p "$isolated_home" "$derived_data" "$cloned_packages" "$package_cache"
+
+          if git config --local --get-regexp '^http\..*extraheader$'; then
+            echo 'checkout 残留 GitHub 认证 header' >&2
+            exit 1
+          fi
+          if [[ "$RELEASE_MODE" == 'candidate' ]]; then
+            consumer="$RUNNER_TEMP/ifly-swiftpm-local/consumer"
+          else
+            consumer="$GITHUB_WORKSPACE/.github/fixtures/swiftpm-consumer"
+          fi
+
+          (
+            cd "$consumer"
+            env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
+              -u IFLY_PRIVATE_SOURCE_TOKEN \
+              HOME="$isolated_home" \
+              CFFIXED_USER_HOME="$isolated_home" \
+              xcodebuild build \
+                -scheme IFLYADLibReleaseConsumer \
+                -destination 'generic/platform=iOS Simulator' \
+                -derivedDataPath "$derived_data" \
+                -clonedSourcePackagesDirPath "$cloned_packages" \
+                -packageCachePath "$package_cache" \
+                -disablePackageRepositoryCache \
+                CODE_SIGNING_ALLOWED=NO
+          )
+
+          if [[ "$RELEASE_MODE" == 'formal' ]]; then
+            resolved_checkout="$cloned_packages/checkouts/IFLYADLib_iOS"
             test -d "$resolved_checkout"
-            test "$(git -C "$resolved_checkout" rev-parse HEAD)" = "$(git rev-parse "$RELEASE_VERSION^{commit}")"
-          )
+            test "$(git -C "$resolved_checkout" rev-parse HEAD)" = \
+              "$(git rev-parse "$RELEASE_VERSION^{commit}")"
+          else
+            test ! -e "$cloned_packages/checkouts/IFLYADLib_iOS"
+            ! grep -R 'releases/download\|github.com/LJMcarryu/IFLYADLib_iOS' \
+              "$RUNNER_TEMP/ifly-swiftpm-local/IFLYADLib_iOS/Package.swift" \
+              "$RUNNER_TEMP/ifly-swiftpm-local/consumer/Package.swift"
+          fi
 
-      - name: 正式态安装 CocoaPods 并校验 NativeFeed 新 API 正向/旧 API 反向
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+  cocoapods-demo-consumer:
+    name: CocoaPods、-ObjC 与 Demo 独立消费
+    needs: [preflight, release-assets]
+    if: ${{ needs.preflight.outputs.release_mode == 'candidate' || needs.preflight.outputs.release_mode == 'formal' }}
+    runs-on: macos-15
+    timeout-minutes: 55
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.preflight.outputs.checkout_sha }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - name: Candidate 独立认证下载并核对公共库存指纹
+        if: needs.preflight.outputs.release_mode == 'candidate'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          DRAFT_RELEASE_ID: ${{ needs.preflight.outputs.draft_release_id }}
+          CANDIDATE_ID: ${{ needs.preflight.outputs.candidate_id }}
+          CANDIDATE_BRANCH: ${{ needs.preflight.outputs.candidate_branch }}
+          EXPECTED_TARGET_COMMIT: ${{ needs.preflight.outputs.checkout_sha }}
+          EXPECTED_ASSET_INVENTORY_SHA256: ${{ needs.release-assets.outputs.asset_inventory_sha256 }}
+          ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets
+          RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
         run: |
+          python3 scripts/download_draft_release.py \
+            --repository "$RELEASE_REPOSITORY" \
+            --tag "$RELEASE_VERSION" \
+            --release-id "$DRAFT_RELEASE_ID" \
+            --candidate-id "$CANDIDATE_ID" \
+            --expected-target-commit "$EXPECTED_TARGET_COMMIT" \
+            --target-branch "$CANDIDATE_BRANCH" \
+            --destination "$ASSET_DIRECTORY" \
+            --metadata-output "$RELEASE_METADATA" \
+            --expected-inventory-sha256 "$EXPECTED_ASSET_INVENTORY_SHA256"
+
+      - name: 确定 CocoaPods 消费根目录
+        id: consumer-paths
+        shell: bash
+        env:
+          RELEASE_MODE: ${{ needs.preflight.outputs.release_mode }}
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ "$RELEASE_MODE" == 'candidate' ]]; then
+            output="$RUNNER_TEMP/ifly-cocoapods-local"
+            python3 scripts/prepare_release_consumers.py \
+              --kind cocoapods \
+              --asset-dir "$RUNNER_TEMP/ifly-release-assets" \
+              --repository-root "$GITHUB_WORKSPACE" \
+              --output "$output" \
+              --version "$RELEASE_VERSION"
+            demo_root="$output/IFLYADLibSimple"
+            pod_root="$output/IFLYADLib"
+          else
+            demo_root="$GITHUB_WORKSPACE/IFLYADLibSimple"
+            pod_root=''
+          fi
+          echo "demo_root=$demo_root" >> "$GITHUB_OUTPUT"
+          echo "pod_root=$pod_root" >> "$GITHUB_OUTPUT"
+
+      - name: 使用隔离且干净的 CocoaPods 缓存安装
+        shell: bash
+        env:
+          RELEASE_MODE: ${{ needs.preflight.outputs.release_mode }}
+          DEMO_ROOT: ${{ steps.consumer-paths.outputs.demo_root }}
+        run: |
+          set -euo pipefail
+          isolated_home="$RUNNER_TEMP/ifly-cocoapods-home"
+          cp_home="$isolated_home/.cocoapods"
+          mkdir -p "$isolated_home" "$cp_home"
+          if git config --local --get-regexp '^http\..*extraheader$'; then
+            echo 'checkout 残留 GitHub 认证 header' >&2
+            exit 1
+          fi
+          if [[ "$RELEASE_MODE" == 'formal' ]]; then
+            env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
+              -u IFLY_PRIVATE_SOURCE_TOKEN \
+              HOME="$isolated_home" CP_HOME_DIR="$cp_home" \
+              pod cache clean IFLYADLib --all
+          fi
           (
-            cd IFLYADLibSimple
-            pod install
+            cd "$DEMO_ROOT"
+            env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
+              -u IFLY_PRIVATE_SOURCE_TOKEN \
+              HOME="$isolated_home" CP_HOME_DIR="$cp_home" \
+              pod install
           )
 
+      - name: 校验 NativeFeed 新 API 正向与旧 API 反向
+        env:
+          DEMO_ROOT: ${{ steps.consumer-paths.outputs.demo_root }}
+        run: |
           python3 - <<'PY'
+          import os
           import re
           from pathlib import Path
 
+          demo_root = Path(os.environ["DEMO_ROOT"])
           headers = list(
-              Path("IFLYADLibSimple/Pods").glob(
+              (demo_root / "Pods").glob(
                   "**/IFLYAdNativeFeed.xcframework/*/Headers/"
                   "IFLYADLib/IFLYNativeFeedAd.h"
               )
@@ -467,9 +674,7 @@ jobs:
                   r"-\s*\(BOOL\)\s*attachWithViewBinder:"
                   r"\s*\([^)]*\)\s*binder\s*error:"
               ),
-              "detachAdFromContainerView:": (
-                  r"\+\s*\(void\)\s*detachAdFromContainerView:"
-              ),
+              "detachAdFromContainerView:": r"\+\s*\(void\)\s*detachAdFromContainerView:",
           }
           negative = (
               "IFLYNativeFeedDisplaySession",
@@ -488,19 +693,23 @@ jobs:
               assert not leaked, f"{header} 残留旧 API：{leaked}"
           PY
 
-      - name: 正式态校验 CocoaPods 将 -ObjC 传播到最终 App
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+      - name: 校验 CocoaPods 将 -ObjC 传播到最终 App
+        shell: bash
+        env:
+          DEMO_ROOT: ${{ steps.consumer-paths.outputs.demo_root }}
+          BUILD_SETTINGS: ${{ runner.temp }}/ifly-build-settings.json
         run: |
+          set -euo pipefail
           python3 - <<'PY'
+          import os
           import shlex
           from pathlib import Path
 
-          root = Path("IFLYADLibSimple/Pods/Target Support Files")
+          root = Path(os.environ["DEMO_ROOT"]) / "Pods/Target Support Files"
           configs = {
               "pod target": root / "IFLYADLib/IFLYADLib.debug.xcconfig",
               "aggregate target": (
-                  root
-                  / "Pods-IFLYADLibSimple/Pods-IFLYADLibSimple.debug.xcconfig"
+                  root / "Pods-IFLYADLibSimple/Pods-IFLYADLibSimple.debug.xcconfig"
               ),
           }
           for label, path in configs.items():
@@ -508,40 +717,135 @@ jobs:
               values = [
                   line.split("=", 1)[1].strip()
                   for line in path.read_text(encoding="utf-8").splitlines()
-                  if line.strip().startswith("OTHER_LDFLAGS")
-                  and "=" in line
+                  if line.strip().startswith("OTHER_LDFLAGS") and "=" in line
               ]
-              assert any(
-                  "-ObjC" in shlex.split(value) for value in values
-              ), f"{label} 未传播 -ObjC"
+              assert any("-ObjC" in shlex.split(value) for value in values), (
+                  f"{label} 未传播 -ObjC"
+              )
           PY
 
-          xcodebuild             -workspace IFLYADLibSimple/IFLYADLibSimple.xcworkspace             -scheme IFLYADLibSimple             -configuration Debug             -sdk iphonesimulator             -showBuildSettings             -json > /tmp/ifly-build-settings.json
+          xcodebuild \
+            -workspace "$DEMO_ROOT/IFLYADLibSimple.xcworkspace" \
+            -scheme IFLYADLibSimple \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -showBuildSettings \
+            -json > "$BUILD_SETTINGS"
 
           python3 - <<'PY'
           import json
+          import os
           import shlex
           from pathlib import Path
 
-          records = json.loads(
-              Path("/tmp/ifly-build-settings.json").read_text(encoding="utf-8")
-          )
+          records = json.loads(Path(os.environ["BUILD_SETTINGS"]).read_text(encoding="utf-8"))
           apps = [item for item in records if item.get("target") == "IFLYADLibSimple"]
           assert len(apps) == 1, len(apps)
           flags = apps[0]["buildSettings"].get("OTHER_LDFLAGS", "")
           assert "-ObjC" in shlex.split(flags), flags
           PY
 
-      - name: 正式态真正编译链接公开 Demo
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+      - name: 真正编译链接 Demo
+        env:
+          DEMO_ROOT: ${{ steps.consumer-paths.outputs.demo_root }}
         run: |
-          xcodebuild build             -workspace IFLYADLibSimple/IFLYADLibSimple.xcworkspace             -scheme IFLYADLibSimple             -configuration Debug             -destination 'generic/platform=iOS Simulator'             CODE_SIGNING_ALLOWED=NO
+          xcodebuild build \
+            -workspace "$DEMO_ROOT/IFLYADLibSimple.xcworkspace" \
+            -scheme IFLYADLibSimple \
+            -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
 
       - name: 正式态 pod spec lint
-        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
-        run: pod spec lint IFLYADLib.podspec --quick --allow-warnings
+        if: needs.preflight.outputs.release_mode == 'formal'
+        run: |
+          isolated_home="$RUNNER_TEMP/ifly-cocoapods-home"
+          env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
+            -u IFLY_PRIVATE_SOURCE_TOKEN \
+            HOME="$isolated_home" CP_HOME_DIR="$isolated_home/.cocoapods" \
+            pod spec lint IFLYADLib.podspec --quick --allow-warnings
 
-# main/PR 允许 7 个精确 PENDING 的准备态，或 7 个真实 checksum 与已发布文档齐备的正式态。
-# tag 必须无 PENDING、不得复用 6.2.1 checksum，并绑定不可变 annotated tag；Release 发布事件
-# 再匿名下载并核对全部 10 个资产、真实消费和 Demo 构建，避免 tag push 与资产创建顺序竞争。
-# 已发布 Release 仅允许从 main 手动全量复验；main 相对 tag 只可包含两项终验 harness 和列明的发布闭环文件。
+      - name: Candidate 本地 pod lib lint
+        if: needs.preflight.outputs.release_mode == 'candidate'
+        env:
+          POD_ROOT: ${{ steps.consumer-paths.outputs.pod_root }}
+        run: |
+          isolated_home="$RUNNER_TEMP/ifly-cocoapods-home"
+          (
+            cd "$POD_ROOT"
+            env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
+              -u IFLY_PRIVATE_SOURCE_TOKEN \
+              HOME="$isolated_home" CP_HOME_DIR="$isolated_home/.cocoapods" \
+              pod lib lint IFLYADLib.podspec --quick --allow-warnings
+          )
+
+  release-summary:
+    name: 发布验证只读汇总
+    if: ${{ always() }}
+    needs: [preflight, release-assets, swiftpm-consumer, cocoapods-demo-consumer]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    env:
+      RELEASE_MODE: ${{ needs.preflight.outputs.release_mode }}
+      RELEASE_TAG: ${{ needs.preflight.outputs.event_tag }}
+      RELEASE_ID: ${{ needs.preflight.outputs.draft_release_id || github.event.release.id || '' }}
+      CANDIDATE_ID: ${{ needs.preflight.outputs.candidate_id }}
+      CHECKOUT_COMMIT: ${{ needs.preflight.outputs.checkout_sha || github.sha }}
+      ASSET_INVENTORY: ${{ needs.release-assets.outputs.asset_inventory_sha256 }}
+      PREFLIGHT_RESULT: ${{ needs.preflight.result }}
+      ASSETS_RESULT: ${{ needs.release-assets.result }}
+      SWIFTPM_RESULT: ${{ needs.swiftpm-consumer.result }}
+      COCOAPODS_RESULT: ${{ needs.cocoapods-demo-consumer.result }}
+    steps:
+      - name: 写入身份、库存与 job 结论
+        shell: bash
+        run: |
+          set -euo pipefail
+          value_or_none() {
+            if [[ -n "$1" ]]; then
+              printf '%s' "$1"
+            else
+              printf '%s' '<无>'
+            fi
+          }
+          {
+            echo '## 发布验证汇总'
+            echo
+            echo '| 字段 | 值 |'
+            echo '| --- | --- |'
+            printf '| 模式 | `%s` |\n' "$(value_or_none "$RELEASE_MODE")"
+            printf '| Candidate ID | `%s` |\n' "$(value_or_none "$CANDIDATE_ID")"
+            printf '| Release ID | `%s` |\n' "$(value_or_none "$RELEASE_ID")"
+            printf '| Release tag | `%s` |\n' "$(value_or_none "$RELEASE_TAG")"
+            printf '| Checkout commit | `%s` |\n' "$(value_or_none "$CHECKOUT_COMMIT")"
+            printf '| 资产库存身份 | `%s` |\n' "$(value_or_none "$ASSET_INVENTORY")"
+            echo
+            echo '| Job | 结论 |'
+            echo '| --- | --- |'
+            printf '| preflight | `%s` |\n' "$PREFLIGHT_RESULT"
+            printf '| release-assets | `%s` |\n' "$ASSETS_RESULT"
+            printf '| swiftpm-consumer | `%s` |\n' "$SWIFTPM_RESULT"
+            printf '| cocoapods-demo-consumer | `%s` |\n' "$COCOAPODS_RESULT"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for result in \
+            "$PREFLIGHT_RESULT" "$ASSETS_RESULT" \
+            "$SWIFTPM_RESULT" "$COCOAPODS_RESULT"; do
+            case "$result" in
+              failure|cancelled|timed_out|action_required) exit 1 ;;
+            esac
+          done
+          test "$PREFLIGHT_RESULT" = 'success'
+          if [[ "$RELEASE_MODE" == 'candidate' || "$RELEASE_MODE" == 'formal' ]]; then
+            test "$ASSETS_RESULT" = 'success'
+            test "$SWIFTPM_RESULT" = 'success'
+            test "$COCOAPODS_RESULT" = 'success'
+            [[ "$ASSET_INVENTORY" =~ ^[0-9a-f]{64}$ ]]
+          fi
+
+# main/PR 只执行本地门禁，不访问 draft，也不获得发布下载 Token。
+# tag push 保留不可变 annotated tag 与 provenance 门禁，但不与 Release 资产创建顺序竞争。
+# release.published 与手动 release_tag 始终无 Token 匿名消费；draft_release_id 仅在候选分支完整前置
+# 门禁通过后认证下载。公共资产 Job 只输出库存 SHA；两个并行消费 Job 各自在唯一 Token
+# 步骤中独立下载同一 draft 并核对该 SHA，不跨 Job 传递 draft 二进制。
