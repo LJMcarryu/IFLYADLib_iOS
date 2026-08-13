@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -32,12 +32,39 @@ CONTRACT_FILES = (
 )
 
 
+def pending_contract_commit() -> str:
+    commits = subprocess.run(
+        ["git", "rev-list", "HEAD", "--", "RELEASING.md"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.splitlines()
+    for commit in commits:
+        releasing = subprocess.run(
+            ["git", "show", f"{commit}:RELEASING.md"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        if "- `releaseState`：`PENDING`" in releasing:
+            return commit
+    raise AssertionError("Git 历史中找不到 6.2.3 PENDING 契约基线")
+
+
 def copy_contract_files(destination: Path) -> None:
+    commit = pending_contract_commit()
     for relative in CONTRACT_FILES:
-        source = ROOT / relative
         target = destination / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(source, target)
+        contents = subprocess.run(
+            ["git", "show", f"{commit}:{relative}"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        ).stdout
+        target.write_bytes(contents)
 
 
 def replace_all_pending_checksums(root: Path, checksums: list[str]) -> None:
@@ -131,13 +158,31 @@ def make_published_repository(root: Path) -> None:
 
 
 class DistributionManifestTests(unittest.TestCase):
-    def test_current_pending_repository_passes_local_mode_only(self) -> None:
-        verify(ROOT, VERSION, "local")
-        for mode in ("candidate", "tag", "formal"):
-            with self.subTest(mode=mode), self.assertRaisesRegex(
-                AssertionError, "禁止保留 PENDING"
-            ):
-                verify(ROOT, VERSION, mode)
+    def test_current_repository_matches_declared_release_state(self) -> None:
+        releasing = (ROOT / "RELEASING.md").read_text(encoding="utf-8")
+        if "- `releaseState`：`PENDING`" in releasing:
+            self.assertEqual(verify(ROOT, VERSION, "local"), "准备")
+            for mode in ("candidate", "tag", "formal"):
+                with self.subTest(mode=mode), self.assertRaisesRegex(
+                    AssertionError, "禁止保留 PENDING"
+                ):
+                    verify(ROOT, VERSION, mode)
+            return
+
+        self.assertIn("- `releaseState`：`FORMAL`", releasing)
+        self.assertEqual(verify(ROOT, VERSION, "local"), "已冻结正式资产")
+        self.assertEqual(
+            verify(ROOT, VERSION, "candidate"),
+            "Draft candidate 冻结资产预验",
+        )
+        self.assertEqual(
+            verify(ROOT, VERSION, "tag"),
+            "不可变 tag 冻结资产复验",
+        )
+        self.assertEqual(
+            verify(ROOT, VERSION, "formal"),
+            "正式 Release 冻结文档与清单复验",
+        )
 
     def test_frozen_repository_passes_local_candidate_and_tag_modes(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
