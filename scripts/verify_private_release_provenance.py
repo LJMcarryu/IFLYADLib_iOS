@@ -13,8 +13,9 @@ from urllib.parse import quote, urlsplit
 from urllib.request import Request, urlopen
 
 PRIVATE_SOURCE_REPOSITORY = "LJMcarryu/IFLYADLibDemo"
-PENDING_BINARY = "__IFLYADLIB_6_2_2_BINARY_SOURCE_COMMIT_PENDING__"
-PENDING_METADATA = "__IFLYADLIB_6_2_2_RELEASE_METADATA_COMMIT_PENDING__"
+CURRENT_VERSION = "6.2.3"
+PENDING_BINARY = "__IFLYADLIB_6_2_3_BINARY_SOURCE_COMMIT_PENDING__"
+PENDING_METADATA = "__IFLYADLIB_6_2_3_RELEASE_METADATA_COMMIT_PENDING__"
 ALLOWED_METADATA_FILES = {"Package.swift", "README.md", "CONTEXT.md"}
 
 
@@ -43,12 +44,33 @@ def _find(document: str, label: str) -> list[str]:
     return [value for pattern in patterns for value in re.findall(pattern, document, re.M)]
 
 
+def current_version_section(document: str, label: str) -> str:
+    heading = re.compile(
+        rf"^##[ \t]+(?:\[{re.escape(CURRENT_VERSION)}\]|"
+        rf"{re.escape(CURRENT_VERSION)})(?:[ \t]|$).*$",
+        re.M,
+    )
+    matches = list(heading.finditer(document))
+    require(len(matches) == 1, f"{label} 必须唯一声明 {CURRENT_VERSION} 二级章节")
+    start = matches[0].start()
+    following = re.search(r"^#{1,2}[ \t]+", document[matches[0].end():], re.M)
+    end = matches[0].end() + following.start() if following else len(document)
+    return document[start:end]
+
+
 def parse_document(document: str, label: str) -> tuple[str, str, str]:
-    binary = _find(document, "binary")
-    metadata = _find(document, "metadata")
-    states = re.findall(r"^\s*-\s*`releaseState`：`(PENDING|FORMAL)`\s*$", document, re.M)
-    require(len(binary) == len(metadata) == len(states) == 1,
-            f"{label} 必须唯一声明 releaseState/A/B")
+    section = current_version_section(document, label)
+    binary = _find(section, "binary")
+    metadata = _find(section, "metadata")
+    states = re.findall(
+        r"^\s*-\s*`releaseState`：`(PENDING|FORMAL)`\s*$",
+        section,
+        re.M,
+    )
+    require(
+        len(binary) == len(metadata) == len(states) == 1,
+        f"{label} 的 {CURRENT_VERSION} 章节必须唯一声明 releaseState/A/B",
+    )
     return states[0], binary[0], metadata[0]
 
 

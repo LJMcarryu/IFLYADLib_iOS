@@ -1,6 +1,6 @@
 # IFLYADLibSimple — IFLYADLib 接入示例
 
-面向媒体接入方的最小示例，仅使用公开 API，演示开屏、Banner、插屏、自渲染信息流和激励视频。当前示例固定到已于 2026-08-10 正式发布的 `6.2.2`，NativeFeed 使用 SDK 托管挂载。
+面向媒体接入方的最小示例，仅使用公开 API，演示开屏、Banner、插屏、自渲染信息流和激励视频。当前清单为 `6.2.3` 发布准备版本，正式资产、tag 和 Release 尚不存在；生产项目继续使用已发布的 `6.2.2`。
 
 ## 运行
 
@@ -9,7 +9,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-- Podfile 已预置为不可变 `6.2.2` tag 的 `:podspec`；若 `pod install` 失败，请检查 Release 网络访问和本地缓存。
+- Podfile 已预置待发布 `6.2.3` tag 的 `:podspec`；正式资产公开前 `pod install` 失败是预期结果。
 - 正式资产必须包含 arm64 真机及 arm64/x86_64 模拟器切片。真机运行请在「Signing & Capabilities」选择自己的开发者 Team。
 - 工程最低支持 iOS 11.0，默认安装 `Full`。
 
@@ -33,6 +33,8 @@ NativeFeed 生命周期统一为：
 - 视频 detach/attach 保留进度与播放意图；不要在每次 attach 或 `nativeFeedAdDidRender:` 无条件调用 `startPlay`。
 
 `Redirect/Download` 才传点击视图；`Exposure/Unknown` 显式传 `@[]`。视频只传普通 `UIView` 给 Binder，播放器和监测由 SDK 管理。
+
+`6.2.3` 默认仍要求 `clickViews` 位于 `containerView`。确需容器外 CTA 时显式设置 `allowsExternalClickViews`，并处理 delegate `nativeFeedAd:didRejectClickWithError:`；共享、悬浮、离屏仍可点击或归属不明的视图会以 71503 失败关闭。固定单容器页面可按需使用 `detachFromCurrentContainer`。
 
 ## 从 6.2.1 升级到 6.2.2
 

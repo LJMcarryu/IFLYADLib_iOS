@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""校验 6.2.2 通用分发清单、版本状态与 10 资产静态契约。"""
+"""校验 6.2.3 通用分发清单、版本状态与 10 资产静态契约。"""
 
 from __future__ import annotations
 
@@ -10,39 +10,40 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
-VERSION = "6.2.2"
+VERSION = "6.2.3"
+RELEASE_DATE = "2026-08-13"
 REPOSITORY = "LJMcarryu/IFLYADLib_iOS"
 EXPECTED = {
     "IFLYAdCore": (
         "IFLYAdCore.xcframework.zip",
-        "__IFLYADLIB_6_2_2_CORE_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_2_3_CORE_CHECKSUM_PENDING__",
     ),
     "IFLYAdVideoUI": (
         "IFLYAdVideoUI.xcframework.zip",
-        "__IFLYADLIB_6_2_2_VIDEO_UI_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_2_3_VIDEO_UI_CHECKSUM_PENDING__",
     ),
     "IFLYAdBanner": (
         "IFLYAdBanner.xcframework.zip",
-        "__IFLYADLIB_6_2_2_BANNER_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_2_3_BANNER_CHECKSUM_PENDING__",
     ),
     "IFLYAdSplash": (
         "IFLYAdSplash.xcframework.zip",
-        "__IFLYADLIB_6_2_2_SPLASH_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_2_3_SPLASH_CHECKSUM_PENDING__",
     ),
     "IFLYAdInterstitial": (
         "IFLYAdInterstitial.xcframework.zip",
-        "__IFLYADLIB_6_2_2_INTERSTITIAL_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_2_3_INTERSTITIAL_CHECKSUM_PENDING__",
     ),
     "IFLYAdNativeFeed": (
         "IFLYAdNativeFeed.xcframework.zip",
-        "__IFLYADLIB_6_2_2_NATIVE_FEED_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_2_3_NATIVE_FEED_CHECKSUM_PENDING__",
     ),
     "IFLYAdReward": (
         "IFLYAdReward.xcframework.zip",
-        "__IFLYADLIB_6_2_2_REWARD_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_2_3_REWARD_CHECKSUM_PENDING__",
     ),
 }
-OLD_621 = {
+PREVIOUS_CHECKSUMS = {
     "d7f6931fdc9613bb5497d122c1410b4768094da56e352fa32b0ac2979a07e6e0",
     "185b6e26b22a12e9776dae0e621e99f4722c42859f6d86ceed63cba51ba67213",
     "8432807c3c767f7c165de8a9517f70b0ed3e357b4c28ad75cdfd8829a64f4d8c",
@@ -50,13 +51,120 @@ OLD_621 = {
     "8a65097a81f8354a2c4ade78a09fc9e4dac6e3029a2e9990a94386594dc3205d",
     "6d33bc2876ac7a1f84ff84e1b78ba0ec5fe33cef489e2ad814858a6c845176aa",
     "2b7b94447fbe50f24c20f25c324cda98285d8ced3050ed8a0c56561d99419a3d",
+    "397b10feb631331bf8edf2491cf4b66513d5662432d151c68c9a832154a35661",
+    "f01b7c4c6829029935c34ef32186b1359ec2298630de4663896576e348325a77",
+    "abea4cd9e38f443b7f8fa363e75cd857f4e6835cbafcd99582cd817747e27bb1",
+    "0e2885577f73636c290245108f91b4335e6a92ef74257ee85d8a7433f1401a27",
+    "8e97a74dfa63400273036bd0d33f1ff111c882ba9a292654570574fc4be3362d",
+    "bfd00324f2d91803c9e3939c09b64f5c80c2f1f7a09fe839f1c14b6945e08844",
+    "8ef01583768f7d2b1c7f9a6089ddad3a7dc2c5d689a6af680a2842feec1d0759",
 }
-COMBINED_SHA = "f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673"
+PREVIOUS_COMBINED_SHA256 = {
+    "f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673",
+}
 RELEASE_MODES = {"local", "candidate", "tag", "formal"}
+PENDING_ONLY_MARKERS = (
+    "- `releaseState`：`PENDING`",
+    "__IFLYADLIB_6_2_3_BINARY_SOURCE_COMMIT_PENDING__",
+    "__IFLYADLIB_6_2_3_RELEASE_METADATA_COMMIT_PENDING__",
+    "最新公开正式版仍为 `IFLYADLib 6.2.2`",
+    "`main` 正在准备全渠道共享优化版 `6.2.3`",
+    "正式签名资产、tag、Release 和匿名消费验证均未生成",
+    "当前 `6.2.3` URL 不可用于生产依赖",
+    "## [6.2.3] - 待发布",
+    "正式签名资产、7 个 SwiftPM checksum、tag、Release 与匿名消费验证尚未生成",
+    "`main` 正在准备 `6.2.3`",
+    "该版正式资产、checksum、tag、Release 与匿名消费验证均未生成",
+    "### `6.2.3` 发布准备",
+    "`6.2.3` 当前为 `PENDING`",
+    "正式资产、tag 和 Release 尚不存在",
+    "正式资产公开前 `pod install` 失败是预期结果",
+    "正式资产、tag 和 Release 尚不存在，当前远程依赖不可用",
+    "下列 checksum 为 6.2.3 唯一 PENDING 占位",
+)
+FORMAL_REQUIRED_MARKERS = {
+    "README": (
+        "- `releaseState`：`FORMAL`",
+        "当前最新公开正式版为 `IFLYADLib 6.2.3`",
+        f"已于 {RELEASE_DATE} 正式发布",
+        "IFLYADLib-modelA-6.2.3.zip",
+        "冻结 SHA-256",
+        "匿名下载",
+    ),
+    "CHANGELOG": (
+        "- `releaseState`：`FORMAL`",
+        f"## [6.2.3] - {RELEASE_DATE}",
+        "IFLYADLib-modelA-6.2.3.zip",
+        "冻结 SHA-256",
+        "匿名下载",
+    ),
+    "RELEASING": (
+        "- `releaseState`：`FORMAL`",
+        "当前最新公开正式版是 [`6.2.3`]",
+        "IFLYADLib-modelA-6.2.3.zip",
+        "冻结 SHA-256",
+        "匿名下载",
+    ),
+    "SECURITY": (
+        "最新公开正式版本（当前为 `6.2.3`）",
+        f"`6.2.3` 已于 {RELEASE_DATE}",
+    ),
+    "DEMO": (
+        f"已于 {RELEASE_DATE} 正式发布的 `6.2.3`",
+        "不可变 `6.2.3` tag",
+    ),
+    "PODFILE": (
+        "IFLYADLib 6.2.3 已正式发布并完成匿名消费复验",
+        "不可变 tag",
+    ),
+}
+STRICT_REVIEW_POLICY = (
+    "failOn=high`、`failOnWarning=true`、`strict=true`、"
+    "`requireManual=true` 且接受名单为空"
+)
+RISK_AUTHORIZATION_BOUNDARY = "`6.2.3` 不沿用 `6.2.2` 的启发式风险授权"
+HISTORICAL_REVIEW_POLICY_MARKERS = (
+    "failOnWarning=false",
+    "strict=false",
+    "requireManual=false",
+)
 
 
 def read(root: Path, relative: str) -> str:
     return (root / relative).read_text(encoding="utf-8")
+
+
+def current_version_section(document: str, label: str) -> str:
+    heading = re.compile(
+        rf"^##[ \t]+(?:\[{re.escape(VERSION)}\]|{re.escape(VERSION)})(?:[ \t]|$).*$",
+        re.M,
+    )
+    matches = list(heading.finditer(document))
+    assert len(matches) == 1, f"{label} 必须唯一声明 {VERSION} 二级章节"
+    start = matches[0].start()
+    following = re.search(r"^#{1,2}[ \t]+", document[matches[0].end():], re.M)
+    end = matches[0].end() + following.start() if following else len(document)
+    return document[start:end]
+
+
+def require_formal_combined_sha256(
+    documents: dict[str, str], checksums: dict[str, str]
+) -> str:
+    values: dict[str, str] = {}
+    pattern = re.compile(
+        rf"IFLYADLib-modelA-{re.escape(VERSION)}\.zip"
+        r".{0,300}?冻结 SHA-256(?: 为|：)?\s*`([0-9a-f]{64})`",
+        re.S,
+    )
+    for label in ("README", "CHANGELOG", "RELEASING"):
+        matches = pattern.findall(documents[label])
+        assert len(matches) == 1, f"{label} 必须唯一记录本版正式合并包 SHA-256"
+        values[label] = matches[0]
+    assert len(set(values.values())) == 1, f"正式合并包 SHA-256 文档不一致：{values}"
+    combined_sha256 = next(iter(values.values()))
+    assert combined_sha256 not in PREVIOUS_COMBINED_SHA256, "禁止沿用历史合并包 SHA-256"
+    assert combined_sha256 not in checksums.values(), "合并包 SHA-256 不得冒充模块 checksum"
+    return combined_sha256
 
 
 def verify(root: Path, version: str, mode: str) -> str:
@@ -69,7 +177,17 @@ def verify(root: Path, version: str, mode: str) -> str:
     changelog = read(root, "CHANGELOG.md")
     releasing = read(root, "RELEASING.md")
     security = read(root, "SECURITY.md")
+    demo_readme = read(root, "IFLYADLibSimple/README.md")
+    podfile = read(root, "IFLYADLibSimple/Podfile")
     package = read(root, "Package.swift")
+    for label, document in (("README", readme), ("RELEASING", releasing)):
+        current = current_version_section(document, label)
+        assert STRICT_REVIEW_POLICY in current, f"{label} 缺少 6.2.3 严格扫描策略"
+        assert RISK_AUTHORIZATION_BOUNDARY in current, (
+            f"{label} 缺少 6.2.3 不沿用历史风险授权的边界"
+        )
+        leaked = [marker for marker in HISTORICAL_REVIEW_POLICY_MARKERS if marker in current]
+        assert not leaked, f"{label} 的 6.2.3 章节沿用了历史扫描策略：{leaked}"
 
     blocks = re.findall(
         r'\.binaryTarget\(\s*name:\s*"([^"]+)"\s*,'
@@ -99,49 +217,44 @@ def verify(root: Path, version: str, mode: str) -> str:
     all_final = all(
         re.fullmatch(r"[0-9a-f]{64}", checksums[name])
         and checksums[name] != "0" * 64
-        and checksums[name] not in OLD_621
+        and checksums[name] not in PREVIOUS_CHECKSUMS
         for name in EXPECTED
     )
     assert all_pending or all_final, (
         "7 个 checksum 必须全部是精确 PENDING，或全部是本版非零、"
-        "非 6.2.1 的 64 位小写 SHA-256；不得混用"
+        "非历史版本的 64 位小写 SHA-256；不得混用"
     )
     if mode != "local":
         assert all_final, f"{mode} 模式禁止保留 PENDING checksum"
 
     if all_pending:
         assert mode == "local"
-        assert "最新正式版仍是 `6.2.1`" in readme
-        assert re.search(r"^## \[6\.2\.2\] - 待发布\s*$", changelog, re.M)
-        assert "`main` 正在准备 `6.2.2`" in releasing
-        assert "`6.2.2` 发布准备" in security
+        assert "最新公开正式版仍为 `IFLYADLib 6.2.2`" in readme
+        assert re.search(r"^## \[6\.2\.3\] - 待发布\s*$", changelog, re.M)
+        assert "`main` 正在准备 `6.2.3`" in releasing
+        assert "`6.2.3` 发布准备" in security
+        assert "尚未生成或核对" in readme
         state = "准备"
     else:
-        for label, document in (
-            ("README", readme),
-            ("CHANGELOG", changelog),
-            ("RELEASING", releasing),
-        ):
-            assert document.count(COMBINED_SHA) == 1, (
-                f"{label} 必须唯一记录正式合并包 SHA-256"
-            )
-
         if mode in {"tag", "formal"}:
-            assert "当前最新公开正式版为 `IFLYADLib 6.2.2`" in readme
-            assert "已于 2026-08-10 正式发布" in readme
-            assert "actions/runs/31347794760" in readme
-            assert re.search(r"^## \[6\.2\.2\] - 2026-08-10\s*$", changelog, re.M)
-            assert "当前最新公开正式版是 [`6.2.2`]" in releasing
-            assert "actions/runs/31347794760" in releasing
-            assert "最新公开正式版本（当前为 `6.2.2`）" in security
-            stale_markers = (
-                "最新公开正式版仍是 `6.2.1`",
-                "无 Token 匿名下载和最终消费验证尚未完成",
-                "6.2.2] - 待发布",
-                "`6.2.2` 正式资产准备",
-            )
-            for marker in stale_markers:
-                assert marker not in readme + changelog + releasing + security, marker
+            documents = {
+                "README": readme,
+                "CHANGELOG": changelog,
+                "RELEASING": releasing,
+                "SECURITY": security,
+                "DEMO": demo_readme,
+                "PODFILE": podfile,
+            }
+            for label, markers in FORMAL_REQUIRED_MARKERS.items():
+                for marker in markers:
+                    assert marker in documents[label], (
+                        f"{label} 正式态缺少发布事实：{marker}"
+                    )
+            for marker in PENDING_ONLY_MARKERS:
+                assert marker not in "\n".join(documents.values()) + package, (
+                    f"正式态残留 PENDING 文案：{marker}"
+                )
+            require_formal_combined_sha256(documents, checksums)
             state = "正式发布复验"
         elif mode == "candidate":
             state = "Draft candidate 预验"
@@ -171,7 +284,6 @@ def verify(root: Path, version: str, mode: str) -> str:
     }
     assert len(release_assets) == 10, release_assets
 
-    podfile = read(root, "IFLYADLibSimple/Podfile")
     if mode in {"tag", "formal"}:
         for marker in (
             "tag/Release 尚未创建",

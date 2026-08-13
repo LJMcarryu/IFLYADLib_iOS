@@ -80,7 +80,7 @@ jobs:
           MANUAL_DISPATCH_NONCE: ${{ inputs.dispatch_nonce }}
         run: |
           set -euo pipefail
-          version='6.2.2'
+          version='6.2.3'
           release_mode='local'
           event_tag=''
           draft_release_id=''
@@ -285,6 +285,11 @@ jobs:
             grep -q 'detachAdFromContainerView:' "$source"
           done
 
+          grep -q 'allowsExternalClickViews' README.md
+          grep -q 'nativeFeedAd:didRejectClickWithError:' README.md
+          grep -q 'IFLYAdErrorCodeNativeFeedClickViewsInvalid' README.md
+          grep -q 'detachFromCurrentContainer' README.md
+
           if grep -En 'IFLYNativeFeedDisplaySession|IFLYNativeFeedAdBinding|beginDisplaySessionWithError:|bindAdWithViewBinder:|unbindAd|endDisplaySession' "${sources[@]}"; then
             echo 'Demo 仍使用 6.2.1 NativeFeed 历史 API' >&2
             exit 1
@@ -311,7 +316,7 @@ jobs:
           def has_objc_flag(config):
               return "-ObjC" in shlex.split((config or {}).get("OTHER_LDFLAGS", ""))
 
-          assert spec["version"] == "6.2.2", spec["version"]
+          assert spec["version"] == "6.2.3", spec["version"]
           assert has_objc_flag(spec.get("pod_target_xcconfig"))
           assert has_objc_flag(spec.get("user_target_xcconfig"))
           core = next(item for item in spec["subspecs"] if item["name"] == "Core")
@@ -675,6 +680,15 @@ jobs:
                   r"\s*\([^)]*\)\s*binder\s*error:"
               ),
               "detachAdFromContainerView:": r"\+\s*\(void\)\s*detachAdFromContainerView:",
+              "detachFromCurrentContainer": r"-\s*\(void\)\s*detachFromCurrentContainer",
+              "allowsExternalClickViews": r"@property\s*\([^)]*\)\s*BOOL\s+allowsExternalClickViews",
+              "nativeFeedAd:didRejectClickWithError:": (
+                  r"nativeFeedAd:\s*\([^)]*\)\s*nativeFeedAd\s*"
+                  r"didRejectClickWithError:"
+              ),
+              "IFLYAdErrorCodeNativeFeedClickViewsInvalid": (
+                  r"IFLYAdErrorCodeNativeFeedClickViewsInvalid\s*=\s*71503"
+              ),
           }
           negative = (
               "IFLYNativeFeedDisplaySession",

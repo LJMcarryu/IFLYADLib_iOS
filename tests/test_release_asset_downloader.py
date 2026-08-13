@@ -27,7 +27,7 @@ from download_draft_release import run as run_draft_download  # noqa: E402
 
 
 REPOSITORY = "LJMcarryu/IFLYADLib_iOS"
-TAG = "6.2.2"
+TAG = "6.2.3"
 TARGET = "1" * 40
 CANDIDATE_ID = "2" * 64
 CANDIDATE_BRANCH = f"release-candidate/{TAG}-{CANDIDATE_ID}"
@@ -108,6 +108,18 @@ class ReleaseAssetDownloaderTests(unittest.TestCase):
             "published_at": "2026-08-10T00:00:00Z",
             "body": "body",
             "assets": release_assets() + [asset("extra.zip", 99)],
+        }
+        with self.assertRaisesRegex(VerificationError, "精确包含 10"):
+            validate_public_release(release, REPOSITORY, TAG)
+
+    def test_inventory_rejects_missing_asset(self) -> None:
+        release = {
+            "tag_name": TAG,
+            "draft": False,
+            "prerelease": False,
+            "published_at": "2026-08-13T00:00:00Z",
+            "body": "body",
+            "assets": release_assets()[:-1],
         }
         with self.assertRaisesRegex(VerificationError, "精确包含 10"):
             validate_public_release(release, REPOSITORY, TAG)

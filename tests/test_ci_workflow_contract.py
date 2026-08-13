@@ -120,6 +120,24 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertIn("scripts/release-orchestrator.py", releasing)
         self.assertIn("底层门禁或故障诊断入口", releasing)
 
+    def test_cocoapods_consumer_gates_new_native_feed_api(self) -> None:
+        block = job_block("cocoapods-demo-consumer")
+        self.assertIn("校验 NativeFeed 新 API 正向与旧 API 反向", block)
+        for marker in (
+            "detachFromCurrentContainer",
+            "allowsExternalClickViews",
+            "nativeFeedAd:didRejectClickWithError:",
+            "IFLYAdErrorCodeNativeFeedClickViewsInvalid",
+        ):
+            self.assertIn(marker, block)
+        for marker in (
+            "IFLYNativeFeedDisplaySession",
+            "IFLYNativeFeedAdBinding",
+            "beginDisplaySessionWithError:",
+            "bindAdWithViewBinder:",
+        ):
+            self.assertIn(marker, block)
+
 
 if __name__ == "__main__":
     unittest.main()

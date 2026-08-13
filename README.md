@@ -2,18 +2,22 @@
 
 `IFLYADLib` 是讯飞广告 iOS SDK，提供开屏、Banner、插屏、自渲染信息流、激励视频等广告能力。
 
-当前最新公开正式版为 `IFLYADLib 6.2.2`（NativeFeed SDK 托管挂载）；示例工程见 [IFLYADLibSimple](./IFLYADLibSimple)。
+## 6.2.3 发布状态
+
+当前最新公开正式版仍为 `IFLYADLib 6.2.2`；`main` 正在准备全渠道共享优化版 `6.2.3`，示例工程见 [IFLYADLibSimple](./IFLYADLibSimple)。
 
 > **发布状态**：[`6.2.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.2) 已于 2026-08-10 正式发布。不可变 annotated tag 指向 `d5caeb26794d8000e13e40d4356d2ff79706a3a9`；10 个 Release 资产已完成无 Token 匿名下载、逐字节同源、SwiftPM、CocoaPods、`-ObjC`、Demo 编译链接和 `pod spec lint` 终验，证据见 [Run 31347794760](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31347794760)。
 
-> **风险边界**：本版按已确认范围原样归档 `SRC-004`、`SRC-008`、`SRC-009`、`SRC-011`、`NET-001`、`RRA-003`、`TRACK-001`、`TRACK-002`、`ADS-011`、`EXPORT-001` 启发式残余风险，并以 `failOn=high`、`failOnWarning=false`、`strict=false`、`requireManual=false` 发布；这不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
+> **6.2.3 准备边界**：版本清单已切换到精确 PENDING checksum 与 A/B 占位；正式签名资产、tag、Release 和匿名消费验证均未生成，当前 `6.2.3` URL 不可用于生产依赖。
+
+> **风险边界**：`6.2.3` 不沿用 `6.2.2` 的启发式风险授权。主动扫描固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；扫描未满足该策略前不得将候选写成通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
 
 <!-- 供发布 CI 机器校验的两提交 provenance；正式回填时 README、CHANGELOG、RELEASING 必须保持一致。 -->
-- `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`a8ec925d3731d7d11734647aa02ca7d91d674965`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`eff78263c2d3f65b029f4114de1a9ed00f3827f3`
+- `releaseState`：`PENDING`
+- `binarySourceCommit`（SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_BINARY_SOURCE_COMMIT_PENDING__`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_RELEASE_METADATA_COMMIT_PENDING__`
 
-`releaseState=FORMAL` 本身只表示正式签名资产与发布元数据已经冻结；`6.2.2` 的公开发布另由不可变 tag、Release 和匿名消费终验证明。合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
+`releaseState=PENDING` 明确表示 `6.2.3` 不能发布；不得复用 `6.2.2` 的 checksum 或 A/B 提交。上文 `6.2.2` 的 tag、Release 与终验证据继续作为历史正式事实保留。
 
 > 文档以中文为主。如需用英文反馈问题，请直接在 [Issues](https://github.com/LJMcarryu/IFLYADLib_iOS/issues) 提交。
 
@@ -23,6 +27,7 @@
 
 | 版本 | 日期 | 说明 |
 | --- | --- | --- |
+| 6.2.3 | 待发布 | 全渠道共享优化：NativeFeed 新增受限外部 CTA 适配，默认关闭；媒体显式设置 Binder 的 `allowsExternalClickViews=YES` 后，仅接受同 window/scene 且归属可判定的同 Cell 或窄范围兄弟视图。共享、固定悬浮、广告离屏后仍可点击或归属不明时失败关闭，并通过 `nativeFeedAd:didRejectClickWithError:` 返回 `IFLYAdErrorCodeNativeFeedClickViewsInvalid`（71503）。新增 `detachFromCurrentContainer` 固定单容器便利入口，不改变 6.2.2 的 attach/容器 detach 主路径。 |
 | 6.2.2 | 2026-08-10 | NativeFeed 改为 SDK 托管挂载：数据层只持 Ad，Cell 不持 Session/Binding 或首次/复用状态；进屏调用 Ad 级 `attachWithViewBinder:error:`，离屏/复用/切普通内容按容器调用 `detachAdFromContainerView:`。释放最后一个 Ad 强引用自动终止，`destroy` 仅作可选的主动提前终止；旧 DisplaySession/Binding 契约从公开 API 移除。 |
 | 6.2.1 | 2026-08-07 | NativeFeed 新增 `IFLYNativeFeedDisplaySession` 与 `IFLYNativeFeedAdBinding`，支持同一稳定逻辑条目跨复用 Cell 串行恢复原广告；数据层持有 Ad + Session，Cell 只持 Binding，离屏 detach，淘汰 `endDisplaySession → destroy`。TTL 在活动 Binding 期间到达不强拆当前展示，detach 后结束旧会话并请求新广告。 |
 | 6.2.0 | 2026-08-06 | 全渠道共享基线优化：iOS 14+ 仅在 ATT `authorized` 时读取、缓存和发送 IDFA，未授权阶段显式传入的 IDFA 直接丢弃且授权后须重新设置；跳转链路删除 `canOpenURL:` 预检并按系统 completion 保留落地页 fallback，`jumpDirectly` 降为兼容 no-op；NativeFeed 新增统一方法 `reportMediaShakeTriggeredWithError:`，通用模型 A 固定返回 `71512` 表示能力未启用；Core 显式链接 `AdSupport` 并弱链接 `AppTrackingTransparency`，继续支持 iOS 11。 |
@@ -55,7 +60,7 @@
 
 ## CocoaPods 接入
 
-> 下列地址固定到不可变 `6.2.2` tag；不要在生产项目中引用 `main`。
+> 下列 `6.2.3` 地址仅为发布准备，正式 tag/Release 与资产不存在；生产项目继续固定已发布的 `6.2.2`。
 
 ```ruby
 source 'https://cdn.cocoapods.org/'
@@ -67,21 +72,21 @@ target 'YOUR_APP_TARGET' do
 
   # 默认 Full；也可改成 IFLYADLib/NativeFeed 等按格式 subspec。
   pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.2/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.3/IFLYADLib.podspec'
 end
 ```
 
-CocoaPods 的 `Core` 会显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`；podspec 同时向 Pod target 和最终 aggregate/user target 传播 `-ObjC`。二进制从 `IFLYADLib-modelA-6.2.2.zip` 下载，不要用 `:git` 或 `:path` 绕过 Release zip。
+CocoaPods 的 `Core` 会显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`；podspec 同时向 Pod target 和最终 aggregate/user target 传播 `-ObjC`。正式发布后，二进制从 `IFLYADLib-modelA-6.2.3.zip` 下载；不要用 `:git` 或 `:path` 绕过 Release zip。
 
 可选 subspec：`Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full`（默认）。`Splash/Interstitial/Reward` 会自动带入 `VideoUI`。
 
 ## Swift Package Manager
 
-在 Xcode「Add Packages」添加 `https://github.com/LJMcarryu/IFLYADLib_iOS` 并选择 `6.2.2`，按需勾选 `Core/Banner/Splash/Interstitial/NativeFeed/Reward/Full`。
+正式 Release 创建后，在 Xcode「Add Packages」添加 `https://github.com/LJMcarryu/IFLYADLib_iOS` 并选择 `6.2.3`，按需勾选 `Core/Banner/Splash/Interstitial/NativeFeed/Reward/Full`。
 
 - 消费方 App target 的 `OTHER_LDFLAGS` 必须添加 `-ObjC`。
 - 7 个远程 `binaryTarget` 分别承载模块代码；Core、VideoUI、Reward 伞 target 自动投递三域资源和 `PrivacyInfo.xcprivacy`。
-- `Package.swift` 的 7 个 checksum 来自本版正式签名 zip，已与冻结资产和匿名下载件逐项核对。
+- 当前 `Package.swift` 的 7 个 checksum 均为本版精确 PENDING 占位，尚未生成或核对；正式签名 zip 冻结后须整体回填，并在 Release 创建后与匿名下载件逐项复验。
 - 通用 Release 固定为 10 个资产：7 个模块 zip、1 个合并 zip、`checksums.txt`、`binary-targets.remote.swift`。
 
 ## 权限与隐私配置
@@ -365,6 +370,11 @@ BOOL attached = [ad attachWithViewBinder:binder error:&error];
 
 同一 Ad/同一容器重复 attach 为幂等成功；同一 Ad 可在有效期内串行迁移到新 Cell，同一容器可由新 Ad 在预检成功后原子接管。媒体不维护 Session、Binding、Binding 集合或“首次/复用”状态。
 
+`6.2.3` 新增两个可选入口：
+
+- 已知实例且业务保证单活动容器时，可调用 `-[IFLYNativeFeedAd detachFromCurrentContainer]`；常规 Cell 生命周期仍优先使用 `+[IFLYNativeFeedAd detachAdFromContainerView:]`，避免迟到回调误解绑。
+- `clickViews` 默认仍必须位于 `containerView` 内。只有外部 CTA 与广告同生共灭且媒体无法改变视图层级时，才可显式设置 `binder.allowsExternalClickViews = YES`。SDK 仅接受同 window/scene 且归属可判定的同 Cell 或窄范围兄弟视图；共享、固定悬浮、广告离屏后仍可点击或归属不明会失败关闭。attach 时能判定的错误直接返回；运行中失效通过 delegate `nativeFeedAd:didRejectClickWithError:` 通知，错误为 `IFLYAdErrorCodeNativeFeedClickViewsInvalid`（71503）。
+
 固定卡片的最小生命周期：
 
 ```objc
@@ -628,7 +638,11 @@ open IFLYADLibSimple.xcworkspace
 - NativeFeed 只允许同一稳定逻辑条目在复用 Cell 间串行迁移，不能把同一 Ad 当作另一条广告使用。
 - 正式上线前请替换为平台分配的真实广告位 ID，并关闭排查用日志。
 
-## 从 6.2.1 升级到 6.2.2
+## 从 6.2.2 升级到 6.2.3
+
+`6.2.3` 不改变 6.2.2 的 SDK 托管 attach/容器 detach 主路径。只有确需容器外 CTA 时才开启 `allowsExternalClickViews`，并处理 `nativeFeedAd:didRejectClickWithError:`；无法保证 CTA 与广告同生共灭、同 window/scene 且归属唯一时，应调整媒体视图层级而不是绕过门禁。固定单容器页面可按需改用 `detachFromCurrentContainer`。
+
+## 从 6.2.1 升级到 6.2.2（历史）
 
 `6.2.2` 是 NativeFeed 不兼容公开 API 调整，不能只替换二进制：
 
