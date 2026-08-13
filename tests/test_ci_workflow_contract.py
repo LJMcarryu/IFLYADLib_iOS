@@ -37,6 +37,38 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertIn('"$checkout_sha" != "$EVENT_SHA"', WORKFLOW)
         self.assertNotIn("--target-branch main", WORKFLOW)
 
+    def test_distribution_manifest_receives_exact_release_stage(self) -> None:
+        preflight = job_block("preflight")
+        self.assertIn(
+            "RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}",
+            preflight,
+        )
+        self.assertIn('--mode "$RELEASE_MODE"', preflight)
+        self.assertIn("release_mode='candidate'", preflight)
+        self.assertIn("release_mode='tag'", preflight)
+        self.assertIn("release_mode='formal'", preflight)
+
+    def test_tag_and_formal_post_facts_are_proved_by_event_specific_gates(self) -> None:
+        preflight = job_block("preflight")
+        self.assertIn(
+            "steps.release-mode.outputs.release_mode == 'tag' || "
+            "steps.release-mode.outputs.release_mode == 'formal'",
+            preflight,
+        )
+        self.assertIn('git cat-file -t "refs/tags/$RELEASE_VERSION"', preflight)
+
+        release_assets = job_block("release-assets")
+        anonymous = release_assets.split(
+            "- name: 正式态无 Token 匿名下载精确 10 个 Release 资产", 1
+        )[1].split("- name: Candidate 认证下载", 1)[0]
+        self.assertIn("release_mode == 'formal'", anonymous)
+        self.assertIn("scripts/download_release_anonymously.py", anonymous)
+        self.assertIn("校验 Release body 的 A/B provenance 声明", release_assets)
+
+        summary = job_block("release-summary")
+        self.assertIn("$RELEASE_MODE" + '" == \'candidate\' || "$RELEASE_MODE" == \'formal\'', summary)
+        self.assertIn("test \"$ASSETS_RESULT\" = 'success'", summary)
+
     def test_draft_binaries_are_not_transferred_between_jobs(self) -> None:
         self.assertNotIn("actions/upload-artifact", WORKFLOW)
         self.assertNotIn("actions/download-artifact", WORKFLOW)

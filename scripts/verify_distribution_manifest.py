@@ -63,10 +63,13 @@ PREVIOUS_COMBINED_SHA256 = {
     "f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673",
 }
 RELEASE_MODES = {"local", "candidate", "tag", "formal"}
-PENDING_ONLY_MARKERS = (
+PENDING_IDENTITY_MARKERS = (
     "- `releaseState`：`PENDING`",
     "__IFLYADLIB_6_2_3_BINARY_SOURCE_COMMIT_PENDING__",
     "__IFLYADLIB_6_2_3_RELEASE_METADATA_COMMIT_PENDING__",
+    "下列 checksum 为 6.2.3 唯一 PENDING 占位",
+)
+PREPUBLICATION_MARKERS = (
     "最新公开正式版仍为 `IFLYADLib 6.2.2`",
     "`main` 正在准备全渠道共享优化版 `6.2.3`",
     "正式签名资产、tag、Release 和匿名消费验证均未生成",
@@ -80,9 +83,35 @@ PENDING_ONLY_MARKERS = (
     "正式资产、tag 和 Release 尚不存在",
     "正式资产公开前 `pod install` 失败是预期结果",
     "正式资产、tag 和 Release 尚不存在，当前远程依赖不可用",
-    "下列 checksum 为 6.2.3 唯一 PENDING 占位",
 )
-FORMAL_REQUIRED_MARKERS = {
+FROZEN_REQUIRED_MARKERS = {
+    "README": (
+        "- `releaseState`：`FORMAL`",
+        "最新公开正式版仍为 `IFLYADLib 6.2.2`",
+        "IFLYADLib-modelA-6.2.3.zip",
+        "冻结 SHA-256",
+    ),
+    "CHANGELOG": (
+        "- `releaseState`：`FORMAL`",
+        "## [6.2.3] - 待发布",
+        "IFLYADLib-modelA-6.2.3.zip",
+        "冻结 SHA-256",
+    ),
+    "RELEASING": (
+        "- `releaseState`：`FORMAL`",
+        "当前最新公开正式版仍是 [`6.2.2`]",
+        "IFLYADLib-modelA-6.2.3.zip",
+        "冻结 SHA-256",
+    ),
+    "SECURITY": (
+        "最新公开正式版本（当前为 `6.2.2`）",
+        "不属于受支持的公开正式版本",
+    ),
+    "DEMO": (
+        "生产项目继续使用已发布的 `6.2.2`",
+    ),
+}
+PUBLISHED_REQUIRED_MARKERS = {
     "README": (
         "- `releaseState`：`FORMAL`",
         "当前最新公开正式版为 `IFLYADLib 6.2.3`",
@@ -118,6 +147,15 @@ FORMAL_REQUIRED_MARKERS = {
         "不可变 tag",
     ),
 }
+PUBLISHED_CLAIM_MARKERS = (
+    "当前最新公开正式版为 `IFLYADLib 6.2.3`",
+    f"## [6.2.3] - {RELEASE_DATE}",
+    "当前最新公开正式版是 [`6.2.3`]",
+    "最新公开正式版本（当前为 `6.2.3`）",
+    f"`6.2.3` 已于 {RELEASE_DATE}",
+    f"已于 {RELEASE_DATE} 正式发布的 `6.2.3`",
+    "IFLYADLib 6.2.3 已正式发布并完成匿名消费复验",
+)
 STRICT_REVIEW_POLICY = (
     "failOn=high`、`failOnWarning=true`、`strict=true`、"
     "`requireManual=true` 且接受名单为空"
@@ -165,6 +203,65 @@ def require_formal_combined_sha256(
     assert combined_sha256 not in PREVIOUS_COMBINED_SHA256, "禁止沿用历史合并包 SHA-256"
     assert combined_sha256 not in checksums.values(), "合并包 SHA-256 不得冒充模块 checksum"
     return combined_sha256
+
+
+def stage_document(document: str, label: str) -> str:
+    if label in {"README", "CHANGELOG", "RELEASING"}:
+        return current_version_section(document, label)
+    return document
+
+
+def require_markers(
+    documents: dict[str, str], expected: dict[str, tuple[str, ...]], stage: str
+) -> None:
+    for label, markers in expected.items():
+        scoped = stage_document(documents[label], label)
+        for marker in markers:
+            assert marker in scoped, f"{label} {stage}缺少发布事实：{marker}"
+
+
+def require_formal_identity(documents: dict[str, str], package: str) -> None:
+    for label in ("README", "CHANGELOG", "RELEASING"):
+        current = current_version_section(documents[label], label)
+        assert "- `releaseState`：`FORMAL`" in current, (
+            f"{label} 的 {VERSION} 章节未声明 releaseState=FORMAL"
+        )
+        for marker in PENDING_IDENTITY_MARKERS:
+            assert marker not in current, f"{label} 正式资产冻结态残留 PENDING 身份：{marker}"
+    for marker in PENDING_IDENTITY_MARKERS:
+        assert marker not in package, f"Package.swift 正式资产冻结态残留 PENDING 身份：{marker}"
+
+
+def require_frozen_prepublication(
+    documents: dict[str, str], package: str, checksums: dict[str, str]
+) -> None:
+    require_formal_identity(documents, package)
+    current_documents = "\n".join(
+        stage_document(documents[label], label) for label in documents
+    )
+    for marker in PUBLISHED_CLAIM_MARKERS:
+        assert marker not in current_documents, (
+            f"冻结态不得宣称已正式发布或完成发布后验证：{marker}"
+        )
+    require_markers(documents, FROZEN_REQUIRED_MARKERS, "冻结态")
+    require_formal_combined_sha256(documents, checksums)
+
+
+def has_published_claim(documents: dict[str, str]) -> bool:
+    text = "\n".join(stage_document(document, label) for label, document in documents.items())
+    return any(marker in text for marker in PUBLISHED_CLAIM_MARKERS)
+
+
+def require_published(
+    documents: dict[str, str], package: str, checksums: dict[str, str]
+) -> None:
+    require_formal_identity(documents, package)
+    require_markers(documents, PUBLISHED_REQUIRED_MARKERS, "发布后态")
+    for marker in PREPUBLICATION_MARKERS:
+        assert marker not in "\n".join(documents.values()) + package, (
+            f"发布后态残留未发布文案：{marker}"
+        )
+    require_formal_combined_sha256(documents, checksums)
 
 
 def verify(root: Path, version: str, mode: str) -> str:
@@ -236,30 +333,29 @@ def verify(root: Path, version: str, mode: str) -> str:
         assert "尚未生成或核对" in readme
         state = "准备"
     else:
-        if mode in {"tag", "formal"}:
-            documents = {
-                "README": readme,
-                "CHANGELOG": changelog,
-                "RELEASING": releasing,
-                "SECURITY": security,
-                "DEMO": demo_readme,
-                "PODFILE": podfile,
-            }
-            for label, markers in FORMAL_REQUIRED_MARKERS.items():
-                for marker in markers:
-                    assert marker in documents[label], (
-                        f"{label} 正式态缺少发布事实：{marker}"
-                    )
-            for marker in PENDING_ONLY_MARKERS:
-                assert marker not in "\n".join(documents.values()) + package, (
-                    f"正式态残留 PENDING 文案：{marker}"
-                )
-            require_formal_combined_sha256(documents, checksums)
-            state = "正式发布复验"
-        elif mode == "candidate":
-            state = "Draft candidate 预验"
+        documents = {
+            "README": readme,
+            "CHANGELOG": changelog,
+            "RELEASING": releasing,
+            "SECURITY": security,
+            "DEMO": demo_readme,
+            "PODFILE": podfile,
+        }
+        if mode == "local" and has_published_claim(documents):
+            require_published(documents, package, checksums)
+            state = "已发布资产本地复验"
         else:
-            state = "已冻结资产或已发布资产"
+            require_frozen_prepublication(documents, package, checksums)
+            if mode == "candidate":
+                state = "Draft candidate 冻结资产预验"
+            elif mode == "tag":
+                state = "不可变 tag 冻结资产复验"
+            elif mode == "formal":
+                # release.published 检出的是不可变 tag 提交；发布与匿名消费事实由
+                # workflow 的公开 Release 元数据、无 Token 下载和消费 Job 动态证明。
+                state = "正式 Release 冻结文档与清单复验"
+            else:
+                state = "已冻结正式资产"
 
     assert len(set(checksums.values())) == 7, "7 个模块 checksum/PENDING 必须唯一"
 
@@ -284,7 +380,7 @@ def verify(root: Path, version: str, mode: str) -> str:
     }
     assert len(release_assets) == 10, release_assets
 
-    if mode in {"tag", "formal"}:
+    if mode == "formal":
         for marker in (
             "tag/Release 尚未创建",
             "资产未上传",
