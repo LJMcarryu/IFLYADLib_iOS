@@ -16,8 +16,7 @@ import PackageDescription
 
 let package = Package(
     name: "IFLYADLib",
-    // 下列 checksum 为 6.2.3 唯一 PENDING 占位；正式签名 zip 冻结后必须整体回填，
-    // 公开 tag/Release 创建前这些 URL 不可用于远程依赖。
+    // 下列 checksum 来自 6.2.3 正式签名 zip。
     platforms: [
         .iOS("11.0"),
     ],
@@ -34,37 +33,37 @@ let package = Package(
         .binaryTarget(
             name: "IFLYAdCore",
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.2.3/IFLYAdCore.xcframework.zip",
-            checksum: "__IFLYADLIB_6_2_3_CORE_CHECKSUM_PENDING__"
+            checksum: "26cc27dc2aebce8bec5dac2d0840492eb022c2959585465f3d130ea52ddb50d5"
         ),
         .binaryTarget(
             name: "IFLYAdVideoUI",
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.2.3/IFLYAdVideoUI.xcframework.zip",
-            checksum: "__IFLYADLIB_6_2_3_VIDEO_UI_CHECKSUM_PENDING__"
+            checksum: "abfea29151c3e739d67b5221a2cc1da2bfbda1a1773d42e5418bd95f9c39c012"
         ),
         .binaryTarget(
             name: "IFLYAdBanner",
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.2.3/IFLYAdBanner.xcframework.zip",
-            checksum: "__IFLYADLIB_6_2_3_BANNER_CHECKSUM_PENDING__"
+            checksum: "adb21f48c17b20db44554a54ab696aed47380b7d474dd77e9911b126c9096678"
         ),
         .binaryTarget(
             name: "IFLYAdSplash",
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.2.3/IFLYAdSplash.xcframework.zip",
-            checksum: "__IFLYADLIB_6_2_3_SPLASH_CHECKSUM_PENDING__"
+            checksum: "a55504f4781559a9d2697cf364a8ff86e2865f61f0701e0b78a775ac36da5d6c"
         ),
         .binaryTarget(
             name: "IFLYAdInterstitial",
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.2.3/IFLYAdInterstitial.xcframework.zip",
-            checksum: "__IFLYADLIB_6_2_3_INTERSTITIAL_CHECKSUM_PENDING__"
+            checksum: "11c232e39b12de30421fc07076801b57e45a8a4d634840b135005b02658de632"
         ),
         .binaryTarget(
             name: "IFLYAdNativeFeed",
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.2.3/IFLYAdNativeFeed.xcframework.zip",
-            checksum: "__IFLYADLIB_6_2_3_NATIVE_FEED_CHECKSUM_PENDING__"
+            checksum: "781d2e0c7bbca8ba11f26d1e038887cd698fc6d2be7bde472fae4bed9bc484b2"
         ),
         .binaryTarget(
             name: "IFLYAdReward",
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.2.3/IFLYAdReward.xcframework.zip",
-            checksum: "__IFLYADLIB_6_2_3_REWARD_CHECKSUM_PENDING__"
+            checksum: "6deb887ba912a2a6ec91ba281b394cbf43973dd53d3543737bcfd657f50cb2ce"
         ),
         .target(
             name: "Core",
