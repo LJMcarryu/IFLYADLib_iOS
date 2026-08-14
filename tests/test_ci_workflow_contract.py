@@ -80,6 +80,21 @@ class CIWorkflowContractTests(unittest.TestCase):
         )
         self.assertIn("固化本次 Release 精确库存身份", release_assets)
 
+    def test_release_inventory_passes_candidate_or_formal_download_slug(self) -> None:
+        release_assets = job_block("release-assets")
+        inventory_step = release_assets.split(
+            "- name: 固化本次 Release 精确库存身份", 1
+        )[1].split("- name: 校验 7 个模块与合并包逐字节同源", 1)[0]
+        self.assertIn("release_download_slug,", inventory_step)
+        self.assertIn(
+            "download_slug = release_download_slug(metadata, repository, tag)",
+            inventory_step,
+        )
+        self.assertRegex(
+            inventory_step,
+            r"validate_asset_inventory\(\s*metadata, repository, tag, download_slug\s*\)",
+        )
+
     def test_each_candidate_download_boundary_has_one_token_step(self) -> None:
         token_binding = (
             "GITHUB_TOKEN: ${{ secrets.DRAFT_RELEASE_READ_TOKEN }}"

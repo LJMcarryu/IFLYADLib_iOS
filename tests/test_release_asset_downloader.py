@@ -19,6 +19,7 @@ from release_asset_downloader import (  # noqa: E402
     asset_inventory_sha256,
     authenticated_api_request,
     expected_assets,
+    release_download_slug,
     validate_draft_release,
     validate_public_release,
     verify_expected_inventory_sha256,
@@ -56,6 +57,25 @@ def release_assets(download_slug: str = TAG) -> list[dict]:
 
 
 class ReleaseAssetDownloaderTests(unittest.TestCase):
+    def test_release_download_slug_distinguishes_draft_and_formal(self) -> None:
+        draft = {
+            "draft": True,
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{DRAFT_SLUG}",
+        }
+        formal = {
+            "draft": False,
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{TAG}",
+        }
+
+        self.assertEqual(
+            release_download_slug(draft, REPOSITORY, TAG), DRAFT_SLUG
+        )
+        self.assertEqual(release_download_slug(formal, REPOSITORY, TAG), TAG)
+
+        formal["html_url"] = draft["html_url"]
+        with self.assertRaisesRegex(VerificationError, "正式 Release html_url"):
+            release_download_slug(formal, REPOSITORY, TAG)
+
     def test_draft_download_wrapper_rejects_main_instead_of_candidate_branch(self) -> None:
         with tempfile.TemporaryDirectory() as directory, mock.patch.dict(
             os.environ, {"GITHUB_TOKEN": "token"}, clear=True
