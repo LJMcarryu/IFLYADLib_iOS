@@ -18,13 +18,13 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 ## 6.2.3 当前发布状态
 
-当前最新公开正式版仍是 [`6.2.2`]（2026-08-10）。`6.2.3` 正式资产和 checksum 已冻结并完成本地校验；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `7bb36680a29e2b40fdcf182b795add4ca954ff29c44f90cd696562fa0be0e7f0`，但 tag、Release 与匿名消费验证尚未完成，仍待编排器执行。
+当前最新公开正式版仍是 [`6.2.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.2)（2026-08-10）。`main` 正在准备 `6.2.3`；该版正式资产、checksum、tag、Release 与匿名消费验证均未生成。
 
-- `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`c84a0461e6a857cf8ae096c579d77e99a3f83bb9`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`56cf6833e7538025d5e38fa8d6ad976fc9cd8862`
+- `releaseState`：`PENDING`
+- `binarySourceCommit`（SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_BINARY_SOURCE_COMMIT_PENDING__`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_RELEASE_METADATA_COMMIT_PENDING__`
 
-`releaseState=FORMAL` 只表示本版正式资产与发布元数据已冻结，不表示 tag、Release 或匿名消费验证已完成。
+`releaseState=PENDING` 明确禁止候选、tag 或 Release 消费。正式产物冻结后必须整体回填 7 个 checksum 与两个不同的真实 A/B 提交；不得沿用 `6.2.2` 的值。
 
 正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
 

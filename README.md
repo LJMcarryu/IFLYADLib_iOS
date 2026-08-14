@@ -8,16 +8,16 @@
 
 > **发布状态**：[`6.2.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.2) 已于 2026-08-10 正式发布。不可变 annotated tag 指向 `d5caeb26794d8000e13e40d4356d2ff79706a3a9`；10 个 Release 资产已完成无 Token 匿名下载、逐字节同源、SwiftPM、CocoaPods、`-ObjC`、Demo 编译链接和 `pod spec lint` 终验，证据见 [Run 31347794760](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31347794760)。
 
-> **6.2.3 冻结边界**：正式签名资产已从提交 A 构建、冻结并完成本地校验；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `7bb36680a29e2b40fdcf182b795add4ca954ff29c44f90cd696562fa0be0e7f0`。tag、Release 与匿名消费验证尚未完成，仍待编排器执行，当前 URL 不可用于生产依赖。
+> **6.2.3 准备边界**：版本清单已切换到精确 PENDING checksum 与 A/B 占位；正式签名资产、tag、Release 和匿名消费验证均未生成，当前 `6.2.3` URL 不可用于生产依赖。
 
 > **风险边界**：`6.2.3` 不沿用 `6.2.2` 的启发式风险授权。主动扫描固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；扫描未满足该策略前不得将候选写成通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
 
 <!-- 供发布 CI 机器校验的两提交 provenance；正式回填时 README、CHANGELOG、RELEASING 必须保持一致。 -->
-- `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`c84a0461e6a857cf8ae096c579d77e99a3f83bb9`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`56cf6833e7538025d5e38fa8d6ad976fc9cd8862`
+- `releaseState`：`PENDING`
+- `binarySourceCommit`（SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_BINARY_SOURCE_COMMIT_PENDING__`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_RELEASE_METADATA_COMMIT_PENDING__`
 
-`releaseState=FORMAL` 只表示本版正式资产与发布元数据已冻结，不表示 tag、Release 或匿名消费验证已完成。
+`releaseState=PENDING` 明确表示 `6.2.3` 不能发布；不得复用 `6.2.2` 的 checksum 或 A/B 提交。上文 `6.2.2` 的 tag、Release 与终验证据继续作为历史正式事实保留。
 
 > 文档以中文为主。如需用英文反馈问题，请直接在 [Issues](https://github.com/LJMcarryu/IFLYADLib_iOS/issues) 提交。
 
@@ -86,7 +86,7 @@ CocoaPods 的 `Core` 会显式链接 `AdSupport`、弱链接 `AppTrackingTranspa
 
 - 消费方 App target 的 `OTHER_LDFLAGS` 必须添加 `-ObjC`。
 - 7 个远程 `binaryTarget` 分别承载模块代码；Core、VideoUI、Reward 伞 target 自动投递三域资源和 `PrivacyInfo.xcprivacy`。
-- `Package.swift` 的 7 个 checksum 已与冻结资产逐项核对；Release 创建后仍须复验匿名下载件。
+- 当前 `Package.swift` 的 7 个 checksum 均为本版精确 PENDING 占位，尚未生成或核对；正式签名 zip 冻结后须整体回填，并在 Release 创建后与匿名下载件逐项复验。
 - 通用 Release 固定为 10 个资产：7 个模块 zip、1 个合并 zip、`checksums.txt`、`binary-targets.remote.swift`。
 
 ## 权限与隐私配置
