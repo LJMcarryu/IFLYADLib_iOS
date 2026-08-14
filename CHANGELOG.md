@@ -4,11 +4,10 @@
 
 ## [6.2.3] - 待发布
 
-- `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`c90c8e969b05d4d55b522cb162ab0f2e37aacc52`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b340fe7cccc27af37fc6223042f9638e507a4b63`
-- 正式签名资产已冻结并完成本地校验；公开 tag、Release 与匿名消费验证仍待编排器完成，当前尚未公开发布。
-- 合并包 `IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `f1469effabd1c90bb6ff0cd5196ac198088b32a3450c86a219e50ea66f281dd6`。
+- `releaseState`：`PENDING`
+- `binarySourceCommit`（SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_BINARY_SOURCE_COMMIT_PENDING__`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_RELEASE_METADATA_COMMIT_PENDING__`
+- 正式签名资产、7 个 SwiftPM checksum、tag、Release 与匿名消费验证尚未生成；不得将本节写成已发布。
 
 ### 新增
 
