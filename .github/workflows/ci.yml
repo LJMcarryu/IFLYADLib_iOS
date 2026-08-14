@@ -672,11 +672,13 @@ jobs:
           from pathlib import Path
 
           demo_root = Path(os.environ["DEMO_ROOT"])
-          headers = list(
-              (demo_root / "Pods").glob(
-                  "**/IFLYAdNativeFeed.xcframework/*/Headers/"
-                  "IFLYADLib/IFLYNativeFeedAd.h"
-              )
+          installed_pod_root = demo_root / "Pods/IFLYADLib"
+          assert installed_pod_root.exists(), f"缺少 IFLYADLib Pod: {installed_pod_root}"
+          pod_root = installed_pod_root.resolve(strict=True)
+          framework = pod_root / "IFLYAdNativeFeed.xcframework"
+          assert framework.is_dir(), f"缺少 NativeFeed XCFramework: {framework}"
+          headers = sorted(
+              framework.glob("*/Headers/IFLYADLib/IFLYNativeFeedAd.h")
           )
           assert len(headers) >= 2, headers
           positive = {
