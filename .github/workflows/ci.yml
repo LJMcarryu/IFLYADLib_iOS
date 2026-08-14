@@ -664,7 +664,9 @@ jobs:
 
       - name: 校验 NativeFeed 新 API 正向与旧 API 反向
         env:
+          RELEASE_MODE: ${{ needs.preflight.outputs.release_mode }}
           DEMO_ROOT: ${{ steps.consumer-paths.outputs.demo_root }}
+          POD_ROOT: ${{ steps.consumer-paths.outputs.pod_root }}
         run: |
           python3 - <<'PY'
           import os
@@ -672,15 +674,27 @@ jobs:
           from pathlib import Path
 
           demo_root = Path(os.environ["DEMO_ROOT"])
-          installed_pod_root = demo_root / "Pods/IFLYADLib"
-          assert installed_pod_root.exists(), f"缺少 IFLYADLib Pod: {installed_pod_root}"
-          pod_root = installed_pod_root.resolve(strict=True)
-          framework = pod_root / "IFLYAdNativeFeed.xcframework"
-          assert framework.is_dir(), f"缺少 NativeFeed XCFramework: {framework}"
-          headers = sorted(
-              framework.glob("*/Headers/IFLYADLib/IFLYNativeFeedAd.h")
+          release_mode = os.environ["RELEASE_MODE"]
+          if release_mode == "candidate":
+              candidate_pod_root = os.environ["POD_ROOT"]
+              assert candidate_pod_root, "candidate 模式缺少 POD_ROOT"
+              pod_root = Path(candidate_pod_root).resolve(strict=True)
+          elif release_mode == "formal":
+              installed_pod_root = demo_root / "Pods/IFLYADLib"
+              assert installed_pod_root.exists(), (
+                  f"缺少 IFLYADLib Pod: {installed_pod_root}"
+              )
+              pod_root = installed_pod_root.resolve(strict=True)
+          else:
+              raise AssertionError(f"非法 Release mode: {release_mode}")
+          native_feed_framework = pod_root / "IFLYAdNativeFeed.xcframework"
+          assert native_feed_framework.is_dir(), (
+              f"缺少 NativeFeed XCFramework: {native_feed_framework}"
           )
-          assert len(headers) >= 2, headers
+          native_feed_headers = sorted(
+              native_feed_framework.glob("*/Headers/IFLYADLib/IFLYNativeFeedAd.h")
+          )
+          assert len(native_feed_headers) >= 2, native_feed_headers
           positive = {
               "attachWithViewBinder:error:": (
                   r"-\s*\(BOOL\)\s*attachWithViewBinder:"
@@ -690,11 +704,9 @@ jobs:
               "detachFromCurrentContainer": r"-\s*\(void\)\s*detachFromCurrentContainer",
               "allowsExternalClickViews": r"@property\s*\([^)]*\)\s*BOOL\s+allowsExternalClickViews",
               "nativeFeedAd:didRejectClickWithError:": (
-                  r"nativeFeedAd:\s*\([^)]*\)\s*nativeFeedAd\s*"
+                  r"nativeFeedAd:\s*\([^)]*\)\s*"
+                  r"[A-Za-z_][A-Za-z0-9_]*\s*"
                   r"didRejectClickWithError:"
-              ),
-              "IFLYAdErrorCodeNativeFeedClickViewsInvalid": (
-                  r"IFLYAdErrorCodeNativeFeedClickViewsInvalid\s*=\s*71503"
               ),
           }
           negative = (
@@ -705,13 +717,26 @@ jobs:
               "unbindAd",
               "endDisplaySession",
           )
-          for header in headers:
+          for header in native_feed_headers:
               source = header.read_text(encoding="utf-8")
               compact = re.sub(r"\s+", " ", source)
               for name, pattern in positive.items():
                   assert re.search(pattern, compact), f"{header} 缺少 {name}"
               leaked = [token for token in negative if token in source]
               assert not leaked, f"{header} 残留旧 API：{leaked}"
+
+          core_framework = pod_root / "IFLYAdCore.xcframework"
+          assert core_framework.is_dir(), f"缺少 Core XCFramework: {core_framework}"
+          error_headers = sorted(
+              core_framework.glob("*/Headers/IFLYADLib/IFLYAdError.h")
+          )
+          assert len(error_headers) >= 2, error_headers
+          error_pattern = r"IFLYAdErrorCodeNativeFeedClickViewsInvalid\s*=\s*71503"
+          for header in error_headers:
+              source = re.sub(r"\s+", " ", header.read_text(encoding="utf-8"))
+              assert re.search(error_pattern, source), (
+                  f"{header} 缺少 IFLYAdErrorCodeNativeFeedClickViewsInvalid"
+              )
           PY
 
       - name: 校验 CocoaPods 将 -ObjC 传播到最终 App

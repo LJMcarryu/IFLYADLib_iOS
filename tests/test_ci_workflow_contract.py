@@ -44,32 +44,48 @@ def embedded_python(step: str) -> str:
 
 
 def write_native_feed_headers(pod_root: Path) -> None:
-    source = """\
+    native_feed_source = """\
 - (BOOL)attachWithViewBinder:(id)binder error:(id)error;
 + (void)detachAdFromContainerView:(id)containerView;
 - (void)detachFromCurrentContainer;
 @property (nonatomic) BOOL allowsExternalClickViews;
-- (void)nativeFeedAd:(id)nativeFeedAd didRejectClickWithError:(id)error;
-IFLYAdErrorCodeNativeFeedClickViewsInvalid = 71503;
+- (void)nativeFeedAd:(id)ad didRejectClickWithError:(id)error;
 """
     for slice_name in ("ios-arm64", "ios-arm64_x86_64-simulator"):
-        header = (
+        native_feed_header = (
             pod_root
             / "IFLYAdNativeFeed.xcframework"
             / slice_name
             / "Headers/IFLYADLib/IFLYNativeFeedAd.h"
         )
-        header.parent.mkdir(parents=True)
-        header.write_text(source, encoding="utf-8")
+        native_feed_header.parent.mkdir(parents=True)
+        native_feed_header.write_text(native_feed_source, encoding="utf-8")
+        error_header = (
+            pod_root
+            / "IFLYAdCore.xcframework"
+            / slice_name
+            / "Headers/IFLYADLib/IFLYAdError.h"
+        )
+        error_header.parent.mkdir(parents=True)
+        error_header.write_text(
+            "IFLYAdErrorCodeNativeFeedClickViewsInvalid = 71503;\n",
+            encoding="utf-8",
+        )
 
 
-def run_native_feed_header_gate(demo_root: Path) -> subprocess.CompletedProcess[str]:
+def run_native_feed_header_gate(
+    demo_root: Path,
+    release_mode: str,
+    pod_root: Path | None = None,
+) -> subprocess.CompletedProcess[str]:
     step = step_block(
         job_block("cocoapods-demo-consumer"),
         "校验 NativeFeed 新 API 正向与旧 API 反向",
     )
     environment = os.environ.copy()
     environment["DEMO_ROOT"] = str(demo_root)
+    environment["RELEASE_MODE"] = release_mode
+    environment["POD_ROOT"] = str(pod_root) if pod_root is not None else ""
     return subprocess.run(
         [sys.executable, "-c", embedded_python(step)],
         check=False,
@@ -233,6 +249,14 @@ class CIWorkflowContractTests(unittest.TestCase):
     def test_cocoapods_consumer_gates_new_native_feed_api(self) -> None:
         block = job_block("cocoapods-demo-consumer")
         self.assertIn("校验 NativeFeed 新 API 正向与旧 API 反向", block)
+        self.assertIn(
+            "RELEASE_MODE: ${{ needs.preflight.outputs.release_mode }}",
+            block,
+        )
+        self.assertIn(
+            "POD_ROOT: ${{ steps.consumer-paths.outputs.pod_root }}",
+            block,
+        )
         for marker in (
             "detachFromCurrentContainer",
             "allowsExternalClickViews",
@@ -248,17 +272,21 @@ class CIWorkflowContractTests(unittest.TestCase):
         ):
             self.assertIn(marker, block)
 
-    def test_cocoapods_header_gate_follows_local_pod_symlink(self) -> None:
+    def test_cocoapods_header_gate_uses_candidate_pod_root_output(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            demo_root = root / "IFLYADLibSimple"
-            installed_root = demo_root / "Pods/IFLYADLib"
-            local_pod_root = root / "IFLYADLib"
-            write_native_feed_headers(local_pod_root)
-            installed_root.parent.mkdir(parents=True)
-            installed_root.symlink_to(local_pod_root, target_is_directory=True)
+            output = root / "ifly-cocoapods-local"
+            demo_root = output / "IFLYADLibSimple"
+            candidate_pod_root = output / "IFLYADLib"
+            demo_root.mkdir(parents=True)
+            write_native_feed_headers(candidate_pod_root)
+            self.assertFalse((demo_root / "Pods/IFLYADLib").exists())
 
-            result = run_native_feed_header_gate(demo_root)
+            result = run_native_feed_header_gate(
+                demo_root,
+                "candidate",
+                candidate_pod_root,
+            )
 
             self.assertEqual(0, result.returncode, result.stderr)
 
@@ -267,7 +295,7 @@ class CIWorkflowContractTests(unittest.TestCase):
             demo_root = Path(temporary) / "IFLYADLibSimple"
             write_native_feed_headers(demo_root / "Pods/IFLYADLib")
 
-            result = run_native_feed_header_gate(demo_root)
+            result = run_native_feed_header_gate(demo_root, "formal")
 
             self.assertEqual(0, result.returncode, result.stderr)
 
