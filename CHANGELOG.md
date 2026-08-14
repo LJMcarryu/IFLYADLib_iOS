@@ -4,10 +4,11 @@
 
 ## [6.2.3] - 待发布
 
-- `releaseState`：`PENDING`
-- `binarySourceCommit`（SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_BINARY_SOURCE_COMMIT_PENDING__`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`__IFLYADLIB_6_2_3_RELEASE_METADATA_COMMIT_PENDING__`
-- 正式签名资产、7 个 SwiftPM checksum、tag、Release 与匿名消费验证尚未生成；不得将本节写成已发布。
+- `releaseState`：`FORMAL`
+- `binarySourceCommit`（SDK 二进制源码提交）：`da3cbcb39cc92045b099837fb233268c5c1595ec`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`058deaba9ffad0aafe090808f9193a9d88fc0ddc`
+- 正式签名资产和 7 个 SwiftPM checksum 已冻结并完成本地校验；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `1bdb4ed04c2b8f00a9088fa182017e631821b4d32b10ead7e6c3f47f0137ee23`。tag、Release 与匿名消费验证尚未完成，仍待编排器执行。
+- 本候选未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`，不得表述为通过。
 
 ### 新增
 
