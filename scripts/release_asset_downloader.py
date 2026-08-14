@@ -62,15 +62,29 @@ def expected_assets(tag: str) -> set[str]:
     }
 
 
-def _expected_browser_download_url(repository: str, tag: str, name: str) -> str:
+def _expected_browser_download_url(
+    repository: str, download_slug: str, name: str
+) -> str:
     return (
         f"https://github.com/{repository}/releases/download/"
-        f"{quote(tag, safe='')}/{quote(name, safe='')}"
+        f"{quote(download_slug, safe='')}/{quote(name, safe='')}"
     )
 
 
+def _draft_download_slug(release: dict, repository: str) -> str:
+    html_url = release.get("html_url")
+    require(isinstance(html_url, str), "Draft Release html_url 缺失")
+    match = re.fullmatch(
+        rf"https://github\.com/{re.escape(repository)}/releases/tag/"
+        r"(untagged-[0-9a-f]+)",
+        html_url,
+    )
+    require(match is not None, "Draft Release html_url 必须是同仓 HTTPS untagged URL")
+    return match.group(1)
+
+
 def validate_asset_inventory(
-    release: dict, repository: str, tag: str
+    release: dict, repository: str, tag: str, download_slug: str
 ) -> dict[str, dict]:
     assets = release.get("assets")
     require(isinstance(assets, list), "Release assets 不是数组")
@@ -98,7 +112,7 @@ def validate_asset_inventory(
         )
         require(
             asset.get("browser_download_url")
-            == _expected_browser_download_url(repository, tag, name),
+            == _expected_browser_download_url(repository, download_slug, name),
             f"{name} browser_download_url 非预期",
         )
         by_name[name] = asset
@@ -145,7 +159,12 @@ def validate_public_release(
     require(release.get("prerelease") is False, "Release 不得为 prerelease")
     require(bool(release.get("published_at")), "Release 缺少 published_at")
     require(isinstance(release.get("body"), str), "Release body 缺失")
-    return validate_asset_inventory(release, repository, tag)
+    require(
+        release.get("html_url")
+        == f"https://github.com/{repository}/releases/tag/{quote(tag, safe='')}",
+        "正式 Release html_url 与当前仓库/tag 不一致",
+    )
+    return validate_asset_inventory(release, repository, tag, tag)
 
 
 def validate_draft_release(
@@ -194,7 +213,8 @@ def validate_draft_release(
         "Draft Release 未绑定触发时的候选分支提交",
     )
 
-    assets = validate_asset_inventory(release, repository, tag)
+    download_slug = _draft_download_slug(release, repository)
+    assets = validate_asset_inventory(release, repository, tag, download_slug)
     seen_ids: set[int] = set()
     for name, asset in assets.items():
         asset_id = asset.get("id")

@@ -31,9 +31,10 @@ TAG = "6.2.3"
 TARGET = "1" * 40
 CANDIDATE_ID = "2" * 64
 CANDIDATE_BRANCH = f"release-candidate/{TAG}-{CANDIDATE_ID}"
+DRAFT_SLUG = "untagged-" + "3" * 16
 
 
-def asset(name: str, asset_id: int) -> dict:
+def asset(name: str, asset_id: int, download_slug: str = TAG) -> dict:
     return {
         "id": asset_id,
         "name": name,
@@ -42,13 +43,16 @@ def asset(name: str, asset_id: int) -> dict:
         "digest": "sha256:" + "a" * 64,
         "url": f"https://api.github.com/repos/{REPOSITORY}/releases/assets/{asset_id}",
         "browser_download_url": (
-            f"https://github.com/{REPOSITORY}/releases/download/{TAG}/{name}"
+            f"https://github.com/{REPOSITORY}/releases/download/{download_slug}/{name}"
         ),
     }
 
 
-def release_assets() -> list[dict]:
-    return [asset(name, index) for index, name in enumerate(sorted(expected_assets(TAG)), 1)]
+def release_assets(download_slug: str = TAG) -> list[dict]:
+    return [
+        asset(name, index, download_slug)
+        for index, name in enumerate(sorted(expected_assets(TAG)), 1)
+    ]
 
 
 class ReleaseAssetDownloaderTests(unittest.TestCase):
@@ -91,6 +95,7 @@ class ReleaseAssetDownloaderTests(unittest.TestCase):
             "draft": False,
             "prerelease": False,
             "published_at": "2026-08-10T00:00:00Z",
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{TAG}",
             "body": "body",
             "assets": release_assets(),
         }
@@ -106,6 +111,7 @@ class ReleaseAssetDownloaderTests(unittest.TestCase):
             "draft": False,
             "prerelease": False,
             "published_at": "2026-08-10T00:00:00Z",
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{TAG}",
             "body": "body",
             "assets": release_assets() + [asset("extra.zip", 99)],
         }
@@ -118,6 +124,7 @@ class ReleaseAssetDownloaderTests(unittest.TestCase):
             "draft": False,
             "prerelease": False,
             "published_at": "2026-08-13T00:00:00Z",
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{TAG}",
             "body": "body",
             "assets": release_assets()[:-1],
         }
@@ -134,8 +141,9 @@ class ReleaseAssetDownloaderTests(unittest.TestCase):
             "draft": True,
             "prerelease": False,
             "published_at": None,
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{DRAFT_SLUG}",
             "body": f"- `candidateId`：`{CANDIDATE_ID}`\n",
-            "assets": release_assets(),
+            "assets": release_assets(DRAFT_SLUG),
         }
         resolved: list[str] = []
 
@@ -193,8 +201,9 @@ class ReleaseAssetDownloaderTests(unittest.TestCase):
             "draft": True,
             "prerelease": False,
             "published_at": None,
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{DRAFT_SLUG}",
             "body": f"- `candidateId`：`{CANDIDATE_ID}`\n",
-            "assets": release_assets(),
+            "assets": release_assets(DRAFT_SLUG),
         }
 
         def unexpected(_: str) -> str:
@@ -210,6 +219,50 @@ class ReleaseAssetDownloaderTests(unittest.TestCase):
             CANDIDATE_BRANCH,
             unexpected,
         )
+
+    def test_draft_release_rejects_asset_with_different_untagged_slug(self) -> None:
+        release_id = 44
+        release = {
+            "id": release_id,
+            "url": f"https://api.github.com/repos/{REPOSITORY}/releases/{release_id}",
+            "tag_name": TAG,
+            "target_commitish": TARGET,
+            "draft": True,
+            "prerelease": False,
+            "published_at": None,
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{DRAFT_SLUG}",
+            "body": f"- `candidateId`：`{CANDIDATE_ID}`\n",
+            "assets": release_assets(DRAFT_SLUG),
+        }
+        release["assets"][0]["browser_download_url"] = release["assets"][0][
+            "browser_download_url"
+        ].replace(DRAFT_SLUG, "untagged-deadbeef")
+
+        with self.assertRaisesRegex(VerificationError, "browser_download_url"):
+            validate_draft_release(
+                release,
+                REPOSITORY,
+                TAG,
+                release_id,
+                CANDIDATE_ID,
+                TARGET,
+                CANDIDATE_BRANCH,
+                lambda _: TARGET,
+            )
+
+    def test_public_release_rejects_untagged_html_url(self) -> None:
+        release = {
+            "tag_name": TAG,
+            "draft": False,
+            "prerelease": False,
+            "published_at": "2026-08-10T00:00:00Z",
+            "html_url": f"https://github.com/{REPOSITORY}/releases/tag/{DRAFT_SLUG}",
+            "body": "body",
+            "assets": release_assets(),
+        }
+
+        with self.assertRaisesRegex(VerificationError, "html_url"):
+            validate_public_release(release, REPOSITORY, TAG)
 
     def test_authenticated_request_only_allows_github_api(self) -> None:
         request = authenticated_api_request(
