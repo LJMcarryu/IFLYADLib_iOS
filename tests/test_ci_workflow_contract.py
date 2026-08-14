@@ -81,7 +81,10 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertIn("固化本次 Release 精确库存身份", release_assets)
 
     def test_each_candidate_download_boundary_has_one_token_step(self) -> None:
-        token_binding = "GITHUB_TOKEN: ${{ github.token }}"
+        token_binding = (
+            "GITHUB_TOKEN: ${{ secrets.DRAFT_RELEASE_READ_TOKEN }}"
+        )
+        self.assertNotIn("${{ github.token }}", WORKFLOW)
         expected_fingerprint = (
             "EXPECTED_ASSET_INVENTORY_SHA256: "
             "${{ needs.release-assets.outputs.asset_inventory_sha256 }}"

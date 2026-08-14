@@ -386,7 +386,7 @@ jobs:
       - name: Candidate 认证下载同仓 draft 的精确 10 个资产
         if: needs.preflight.outputs.release_mode == 'candidate'
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.DRAFT_RELEASE_READ_TOKEN }}
           RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
           RELEASE_REPOSITORY: ${{ github.repository }}
           DRAFT_RELEASE_ID: ${{ needs.preflight.outputs.draft_release_id }}
@@ -478,7 +478,7 @@ jobs:
       - name: Candidate 独立认证下载并核对公共库存指纹
         if: needs.preflight.outputs.release_mode == 'candidate'
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.DRAFT_RELEASE_READ_TOKEN }}
           RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
           RELEASE_REPOSITORY: ${{ github.repository }}
           DRAFT_RELEASE_ID: ${{ needs.preflight.outputs.draft_release_id }}
@@ -582,7 +582,7 @@ jobs:
       - name: Candidate 独立认证下载并核对公共库存指纹
         if: needs.preflight.outputs.release_mode == 'candidate'
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ secrets.DRAFT_RELEASE_READ_TOKEN }}
           RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
           RELEASE_REPOSITORY: ${{ github.repository }}
           DRAFT_RELEASE_ID: ${{ needs.preflight.outputs.draft_release_id }}
