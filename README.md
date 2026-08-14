@@ -10,14 +10,14 @@
 
 > **6.2.3 发布边界**：正式签名资产已冻结并完成本地校验；公开 tag、Release 和匿名消费验证仍待编排器完成，当前尚未公开发布。
 
-`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `b8abe74c5ca3ad244265fb4c5f9c5a466e3d071f74f3d2235cfd16dc4c52d27d`；公开 Release 创建后仍须执行匿名下载复验。
+`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `f1469effabd1c90bb6ff0cd5196ac198088b32a3450c86a219e50ea66f281dd6`；公开 Release 创建后仍须执行匿名下载复验。
 
 > **风险边界**：`6.2.3` 不沿用 `6.2.2` 的启发式风险授权。主动扫描固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；扫描未满足该策略前不得将候选写成通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
 
 <!-- 供发布 CI 机器校验的两提交 provenance；正式回填时 README、CHANGELOG、RELEASING 必须保持一致。 -->
 - `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`512f1cf861e8ee2bcdb2b6afea885dac2c0d5853`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`7ae96c819024ce918d4d2d6770506c07ed56ae32`
+- `binarySourceCommit`（SDK 二进制源码提交）：`c90c8e969b05d4d55b522cb162ab0f2e37aacc52`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b340fe7cccc27af37fc6223042f9638e507a4b63`
 
 `releaseState=FORMAL` 表示本版候选元数据已就绪，但在 tag、Release 与匿名验证完成前仍不得作为公开正式版本消费。上文 `6.2.2` 的 tag、Release 与终验证据继续作为历史正式事实保留。
 
