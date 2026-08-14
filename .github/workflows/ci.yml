@@ -423,6 +423,7 @@ jobs:
 
           from scripts.release_asset_downloader import (
               asset_inventory_sha256,
+              release_download_slug,
               validate_asset_inventory,
           )
 
@@ -430,7 +431,11 @@ jobs:
               Path(os.environ["RELEASE_METADATA"]).read_text(encoding="utf-8")
           )
           tag = os.environ["RELEASE_VERSION"]
-          assets = validate_asset_inventory(metadata, os.environ["GITHUB_REPOSITORY"], tag)
+          repository = os.environ["GITHUB_REPOSITORY"]
+          download_slug = release_download_slug(metadata, repository, tag)
+          assets = validate_asset_inventory(
+              metadata, repository, tag, download_slug
+          )
           identity = asset_inventory_sha256(assets, tag)
           assert re.fullmatch(r"[0-9a-f]{64}", identity), identity
           with Path(os.environ["GITHUB_OUTPUT"]).open("a", encoding="utf-8") as output:

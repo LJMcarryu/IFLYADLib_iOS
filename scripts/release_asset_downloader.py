@@ -83,6 +83,20 @@ def _draft_download_slug(release: dict, repository: str) -> str:
     return match.group(1)
 
 
+def release_download_slug(release: dict, repository: str, tag: str) -> str:
+    """按 Release 状态返回并严格校验浏览器下载路径使用的 selector。"""
+
+    if release.get("draft") is True:
+        return _draft_download_slug(release, repository)
+    require(release.get("draft") is False, "Release draft 状态非法")
+    require(
+        release.get("html_url")
+        == f"https://github.com/{repository}/releases/tag/{quote(tag, safe='')}",
+        "正式 Release html_url 与当前仓库/tag 不一致",
+    )
+    return tag
+
+
 def validate_asset_inventory(
     release: dict, repository: str, tag: str, download_slug: str
 ) -> dict[str, dict]:
@@ -159,12 +173,8 @@ def validate_public_release(
     require(release.get("prerelease") is False, "Release 不得为 prerelease")
     require(bool(release.get("published_at")), "Release 缺少 published_at")
     require(isinstance(release.get("body"), str), "Release body 缺失")
-    require(
-        release.get("html_url")
-        == f"https://github.com/{repository}/releases/tag/{quote(tag, safe='')}",
-        "正式 Release html_url 与当前仓库/tag 不一致",
-    )
-    return validate_asset_inventory(release, repository, tag, tag)
+    download_slug = release_download_slug(release, repository, tag)
+    return validate_asset_inventory(release, repository, tag, download_slug)
 
 
 def validate_draft_release(
@@ -213,7 +223,7 @@ def validate_draft_release(
         "Draft Release 未绑定触发时的候选分支提交",
     )
 
-    download_slug = _draft_download_slug(release, repository)
+    download_slug = release_download_slug(release, repository, tag)
     assets = validate_asset_inventory(release, repository, tag, download_slug)
     seen_ids: set[int] = set()
     for name, asset in assets.items():
