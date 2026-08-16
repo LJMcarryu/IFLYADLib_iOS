@@ -18,19 +18,19 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 ## 6.2.3 当前发布状态
 
-当前最新公开正式版仍是 [`6.2.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.2)（2026-08-10）。`6.2.3` 正式资产和 checksum 已冻结并完成本地校验；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `f6331ecf01aa902b5831a62ea8e205799c4301aa689f87bc216c0d1798e6f469`，但 tag、Release 与匿名消费验证尚未完成，仍待编排器执行。
+当前最新公开正式版是 [`6.2.3`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.3)（2026-08-16）。GitHub Release 的正式资产和 checksum 已冻结并公开；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `f6331ecf01aa902b5831a62ea8e205799c4301aa689f87bc216c0d1798e6f469`。annotated tag 解引用到 `53657593328c0b109aac1f38af036cdb0a9edc2c`，10 个资产已完成无 Token 匿名验证，正式消费 [Run 31939141466](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31939141466) 为 `success`。
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`ea0240e620b57d7275e486199099c648f51de257`
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`0f26b7647e6c1aadb32eca68b24f6845639a59c2`
 
-`releaseState=FORMAL` 只表示本版正式资产与发布元数据已冻结，不表示 tag、Release 或匿名消费验证已完成。
+`releaseState=FORMAL` 表示本版正式资产与发布元数据已冻结；发布后 tag、Release、匿名下载和正式消费验证事实以上述 Release 与 Actions 证据为准。
 
 正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
 
-`6.2.2` 的发布后终验证据为 [Run 31347794760](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31347794760)：匿名下载、逐字节同源、Release provenance、SwiftPM、CocoaPods、新旧 API、`-ObjC`、Demo 编译链接与 `pod spec lint` 均通过。这是历史证据，不延伸到 `6.2.3`；后者未取得对应证据前不得写成已经通过。
+`6.2.3` 的发布后证据为 [Run 31939141466](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31939141466)：Release provenance、10 个正式资产、匿名下载、SwiftPM Full、CocoaPods、`-ObjC` 与 Demo 独立消费均通过。`6.2.2` 的 [Run 31347794760](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31347794760) 仅作为历史证据保留。
 
-`6.2.3` 不沿用 `6.2.2` 的启发式风险授权。本候选未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空，不得套用 `6.2.2` 的阈值或接受名单；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
+`6.2.3` 不沿用 `6.2.2` 的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空，不得套用 `6.2.2` 的阈值或接受名单；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
 
 正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
 

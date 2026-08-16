@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 
 VERSION = "6.2.3"
-RELEASE_DATE = "2026-08-13"
+RELEASE_DATE = "2026-08-16"
 REPOSITORY = "LJMcarryu/IFLYADLib_iOS"
 EXPECTED = {
     "IFLYAdCore": (

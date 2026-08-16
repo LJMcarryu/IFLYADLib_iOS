@@ -1,5 +1,5 @@
-# IFLYADLib 6.2.3 正在准备；正式资产、tag 和 Release 尚不存在，当前远程依赖不可用。
-# 发布后，本示例通过不可变 tag 的 :podspec 直连本仓 Release，不依赖 trunk/CDN 索引。
+# IFLYADLib 6.2.3 已正式发布并完成匿名消费复验；本示例固定到不可变 tag。
+# 本示例通过不可变 tag 的 :podspec 直连本仓 Release，不依赖 trunk/CDN 索引。
 source 'https://cdn.cocoapods.org/'
 
 platform :ios, '11.0'

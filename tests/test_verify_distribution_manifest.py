@@ -170,7 +170,16 @@ class DistributionManifestTests(unittest.TestCase):
             return
 
         self.assertIn("- `releaseState`：`FORMAL`", releasing)
-        self.assertEqual(verify(ROOT, VERSION, "local"), "已冻结正式资产")
+        local_state = verify(ROOT, VERSION, "local")
+        if local_state == "已发布资产本地复验":
+            for mode in ("candidate", "tag", "formal"):
+                with self.subTest(mode=mode), self.assertRaisesRegex(
+                    AssertionError, "冻结态不得宣称已正式发布"
+                ):
+                    verify(ROOT, VERSION, mode)
+            return
+
+        self.assertEqual(local_state, "已冻结正式资产")
         self.assertEqual(
             verify(ROOT, VERSION, "candidate"),
             "Draft candidate 冻结资产预验",

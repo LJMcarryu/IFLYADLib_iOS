@@ -2,13 +2,13 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
-## [6.2.3] - 待发布
+## [6.2.3] - 2026-08-16
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`ea0240e620b57d7275e486199099c648f51de257`
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`0f26b7647e6c1aadb32eca68b24f6845639a59c2`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结并完成本地校验；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `f6331ecf01aa902b5831a62ea8e205799c4301aa689f87bc216c0d1798e6f469`。tag、Release 与匿名消费验证尚未完成，仍待编排器执行。
-- 本候选未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`，不得表述为通过。
+- 正式签名资产和 7 个 SwiftPM checksum 已冻结并公开；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `f6331ecf01aa902b5831a62ea8e205799c4301aa689f87bc216c0d1798e6f469`。[GitHub Release 6.2.3](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.3) 的 10 个资产已通过无 Token 匿名下载与正式消费 [Run 31939141466](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31939141466) 验证。
+- 本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`，不得表述为通过。
 
 ### 新增
 
@@ -222,6 +222,7 @@
 - `5.0.0`（2025-03-07）：开始支持 CocoaPods 接入。
 - 更早版本详见 git tag。
 
+[6.2.3]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.3
 [6.2.2]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.2
 [6.2.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.1
 [6.2.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.0
