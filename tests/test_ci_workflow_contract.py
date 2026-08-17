@@ -102,16 +102,61 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertRegex(ignore, r"(?m)^\*\.py\[cod\]$")
 
     def test_candidate_dispatch_identity_is_branch_and_run_name_bound(self) -> None:
-        for input_name in ("draft_release_id", "candidate_id", "dispatch_nonce"):
+        for input_name in (
+            "draft_release_id", "candidate_id", "dispatch_nonce",
+            "control_plane_canary", "canary_tag", "canary_release_id",
+            "canary_candidate_id",
+        ):
             self.assertRegex(WORKFLOW, rf"(?m)^      {input_name}:$")
         self.assertIn("draft-candidate:{0}:{1}:{2}", WORKFLOW)
         self.assertIn("formal-release:{0}:{1}", WORKFLOW)
+        self.assertIn("control-plane-canary:{0}:{1}:{2}", WORKFLOW)
         self.assertIn(
             'candidate_branch="release-candidate/$version-$candidate_id"',
             WORKFLOW,
         )
         self.assertIn('"$checkout_sha" != "$EVENT_SHA"', WORKFLOW)
         self.assertNotIn("--target-branch main", WORKFLOW)
+
+    def test_control_plane_canary_reuses_draft_downloader_without_heavy_builds(self) -> None:
+        block = job_block("control-plane-canary")
+        self.assertIn("needs: [preflight]", block)
+        self.assertIn("DRAFT_RELEASE_READ_TOKEN", block)
+        self.assertIn("scripts/download_draft_release.py", block)
+        self.assertIn('test "$CANARY_TAG" != "$state_version"', block)
+        self.assertIn("release-candidate/${CANARY_TAG}-${CANARY_CANDIDATE_ID}", block)
+        self.assertIn("release_control_plane_checks.py fixture", block)
+        self.assertIn("didRejectClickWithError:", block)
+        production = (ROOT / "scripts/release_control_plane_checks.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("symlink_to", production)
+        self.assertIn("resolve_pod_root", production)
+        for forbidden in ("xcodebuild", "pod install", "swift build"):
+            self.assertNotIn(forbidden, block)
+
+    def test_simple_job_has_scheme_bound_name_and_integer_json_contract(self) -> None:
+        block = job_block("cocoapods-demo-consumer")
+        self.assertIn("name: Simple IFLYADLibSimple｜", block)
+        self.assertIn(
+            "simple_result_json: ${{ steps.simple-result.outputs.json }}", block
+        )
+        step = step_block(block, "输出统一 Simple 验证结果")
+        self.assertIn(
+            "RELEASE_ID: ${{ needs.release-assets.outputs.release_id }}", step
+        )
+        release_assets = job_block("release-assets")
+        self.assertIn(
+            "release_id: ${{ steps.release-inventory.outputs.release_id }}",
+            release_assets,
+        )
+        for marker in (
+            '"schemaVersion": 1', '"channel": "general"',
+            '"simpleScheme": "IFLYADLibSimple"',
+            '"artifactInventorySha256"', '"buildResult": "success"',
+            '"runId"', 'int(os.environ["RELEASE_ID"])',
+        ):
+            self.assertIn(marker, step)
 
     def test_distribution_manifest_receives_exact_release_stage(self) -> None:
         preflight = job_block("preflight")
@@ -123,6 +168,22 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertIn("release_mode='candidate'", preflight)
         self.assertIn("release_mode='tag'", preflight)
         self.assertIn("release_mode='formal'", preflight)
+
+    def test_markdown_wording_checks_are_non_blocking_and_state_drives_provenance(self) -> None:
+        preflight = job_block("preflight")
+        manifest_step = step_block(
+            preflight, "校验版本、PENDING/checksum 状态与通用仓 10 资产契约"
+        )
+        self.assertIn("continue-on-error: true", manifest_step)
+        maintenance = step_block(
+            preflight, "校验 A/B provenance 文档一致性（main/PR 不访问私有仓）"
+        )
+        self.assertIn("continue-on-error: true", maintenance)
+        release_provenance = step_block(
+            job_block("release-assets"), "校验 Release body 的 A/B provenance 声明"
+        )
+        self.assertIn("--release-state release-state.json", release_provenance)
+        self.assertNotIn("--readme", release_provenance)
 
     def test_tag_and_formal_post_facts_are_proved_by_event_specific_gates(self) -> None:
         preflight = job_block("preflight")

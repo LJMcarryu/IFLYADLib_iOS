@@ -143,14 +143,30 @@ def compare_with_private(binary: str, metadata: str, token: str) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--readme", type=Path, required=True)
-    parser.add_argument("--changelog", type=Path, required=True)
-    parser.add_argument("--releasing", type=Path, required=True)
+    parser.add_argument("--readme", type=Path)
+    parser.add_argument("--changelog", type=Path)
+    parser.add_argument("--releasing", type=Path)
+    parser.add_argument("--release-state", type=Path)
     parser.add_argument("--release-metadata", type=Path)
     parser.add_argument("--skip-compare", action="store_true")
     args = parser.parse_args()
     try:
-        state, binary, metadata = validate_documents([args.readme, args.changelog, args.releasing])
+        if args.release_state:
+            from release_state import validate_state
+
+            machine_state = validate_state(json.loads(args.release_state.read_text(encoding="utf-8")))
+            require(machine_state["phase"] != "PREPARING", "发布 provenance 不接受 PREPARING")
+            state = "FORMAL"
+            binary = machine_state["binarySourceCommit"]
+            metadata = machine_state["releaseMetadataCommit"]
+            require(not any((args.readme, args.changelog, args.releasing)),
+                    "--release-state 不得混入 Markdown provenance 输入")
+        else:
+            require(all((args.readme, args.changelog, args.releasing)),
+                    "维护检查必须同时提供 README/CHANGELOG/RELEASING")
+            state, binary, metadata = validate_documents(
+                [args.readme, args.changelog, args.releasing]
+            )
         if args.skip_compare:
             require(not args.release_metadata,
                     "--skip-compare 只允许校验 README/CHANGELOG/RELEASING 文档一致性")
