@@ -217,17 +217,22 @@ jobs:
             --expected-repository "$GITHUB_REPOSITORY" \
             --expected-version 6.2.3
 
-      - name: 校验版本、PENDING/checksum 状态与通用仓 10 资产契约
+      - name: 阻断校验版本、checksum 与通用仓 10 资产机器契约
+        env:
+          RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}
+          WORKFLOW_CONTROL_SHA: ${{ github.workflow_sha }}
+        run: |
+          git show "${WORKFLOW_CONTROL_SHA}:scripts/verify_repository_contract.py" |
+            python3 - --scope machine --release-kind "${RELEASE_MODE}"
+
+      - name: 非阻断校验 Markdown 发布展示措辞
         continue-on-error: true
         env:
           RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}
-          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+          WORKFLOW_CONTROL_SHA: ${{ github.workflow_sha }}
         run: |
-          python3 scripts/verify_distribution_manifest.py \
-            --repository-root "$GITHUB_WORKSPACE" \
-            --version "$RELEASE_VERSION" \
-            --mode "$RELEASE_MODE"
-
+          git show "${WORKFLOW_CONTROL_SHA}:scripts/verify_repository_contract.py" |
+            python3 - --scope docs --release-kind "${RELEASE_MODE}"
       - name: 校验 Package.swift 可解析
         run: swift package dump-package > "$RUNNER_TEMP/ifly-package.json"
 
@@ -279,6 +284,8 @@ jobs:
               ':(exclude)scripts/release_asset_downloader.py' \
               ':(exclude)scripts/prepare_release_consumers.py' \
               ':(exclude)scripts/verify_distribution_manifest.py' \
+              ':(exclude)scripts/verify_repository_contract.py' \
+              ':(exclude)tests/test_ci_workflow_contract.py' \
               ':(exclude)tests/test_release_asset_downloader.py' \
               ':(exclude)tests/test_prepare_release_consumers.py')
             if [[ -n "$unexpected_paths" ]]; then

@@ -8,10 +8,13 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+sys.path.insert(0, str(ROOT / "scripts"))
+import verify_repository_contract as repository_contract  # noqa: E402
 
 
 def job_block(name: str) -> str:
@@ -158,32 +161,85 @@ class CIWorkflowContractTests(unittest.TestCase):
         ):
             self.assertIn(marker, step)
 
-    def test_distribution_manifest_receives_exact_release_stage(self) -> None:
+    def test_repository_contract_receives_exact_release_stage(self) -> None:
         preflight = job_block("preflight")
-        self.assertIn(
-            "RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}",
-            preflight,
+        machine = step_block(
+            preflight, "阻断校验版本、checksum 与通用仓 10 资产机器契约"
         )
-        self.assertIn('--mode "$RELEASE_MODE"', preflight)
+        self.assertIn(
+            "RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}", machine
+        )
+        self.assertIn("scripts/verify_repository_contract.py", machine)
+        self.assertIn('--scope machine --release-kind "${RELEASE_MODE}"', machine)
         self.assertIn("release_mode='candidate'", preflight)
         self.assertIn("release_mode='tag'", preflight)
         self.assertIn("release_mode='formal'", preflight)
 
-    def test_markdown_wording_checks_are_non_blocking_and_state_drives_provenance(self) -> None:
+    def test_machine_contract_is_blocking_and_document_provenance_is_non_blocking(self) -> None:
         preflight = job_block("preflight")
-        manifest_step = step_block(
-            preflight, "校验版本、PENDING/checksum 状态与通用仓 10 资产契约"
+        machine = step_block(
+            preflight, "阻断校验版本、checksum 与通用仓 10 资产机器契约"
         )
-        self.assertIn("continue-on-error: true", manifest_step)
+        self.assertNotIn("continue-on-error", machine)
+        documentation = step_block(
+            preflight, "非阻断校验 Markdown 发布展示措辞"
+        )
+        self.assertIn("continue-on-error: true", documentation)
+        self.assertIn("--scope docs", documentation)
         maintenance = step_block(
             preflight, "校验 A/B provenance 文档一致性（main/PR 不访问私有仓）"
         )
         self.assertIn("continue-on-error: true", maintenance)
+        self.assertEqual(WORKFLOW.count("continue-on-error: true"), 2)
         release_provenance = step_block(
             job_block("release-assets"), "校验 Release body 的 A/B provenance 声明"
         )
         self.assertIn("--release-state release-state.json", release_provenance)
         self.assertNotIn("--readme", release_provenance)
+
+    def test_docs_drift_is_isolated_but_checksum_drift_fails_machine_scope(self) -> None:
+        original_read = repository_contract.read
+
+        def docs_drift(root: Path, relative: str) -> str:
+            value = original_read(root, relative)
+            if relative == "README.md":
+                return value.replace("- `releaseState`：`FORMAL`", "", 1)
+            return value
+
+        with mock.patch.object(repository_contract, "read", side_effect=docs_drift):
+            repository_contract.verify_machine(ROOT, "local")
+            with self.assertRaises(repository_contract.ContractError):
+                repository_contract.verify_docs(ROOT, "local")
+
+        def checksum_drift(root: Path, relative: str) -> str:
+            value = original_read(root, relative)
+            if relative == "Package.swift":
+                return re.sub(
+                    r'checksum:\s*"[0-9a-f]{64}"',
+                    'checksum: "not-a-checksum"',
+                    value,
+                    count=1,
+                )
+            return value
+
+        with mock.patch.object(repository_contract, "read", side_effect=checksum_drift):
+            with self.assertRaises(repository_contract.ContractError):
+                repository_contract.verify_machine(ROOT, "local")
+
+        def version_drift(root: Path, relative: str) -> str:
+            value = original_read(root, relative)
+            if relative == "IFLYADLib.podspec":
+                return re.sub(
+                    r"(s\.version\s*=\s*['\"])6\.2\.3",
+                    r"\g<1>6.2.4",
+                    value,
+                    count=1,
+                )
+            return value
+
+        with mock.patch.object(repository_contract, "read", side_effect=version_drift):
+            with self.assertRaises(repository_contract.ContractError):
+                repository_contract.verify_machine(ROOT, "local")
 
     def test_tag_and_formal_post_facts_are_proved_by_event_specific_gates(self) -> None:
         preflight = job_block("preflight")
