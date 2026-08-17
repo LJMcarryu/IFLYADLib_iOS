@@ -18,6 +18,8 @@ from verify_distribution_manifest import (
     VERSION,
 )
 
+PREVIOUS_RELEASE_VERSION = "6.2.3"
+
 
 class ContractError(RuntimeError):
     pass
@@ -34,14 +36,34 @@ def read(root: Path, relative: str) -> str:
 
 def machine_state(root: Path) -> dict[str, object]:
     state = json.loads(read(root, "release-state.json"))
-    require(state.get("version") == VERSION, "release-state 版本不匹配")
     require(state.get("channel") == "general", "release-state 渠道不匹配")
     return state
+
+
+def validate_state_version(state: dict[str, object], release_kind: str) -> None:
+    version = state.get("version")
+    phase = state.get("phase")
+    if release_kind in {"candidate", "tag", "formal"}:
+        require(
+            version == VERSION and phase == "FROZEN",
+            "candidate/tag/formal 必须使用当前分发版本的 FROZEN 状态",
+        )
+        return
+    if version == VERSION:
+        return
+    require(
+        release_kind == "local"
+        and version == PREVIOUS_RELEASE_VERSION
+        and phase == "CLOSED",
+        "release-state 版本不匹配：普通 main 只允许保留上一版 CLOSED，"
+        "candidate/tag/formal 必须使用当前分发版本的 FROZEN 状态",
+    )
 
 
 def verify_machine(root: Path, release_kind: str) -> None:
     require(release_kind in {"local", "candidate", "tag", "formal"}, "非法发布模式")
     state = machine_state(root)
+    validate_state_version(state, release_kind)
     package = read(root, "Package.swift")
     podspec = read(root, "IFLYADLib.podspec")
     podfile = read(root, "IFLYADLibSimple/Podfile")
@@ -77,7 +99,10 @@ def verify_machine(root: Path, release_kind: str) -> None:
     require(pending or final, "checksum 必须全部为精确 PENDING 或全部为本版 SHA-256")
     require(len(set(checksums.values())) == 7, "七个模块 checksum 必须唯一")
     preparing = state.get("phase") == "PREPARING"
-    require(pending == preparing, "checksum 状态与 release-state phase 不一致")
+    if state.get("version") == VERSION:
+        require(pending == preparing, "checksum 状态与 release-state phase 不一致")
+    else:
+        require(final, "上一版 CLOSED 与当前分发清单并存时必须使用最终 checksum")
     if release_kind != "local":
         require(final, f"{release_kind} 模式禁止 PENDING checksum")
 
@@ -103,6 +128,7 @@ def verify_machine(root: Path, release_kind: str) -> None:
 
 def verify_docs(root: Path, _release_kind: str) -> None:
     state = machine_state(root)
+    validate_state_version(state, _release_kind)
     documents = {
         name: read(root, name)
         for name in ("README.md", "CHANGELOG.md", "RELEASING.md", "SECURITY.md")
@@ -111,14 +137,14 @@ def verify_docs(root: Path, _release_kind: str) -> None:
     if state.get("phase") == "PREPARING":
         require("待发布" in documents["CHANGELOG.md"], "CHANGELOG 缺少待发布展示")
         require("PENDING" in documents["RELEASING.md"], "RELEASING 缺少 PENDING 展示")
-        require("6.2.3" in demo and "发布准备" in demo, "Demo 缺少发布准备说明")
+        require(VERSION in demo and "发布准备" in demo, "Demo 缺少发布准备说明")
     else:
         for label in ("README.md", "CHANGELOG.md", "RELEASING.md"):
             document = documents[label]
             require("- `releaseState`：`FORMAL`" in document,
                     f"{label} 缺少 FORMAL 展示")
             require("冻结" in document, f"{label} 缺少冻结语义")
-        require("6.2.3" in demo, "Demo 缺少当前版本展示")
+        require(VERSION in demo, "Demo 缺少当前版本展示")
 
 
 def main() -> int:

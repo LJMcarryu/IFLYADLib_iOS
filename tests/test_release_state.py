@@ -28,10 +28,41 @@ ARTIFACTS = [
     {"name": "IFLYAdVideoUI.xcframework.zip", "contentSha256": "abfea29151c3e739d67b5221a2cc1da2bfbda1a1773d42e5418bd95f9c39c012"},
 ]
 
+CLOSED_STATE = {
+    "schemaVersion": 1,
+    "channel": "general",
+    "repository": "LJMcarryu/IFLYADLib_iOS",
+    "version": "6.2.3",
+    "phase": "CLOSED",
+    "binarySourceCommit": "ea0240e620b57d7275e486199099c648f51de257",
+    "releaseMetadataCommit": "0f26b7647e6c1aadb32eca68b24f6845639a59c2",
+    "artifactInventory": {
+        "count": 10,
+        "sha256": "75ece4ae736143231c7ac8b027797d22cd604f4cdb8f8098865d4dd7d8409ea2",
+    },
+    "appleReview": {
+        "requiredForRelease": False,
+        "statusAtFreeze": "not-run",
+        "evidenceIncluded": False,
+    },
+    "publication": {
+        "releaseId": 370458965,
+        "tagName": "6.2.3",
+        "tagObjectSha": "8ec895b20193bde391a8e510e497b7ab2675c43a",
+        "tagCommitSha": "53657593328c0b109aac1f38af036cdb0a9edc2c",
+        "releaseUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.3",
+        "publishedAt": "2026-08-16T09:28:37Z",
+        "formalConsumerRunId": 31939141466,
+        "formalConsumerRunUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31939141466",
+        "conclusion": "success",
+        "verifiedAt": "2026-08-16T09:30:24Z",
+    },
+}
+
 
 class ReleaseStateTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.state = json.loads((ROOT / "release-state.json").read_text(encoding="utf-8"))
+        self.state = copy.deepcopy(CLOSED_STATE)
         self.facts = {
             key: copy.deepcopy(value)
             for key, value in self.state.items()
@@ -44,17 +75,19 @@ class ReleaseStateTests(unittest.TestCase):
         path.write_text(json.dumps(self.facts), encoding="utf-8")
         return path
 
-    def test_current_state_is_rebuilt_exactly_from_content_digests(self) -> None:
+    def test_closed_fixture_is_rebuilt_exactly_from_content_digests(self) -> None:
         generated = release_state.build_closed_state(self.facts)
         self.assertEqual(generated, self.state)
-        self.assertEqual(
-            release_state.canonical_json(generated),
-            (ROOT / "release-state.json").read_text(encoding="utf-8"),
-        )
         self.assertEqual(generated["artifactInventory"], {
             "count": 10,
             "sha256": "75ece4ae736143231c7ac8b027797d22cd604f4cdb8f8098865d4dd7d8409ea2",
         })
+
+    def test_repository_release_state_is_independently_valid(self) -> None:
+        current = json.loads((ROOT / "release-state.json").read_text(encoding="utf-8"))
+        self.assertEqual(release_state.validate_state(current), current)
+        self.assertEqual(current["channel"], "general")
+        self.assertEqual(current["repository"], "LJMcarryu/IFLYADLib_iOS")
 
     def test_dry_run_prints_state_without_writing(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

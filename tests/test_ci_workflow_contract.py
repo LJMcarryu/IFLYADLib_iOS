@@ -230,8 +230,8 @@ class CIWorkflowContractTests(unittest.TestCase):
             value = original_read(root, relative)
             if relative == "IFLYADLib.podspec":
                 return re.sub(
-                    r"(s\.version\s*=\s*['\"])6\.2\.3",
-                    r"\g<1>6.2.4",
+                    r"(s\.version\s*=\s*['\"])6\.2\.4",
+                    r"\g<1>6.2.5",
                     value,
                     count=1,
                 )
@@ -415,6 +415,41 @@ class CIWorkflowContractTests(unittest.TestCase):
             result = run_native_feed_header_gate(demo_root, "formal")
 
             self.assertEqual(0, result.returncode, result.stderr)
+
+    def test_previous_closed_state_is_allowed_only_on_local_main(self) -> None:
+        state = {"version": "6.2.3", "phase": "CLOSED"}
+        repository_contract.validate_state_version(state, "local")
+        for release_kind in ("candidate", "tag", "formal"):
+            with self.subTest(release_kind=release_kind), self.assertRaises(
+                repository_contract.ContractError
+            ):
+                repository_contract.validate_state_version(state, release_kind)
+
+    def test_current_frozen_state_is_allowed_for_all_release_modes(self) -> None:
+        state = {"version": "6.2.4", "phase": "FROZEN"}
+        for release_kind in ("local", "candidate", "tag", "formal"):
+            with self.subTest(release_kind=release_kind):
+                repository_contract.validate_state_version(state, release_kind)
+
+    def test_candidate_tag_and_formal_reject_current_non_frozen_state(self) -> None:
+        for phase in ("PREPARING", "PUBLISHED", "VERIFIED", "CLOSED"):
+            state = {"version": "6.2.4", "phase": phase}
+            for release_kind in ("candidate", "tag", "formal"):
+                with self.subTest(
+                    phase=phase, release_kind=release_kind
+                ), self.assertRaises(repository_contract.ContractError):
+                    repository_contract.validate_state_version(state, release_kind)
+
+    def test_older_closed_and_previous_non_closed_states_are_rejected(self) -> None:
+        for state in (
+            {"version": "6.2.2", "phase": "CLOSED"},
+            {"version": "6.2.3", "phase": "FROZEN"},
+            {"version": "6.2.3", "phase": "PREPARING"},
+        ):
+            with self.subTest(state=state), self.assertRaises(
+                repository_contract.ContractError
+            ):
+                repository_contract.validate_state_version(state, "local")
 
 
 if __name__ == "__main__":

@@ -2,6 +2,20 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.2.4] - 待发布
+
+- `releaseState`：`FORMAL`
+- `binarySourceCommit`（SDK 二进制源码提交）：`b0f745d582ce2bed5110702cff972be4153e5038`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`7b08118b43a0c4441de4c76a64f34fa54b3fe889`
+- `candidateId`：`61f427469346615982e0225fad8187611794cc0a54c452da83073e89fd5ea1bd`
+- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`。Tag、Release 与匿名消费验证尚未完成，当前最新公开可用版仍为 `6.2.3`。
+- Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
+
+### 修复
+
+- NativeFeed 外部 CTA 的非 Cell 场景新增 window-local 归属，不再强制共同紧包 wrapper；同 window/scene、几何紧凑相邻且非页面级范围时允许绑定。
+- 绑定时固化归属类型、结构锚点和双方祖先路径；运行中 reparent、共享、固定悬浮、离屏仍可点击、跨 window、远距离分散或页面级范围继续以 `IFLYAdErrorCodeNativeFeedClickViewsInvalid`（71503）失败关闭。
+
 ## [6.2.3] - 2026-08-16
 
 - `releaseState`：`FORMAL`

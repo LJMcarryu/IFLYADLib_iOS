@@ -1,4 +1,4 @@
-# IFLYADLib 6.2.3 已正式发布并完成匿名消费复验；本示例固定到不可变 tag。
+# IFLYADLib 6.2.4 正式资产与清单已冻结；本示例固定到待创建的不可变 tag。
 # 本示例通过不可变 tag 的 :podspec 直连本仓 Release，不依赖 trunk/CDN 索引。
 source 'https://cdn.cocoapods.org/'
 
@@ -8,13 +8,13 @@ target 'IFLYADLibSimple' do
   use_frameworks!
 
   # 本示例用全量 Full（覆盖开屏/Banner/插屏/信息流/激励五种广告）。
-  # 6.2.3 延续按广告形式可组合的 xcframework，正式资产须同时含 device + 模拟器切片。
-  pod 'IFLYADLib', :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.3/IFLYADLib.podspec'
+  # 6.2.4 延续按广告形式可组合的 xcframework，正式资产须同时含 device + 模拟器切片。
+  pod 'IFLYADLib', :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.4/IFLYADLib.podspec'
 
   # —— 按广告形式可组合接入（模型 A）：只接所需格式可减小包体，例如 ——
   #   pod 'IFLYADLib/Splash',
-  #       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.3/IFLYADLib.podspec'
+  #       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.4/IFLYADLib.podspec'
   # 导入：6.0.3 起伞头 <IFLYADLib/IFLYADLib.h> 用 __has_include 守卫，全量与部分安装均可用；
   #       也可按需 import 具体格式头（如 <IFLYADLib/IFLYSplashAd.h>）。
-  # 6.2.3 进入 trunk 后可改为标准写法：pod 'IFLYADLib/Splash', '6.2.3'
+  # 6.2.4 进入 trunk 后可改为标准写法：pod 'IFLYADLib/Splash', '6.2.4'
 end

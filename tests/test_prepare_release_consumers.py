@@ -19,7 +19,7 @@ from prepare_release_consumers import (  # noqa: E402
 from release_asset_downloader import MODULE_ASSET_NAMES, expected_assets  # noqa: E402
 
 
-VERSION = "6.2.3"
+VERSION = "6.2.4"
 
 
 def write_zip(path: Path, entries: dict[str, bytes]) -> None:
@@ -57,7 +57,7 @@ def create_repository(root: Path) -> None:
         "let package = Package(name: \"consumer\", dependencies: [\n"
         "  .package(\n"
         '    url: "https://github.com/LJMcarryu/IFLYADLib_iOS.git",\n'
-        '    exact: "6.2.3"\n'
+        '    exact: "6.2.4"\n'
         "  )\n"
         "], targets: [])\n",
         encoding="utf-8",
@@ -72,7 +72,7 @@ def create_repository(root: Path) -> None:
         "platform :ios, '11.0'\n"
         "target 'IFLYADLibSimple' do\n"
         "  pod 'IFLYADLib', :podspec => "
-        "'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.3/IFLYADLib.podspec'\n"
+        "'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.4/IFLYADLib.podspec'\n"
         "end\n",
         encoding="utf-8",
     )
