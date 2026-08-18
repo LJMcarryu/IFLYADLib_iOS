@@ -4,9 +4,9 @@
 
 ## 6.2.4 发布状态
 
-当前最新公开正式版仍为 `IFLYADLib 6.2.3`；`6.2.4` 的正式签名资产、7 个 SwiftPM checksum 与发布元数据已经冻结，但 GitHub Tag/Release、无 Token 匿名验证和正式消费验证尚未完成。生产依赖继续使用 [`6.2.3`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.3)。
+当前最新公开正式版为 `IFLYADLib 6.2.4`，已于 2026-08-17 正式发布；参见 [GitHub Release 6.2.4](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4)。10 个资产已完成无 Token 匿名下载和正式消费验证。生产依赖应固定到 `6.2.4`，不要依赖 `main` 分支。
 
-> **6.2.4 冻结边界**：正式签名资产已从提交 A 构建并冻结；`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`。当前 `6.2.4` URL 不可用于生产依赖，公开可用性以同版本 GitHub Release 和发布后 CI 为准。
+> **6.2.4 发布证据**：正式签名资产从提交 A 构建；`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`。annotated Tag 解引用到 `d6a553e001129e2a6fac57422b30d6879c10a333`，正式消费 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 为 `success`。
 
 > **风险边界**：`6.2.4` 不沿用历史版本的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；如另行执行，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空。`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
 
@@ -16,7 +16,7 @@
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`7b08118b43a0c4441de4c76a64f34fa54b3fe889`
 - `candidateId`：`61f427469346615982e0225fad8187611794cc0a54c452da83073e89fd5ea1bd`
 
-`releaseState=FORMAL` 表示本版正式签名资产、checksum 与 A/B 发布元数据已冻结，不表示已经公开发布；Tag、Release、匿名下载和正式消费验证由后续编排器闭环。
+`releaseState=FORMAL` 表示本版正式签名资产、checksum 与 A/B 发布元数据已冻结；仓库根 `release-state.json` 已由编排器推进到 `6.2.4/CLOSED`，证明 Tag、Release、匿名下载和正式消费验证已经闭环。
 
 > 文档以中文为主。如需用英文反馈问题，请直接在 [Issues](https://github.com/LJMcarryu/IFLYADLib_iOS/issues) 提交。
 
@@ -26,7 +26,7 @@
 
 | 版本 | 日期 | 说明 |
 | --- | --- | --- |
-| 6.2.4 | 待发布 | NativeFeed 外部 CTA 的非 Cell 场景新增 window-local 归属：不再强制共同 wrapper；同 window/scene、几何紧凑相邻且范围非页面级时可绑定。绑定时固化归属类型、结构锚点和祖先路径；运行中 reparent、共享、固定悬浮、离屏仍可点击、跨 window 或页面级点击区继续以 71503 失败关闭。 |
+| 6.2.4 | 2026-08-17 | NativeFeed 外部 CTA 的非 Cell 场景新增 window-local 归属：不再强制共同 wrapper；同 window/scene、几何紧凑相邻且范围非页面级时可绑定。绑定时固化归属类型、结构锚点和祖先路径；运行中 reparent、共享、固定悬浮、离屏仍可点击、跨 window 或页面级点击区继续以 71503 失败关闭。 |
 | 6.2.3 | 2026-08-16 | 全渠道共享优化：NativeFeed 新增受限外部 CTA 适配，默认关闭；媒体显式设置 Binder 的 `allowsExternalClickViews=YES` 后，仅接受同 window/scene 且归属可判定的同 Cell 或窄范围兄弟视图。共享、固定悬浮、广告离屏后仍可点击或归属不明时失败关闭，并通过 `nativeFeedAd:didRejectClickWithError:` 返回 `IFLYAdErrorCodeNativeFeedClickViewsInvalid`（71503）。新增 `detachFromCurrentContainer` 固定单容器便利入口，不改变 6.2.2 的 attach/容器 detach 主路径。 |
 | 6.2.2 | 2026-08-10 | NativeFeed 改为 SDK 托管挂载：数据层只持 Ad，Cell 不持 Session/Binding 或首次/复用状态；进屏调用 Ad 级 `attachWithViewBinder:error:`，离屏/复用/切普通内容按容器调用 `detachAdFromContainerView:`。释放最后一个 Ad 强引用自动终止，`destroy` 仅作可选的主动提前终止；旧 DisplaySession/Binding 契约从公开 API 移除。 |
 | 6.2.1 | 2026-08-07 | NativeFeed 新增 `IFLYNativeFeedDisplaySession` 与 `IFLYNativeFeedAdBinding`，支持同一稳定逻辑条目跨复用 Cell 串行恢复原广告；数据层持有 Ad + Session，Cell 只持 Binding，离屏 detach，淘汰 `endDisplaySession → destroy`。TTL 在活动 Binding 期间到达不强拆当前展示，detach 后结束旧会话并请求新广告。 |
@@ -60,7 +60,7 @@
 
 ## CocoaPods 接入
 
-> 下列地址固定到已发布的 `6.2.3` tag 和同版本 Release 资产；生产项目不要依赖 `main` 分支。
+> 下列地址固定到已发布的 `6.2.4` tag 和同版本 Release 资产；生产项目不要依赖 `main` 分支。
 
 ```ruby
 source 'https://cdn.cocoapods.org/'
@@ -72,17 +72,17 @@ target 'YOUR_APP_TARGET' do
 
   # 默认 Full；也可改成 IFLYADLib/NativeFeed 等按格式 subspec。
   pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.3/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.2.4/IFLYADLib.podspec'
 end
 ```
 
-CocoaPods 的 `Core` 会显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`；podspec 同时向 Pod target 和最终 aggregate/user target 传播 `-ObjC`。二进制从 `IFLYADLib-modelA-6.2.3.zip` 下载；不要用 `:git` 或 `:path` 绕过 Release zip。
+CocoaPods 的 `Core` 会显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`；podspec 同时向 Pod target 和最终 aggregate/user target 传播 `-ObjC`。二进制从 `IFLYADLib-modelA-6.2.4.zip` 下载；不要用 `:git` 或 `:path` 绕过 Release zip。
 
 可选 subspec：`Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full`（默认）。`Splash/Interstitial/Reward` 会自动带入 `VideoUI`。
 
 ## Swift Package Manager
 
-在 Xcode「Add Packages」添加 `https://github.com/LJMcarryu/IFLYADLib_iOS` 并选择正式版本 `6.2.3`，按需勾选 `Core/Banner/Splash/Interstitial/NativeFeed/Reward/Full`。
+在 Xcode「Add Packages」添加 `https://github.com/LJMcarryu/IFLYADLib_iOS` 并选择正式版本 `6.2.4`，按需勾选 `Core/Banner/Splash/Interstitial/NativeFeed/Reward/Full`。
 
 - 消费方 App target 的 `OTHER_LDFLAGS` 必须添加 `-ObjC`。
 - 7 个远程 `binaryTarget` 分别承载模块代码；Core、VideoUI、Reward 伞 target 自动投递三域资源和 `PrivacyInfo.xcprivacy`。
@@ -597,8 +597,8 @@ NSString *dealId = ad.bidInfo.dealId;
 
 | 现象 | 排查建议 |
 | --- | --- |
-| `pod install` 找不到 `6.2.3` | 确认使用不可变 `6.2.3` tag、网络可访问 Release 合并 zip，并清理旧 CocoaPods 缓存；不要把 `main` 当作版本依赖。 |
-| 模拟器无法运行 | 确认已固定到正式 `6.2.3` tag、下载本版 Release zip，且本地未复用旧缓存；正式模型 A 资产必须含模拟器切片。 |
+| `pod install` 找不到 `6.2.4` | 确认使用不可变 `6.2.4` tag、网络可访问 Release 合并 zip，并清理旧 CocoaPods 缓存；不要把 `main` 当作版本依赖。 |
+| 模拟器无法运行 | 确认已固定到正式 `6.2.4` tag、下载本版 Release zip，且本地未复用旧缓存；正式模型 A 资产必须含模拟器切片。 |
 | IDFA 为空 | 确认 `NSUserTrackingUsageDescription` 已配置、用户已允许 ATT，并在授权完成后重新读取和设置 IDFA；未授权阶段预置的显式值已被丢弃，不能自动延续到授权后。过滤全零 UUID。 |
 | `reportMediaShakeTriggeredWithError:` 返回 `71512` | 通用模型 A 未启用媒体摇一摇上报能力，这是预期结果；不要重试或用该方法代替普通点击。 |
 | `isAdValid` 为 NO | 确认已收到 `DidReady` 回调；广告未过期、未展示过、实例未销毁。 |
@@ -627,7 +627,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-> 说明：`main` 的示例 Podfile 已预置待发布 `6.2.4` tag；正式发布前生产项目继续固定到 `6.2.3`。默认 `Full`（五种广告全开），工程最低版本为 iOS 11.0。
+> 说明：示例 Podfile 固定到已发布的 `6.2.4` tag。默认 `Full`（五种广告全开），工程最低版本为 iOS 11.0。
 
 ## 接入建议
 

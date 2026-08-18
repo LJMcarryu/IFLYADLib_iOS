@@ -2,13 +2,13 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
-## [6.2.4] - 待发布
+## [6.2.4] - 2026-08-17
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`b0f745d582ce2bed5110702cff972be4153e5038`
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`7b08118b43a0c4441de4c76a64f34fa54b3fe889`
 - `candidateId`：`61f427469346615982e0225fad8187611794cc0a54c452da83073e89fd5ea1bd`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`。Tag、Release 与匿名消费验证尚未完成，当前最新公开可用版仍为 `6.2.3`。
+- 正式签名资产和 7 个 SwiftPM checksum 已冻结并公开；`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`。[GitHub Release 6.2.4](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4) 的 10 个资产已通过无 Token 匿名下载与正式消费 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 验证。
 - Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
 
 ### 修复

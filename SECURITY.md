@@ -4,14 +4,14 @@
 
 | 版本 | 安全更新 |
 | --- | --- |
-| 最新公开正式版本（当前为 `6.2.3`） | ✅ |
-| `6.2.1` 及更早版本 | ❌（请先升级到最新版） |
+| 最新公开正式版本（当前为 `6.2.4`） | ✅ |
+| `6.2.3` 及更早版本 | ❌（请先升级到最新版） |
 
-只有不可变 tag、Release 资产与对应 checksum 均可匿名验证的版本才构成公开正式发布；`releaseState=FORMAL` 和 `main` 上已回填的 checksum 本身只证明正式资产元数据已就绪。`6.2.3` 已于 2026-08-16 完成发布与匿名消费验证。
+只有不可变 tag、Release 资产与对应 checksum 均可匿名验证的版本才构成公开正式发布；`releaseState=FORMAL` 和 `main` 上已回填的 checksum 本身只证明正式资产元数据已就绪。`6.2.4` 已于 2026-08-17 完成发布与匿名消费验证。
 
-### `6.2.4` 发布准备
+### `6.2.4` 发布证据
 
-`6.2.4` 的正式签名资产和 checksum 已冻结，但 Tag、Release、匿名下载与正式消费验证尚未完成，因此不属于受支持的公开正式版本。
+[`6.2.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4) 的正式签名资产和 checksum 已冻结并公开，10 个资产已完成匿名下载校验，正式消费 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 为 `success`。
 
 ## 报告安全漏洞
 

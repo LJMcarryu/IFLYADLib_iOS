@@ -40,8 +40,8 @@ def copy_contract_files(destination: Path) -> None:
 
 
 class DistributionManifestTests(unittest.TestCase):
-    def test_current_frozen_repository_passes_all_static_modes(self) -> None:
-        self.assertEqual(verify(ROOT, VERSION, "local"), "已冻结正式资产")
+    def test_current_release_ready_repository_passes_all_static_modes(self) -> None:
+        self.assertEqual(verify(ROOT, VERSION, "local"), "已发布资产本地复验")
         self.assertEqual(
             verify(ROOT, VERSION, "candidate"),
             "Draft candidate 冻结资产预验",
@@ -55,19 +55,19 @@ class DistributionManifestTests(unittest.TestCase):
             "正式 Release 冻结文档与清单复验",
         )
 
-    def test_candidate_rejects_published_claim(self) -> None:
+    def test_candidate_rejects_prepublication_claim(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copy_contract_files(root)
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             source = source.replace(
-                "当前最新公开正式版仍为 `IFLYADLib 6.2.3`",
                 "当前最新公开正式版为 `IFLYADLib 6.2.4`",
+                "当前最新公开正式版仍为 `IFLYADLib 6.2.3`",
                 1,
             )
             readme.write_text(source, encoding="utf-8")
-            with self.assertRaisesRegex(AssertionError, "冻结态不得宣称"):
+            with self.assertRaisesRegex(AssertionError, "发布后态缺少发布事实"):
                 verify(root, VERSION, "candidate")
 
     def test_rejects_historical_module_checksum(self) -> None:

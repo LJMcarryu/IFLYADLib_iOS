@@ -349,9 +349,16 @@ def verify(root: Path, version: str, mode: str) -> str:
             "DEMO": demo_readme,
             "PODFILE": podfile,
         }
-        if mode == "local" and has_published_claim(documents):
+        if has_published_claim(documents):
             require_published(documents, package, checksums)
-            state = "已发布资产本地复验"
+            if mode == "candidate":
+                state = "Draft candidate 冻结资产预验"
+            elif mode == "tag":
+                state = "不可变 tag 冻结资产复验"
+            elif mode == "formal":
+                state = "正式 Release 冻结文档与清单复验"
+            else:
+                state = "已发布资产本地复验"
         else:
             require_frozen_prepublication(documents, package, checksums)
             if mode == "candidate":
