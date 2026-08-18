@@ -7,7 +7,11 @@ import hashlib
 import hmac
 import json
 import re
+import socket
+import ssl
+import time
 from pathlib import Path
+from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener, urlopen
 
@@ -19,6 +23,9 @@ TOKEN_ENVIRONMENT_VARIABLES = (
     "IFLY_PRIVATE_SOURCE_TOKEN",
 )
 USER_AGENT = "IFLYADLib-release-verifier"
+DOWNLOAD_MAX_ATTEMPTS = 5
+DOWNLOAD_INITIAL_BACKOFF_SECONDS = 1.0
+DOWNLOAD_MAX_BACKOFF_SECONDS = 8.0
 MODULE_ASSET_NAMES = {
     "IFLYAdCore": "IFLYAdCore.xcframework.zip",
     "IFLYAdVideoUI": "IFLYAdVideoUI.xcframework.zip",
@@ -312,11 +319,30 @@ def read_json(request: Request) -> dict:
     return value
 
 
+def _verify_existing_asset(asset: dict, destination: Path) -> str | None:
+    if not destination.exists() and not destination.is_symlink():
+        return None
+    require(
+        destination.is_file() and not destination.is_symlink(),
+        f"{asset['name']} 缓存目标必须是普通文件",
+    )
+    if destination.stat().st_size != asset["size"]:
+        destination.unlink()
+        return None
+    actual = hashlib.sha256(destination.read_bytes()).hexdigest()
+    if not hmac.compare_digest(
+        actual, asset["digest"].removeprefix("sha256:")
+    ):
+        destination.unlink()
+        return None
+    return actual
+
+
 def _write_and_verify(response, asset: dict, destination: Path) -> str:
     _validate_download_url(response.geturl())
     digest = hashlib.sha256()
     size = 0
-    with destination.open("wb") as output:
+    with destination.open("xb") as output:
         while chunk := response.read(1024 * 1024):
             output.write(chunk)
             digest.update(chunk)
@@ -330,22 +356,98 @@ def _write_and_verify(response, asset: dict, destination: Path) -> str:
     return actual
 
 
-def download_anonymously(asset: dict, destination: Path) -> str:
-    request = anonymous_request(asset["browser_download_url"], "application/octet-stream")
-    with urlopen(request, timeout=300) as response:
-        return _write_and_verify(response, asset, destination)
+def _retryable_download_error(error: BaseException) -> bool:
+    if isinstance(error, HTTPError):
+        return error.code in {408, 429} or 500 <= error.code <= 599
+    if isinstance(error, URLError):
+        reason = error.reason
+        return isinstance(
+            reason,
+            (TimeoutError, socket.timeout, ssl.SSLError, ConnectionError),
+        )
+    return isinstance(
+        error,
+        (TimeoutError, socket.timeout, ssl.SSLError, ConnectionError),
+    )
 
 
-def download_authenticated(asset: dict, destination: Path, token: str) -> str:
-    request = authenticated_api_request(asset["url"], token, "application/octet-stream")
-    opener = build_opener(TokenStrippingRedirectHandler())
-    with opener.open(request, timeout=300) as response:
-        return _write_and_verify(response, asset, destination)
+def download_with_retry(
+    asset: dict,
+    destination: Path,
+    open_response,
+    *,
+    max_attempts: int = DOWNLOAD_MAX_ATTEMPTS,
+    sleeper=time.sleep,
+) -> str:
+    cached = _verify_existing_asset(asset, destination)
+    if cached is not None:
+        return cached
+    require(max_attempts >= 1, "下载最大尝试次数必须为正整数")
+    temporary = destination.with_name(f"{destination.name}.part")
+    require(not temporary.is_symlink(), f"临时下载目标不得为符号链接: {temporary}")
+    temporary.unlink(missing_ok=True)
+    for attempt in range(1, max_attempts + 1):
+        try:
+            with open_response() as response:
+                actual = _write_and_verify(response, asset, temporary)
+            temporary.replace(destination)
+            return actual
+        except Exception as error:
+            temporary.unlink(missing_ok=True)
+            if (
+                isinstance(error, VerificationError)
+                or not _retryable_download_error(error)
+                or attempt == max_attempts
+            ):
+                raise
+            delay = min(
+                DOWNLOAD_INITIAL_BACKOFF_SECONDS * (2 ** (attempt - 1)),
+                DOWNLOAD_MAX_BACKOFF_SECONDS,
+            )
+            sleeper(delay)
+    raise AssertionError("unreachable")
+
+
+def download_anonymously(
+    asset: dict, destination: Path, *, max_attempts: int = DOWNLOAD_MAX_ATTEMPTS,
+    sleeper=time.sleep
+) -> str:
+    def open_response():
+        request = anonymous_request(
+            asset["browser_download_url"], "application/octet-stream"
+        )
+        return urlopen(request, timeout=300)
+
+    return download_with_retry(
+        asset, destination, open_response, max_attempts=max_attempts, sleeper=sleeper
+    )
+
+
+def download_authenticated(
+    asset: dict, destination: Path, token: str, *,
+    max_attempts: int = DOWNLOAD_MAX_ATTEMPTS, sleeper=time.sleep
+) -> str:
+    def open_response():
+        request = authenticated_api_request(
+            asset["url"], token, "application/octet-stream"
+        )
+        opener = build_opener(TokenStrippingRedirectHandler())
+        return opener.open(request, timeout=300)
+
+    return download_with_retry(
+        asset, destination, open_response, max_attempts=max_attempts, sleeper=sleeper
+    )
 
 
 def prepare_destination(destination: Path) -> None:
     destination.mkdir(parents=True, exist_ok=True)
-    require(not any(destination.iterdir()), f"下载目录必须为空: {destination}")
+    for path in destination.iterdir():
+        require(
+            path.is_file() and not path.is_symlink(),
+            f"下载目录只能包含普通文件缓存: {path}",
+        )
+        if path.name.endswith(".part"):
+            path.unlink()
 
 
 def verify_download_inventory(destination: Path, tag: str) -> None:

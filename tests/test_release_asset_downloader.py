@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
+import socket
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
 from urllib.request import Request
+from urllib.error import HTTPError
 
 
 SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
@@ -19,6 +21,7 @@ from release_asset_downloader import (  # noqa: E402
     asset_inventory_sha256,
     authenticated_api_request,
     expected_assets,
+    download_with_retry,
     release_download_slug,
     validate_draft_release,
     validate_public_release,
@@ -57,6 +60,96 @@ def release_assets(download_slug: str = TAG) -> list[dict]:
 
 
 class ReleaseAssetDownloaderTests(unittest.TestCase):
+    def test_asset_download_retries_transient_failure_and_atomically_replaces_part(self) -> None:
+        class Response:
+            def __init__(self, payload: bytes) -> None:
+                self.payload = payload
+                self.read_count = 0
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_):
+                return False
+
+            def geturl(self) -> str:
+                return "https://release-assets.githubusercontent.com/object"
+
+            def read(self, _: int) -> bytes:
+                self.read_count += 1
+                if self.read_count == 1:
+                    return self.payload
+                return b""
+
+        payload = b"verified-asset"
+        item = {
+            "name": "asset.zip",
+            "size": len(payload),
+            "digest": "sha256:" + __import__("hashlib").sha256(payload).hexdigest(),
+        }
+        attempts = 0
+        sleeps: list[float] = []
+
+        def open_response():
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                raise socket.timeout("TLS handshake timeout")
+            return Response(payload)
+
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "asset.zip"
+            actual = download_with_retry(
+                item, destination, open_response, sleeper=sleeps.append
+            )
+            self.assertEqual(actual, item["digest"].removeprefix("sha256:"))
+            self.assertEqual(destination.read_bytes(), payload)
+            self.assertFalse(Path(f"{destination}.part").exists())
+        self.assertEqual(attempts, 2)
+        self.assertEqual(sleeps, [1.0])
+
+    def test_asset_download_reuses_verified_cache_without_network(self) -> None:
+        payload = b"cached"
+        item = {
+            "name": "asset.zip",
+            "size": len(payload),
+            "digest": "sha256:" + __import__("hashlib").sha256(payload).hexdigest(),
+        }
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "asset.zip"
+            destination.write_bytes(payload)
+            actual = download_with_retry(
+                item,
+                destination,
+                lambda: self.fail("已校验缓存不得访问网络"),
+            )
+            self.assertEqual(actual, item["digest"].removeprefix("sha256:"))
+
+    def test_asset_download_does_not_retry_http_404_or_digest_mismatch(self) -> None:
+        item = {"name": "asset.zip", "size": 1, "digest": "sha256:" + "a" * 64}
+        http_error = HTTPError("https://example.invalid", 404, "not found", {}, None)
+        self.addCleanup(http_error.close)
+        for error in (
+            http_error,
+            VerificationError("SHA-256 mismatch"),
+        ):
+            with self.subTest(error=type(error).__name__), tempfile.TemporaryDirectory() as directory:
+                calls = 0
+
+                def fail():
+                    nonlocal calls
+                    calls += 1
+                    raise error
+
+                with self.assertRaises(type(error)):
+                    download_with_retry(
+                        item,
+                        Path(directory) / "asset.zip",
+                        fail,
+                        sleeper=lambda _: self.fail("永久错误不得退避"),
+                    )
+                self.assertEqual(calls, 1)
+
     def test_release_download_slug_distinguishes_draft_and_formal(self) -> None:
         draft = {
             "draft": True,
