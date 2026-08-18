@@ -4,6 +4,8 @@
 
 ## 6.2.4 发布状态
 
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.2.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4"} -->
+
 当前最新公开正式版为 `IFLYADLib 6.2.4`，已于 2026-08-17 正式发布；参见 [GitHub Release 6.2.4](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4)。10 个资产已完成无 Token 匿名下载和正式消费验证。生产依赖应固定到 `6.2.4`，不要依赖 `main` 分支。
 
 > **6.2.4 发布证据**：正式签名资产从提交 A 构建；`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`。annotated Tag 解引用到 `d6a553e001129e2a6fac57422b30d6879c10a333`，正式消费 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 为 `success`。

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""分别校验通用仓机器分发契约与非阻断 Markdown 展示契约。"""
+"""分别校验通用仓机器分发契约与阻断式 Markdown 发布契约。"""
 
 from __future__ import annotations
 
@@ -19,6 +19,9 @@ from verify_distribution_manifest import (
 )
 
 PREVIOUS_RELEASE_VERSION = "6.2.3"
+RELEASE_STATUS_RE = re.compile(
+    r"<!--\s*ifly-release-status:\s*(\{[^\r\n]*\})\s*-->"
+)
 
 
 class ContractError(RuntimeError):
@@ -32,6 +35,23 @@ def require(condition: bool, message: str) -> None:
 
 def read(root: Path, relative: str) -> str:
     return (root / relative).read_text(encoding="utf-8")
+
+
+def verify_release_status(label: str, document: str) -> None:
+    markers = RELEASE_STATUS_RE.findall(document)
+    require(len(markers) == 1, f"{label} 发布状态标记数量错误: {len(markers)}")
+    try:
+        marker = json.loads(markers[0])
+    except json.JSONDecodeError as error:
+        raise ContractError(f"{label} 发布状态标记不是合法 JSON") from error
+    expected = {
+        "schemaVersion": 1,
+        "version": VERSION,
+        "releaseState": "FORMAL",
+        "distribution": "github-release",
+        "releaseUrl": f"https://github.com/{REPOSITORY}/releases/tag/{VERSION}",
+    }
+    require(marker == expected, f"{label} 发布状态标记漂移: {marker}")
 
 
 def machine_state(root: Path) -> dict[str, object]:
@@ -140,10 +160,7 @@ def verify_docs(root: Path, _release_kind: str) -> None:
         require(VERSION in demo and "发布准备" in demo, "Demo 缺少发布准备说明")
     else:
         for label in ("README.md", "CHANGELOG.md", "RELEASING.md"):
-            document = documents[label]
-            require("- `releaseState`：`FORMAL`" in document,
-                    f"{label} 缺少 FORMAL 展示")
-            require("冻结" in document, f"{label} 缺少冻结语义")
+            verify_release_status(label, documents[label])
         require(VERSION in demo, "Demo 缺少当前版本展示")
 
 

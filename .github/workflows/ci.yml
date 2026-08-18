@@ -224,8 +224,7 @@ jobs:
           git show "${WORKFLOW_CONTROL_SHA}:scripts/verify_repository_contract.py" |
             python3 - --scope machine --release-kind "${RELEASE_MODE}"
 
-      - name: 非阻断校验 Markdown 发布展示措辞
-        continue-on-error: true
+      - name: 阻断校验 Markdown 发布状态契约
         env:
           RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}
           WORKFLOW_CONTROL_SHA: ${{ github.workflow_sha }}
@@ -237,7 +236,6 @@ jobs:
 
       - name: 校验 A/B provenance 文档一致性（main/PR 不访问私有仓）
         if: steps.release-mode.outputs.release_mode == 'local'
-        continue-on-error: true
         run: |
           python3 scripts/verify_private_release_provenance.py \
             --readme README.md \

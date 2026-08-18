@@ -175,22 +175,22 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertIn("release_mode='tag'", preflight)
         self.assertIn("release_mode='formal'", preflight)
 
-    def test_machine_contract_is_blocking_and_document_provenance_is_non_blocking(self) -> None:
+    def test_machine_and_document_contracts_are_blocking(self) -> None:
         preflight = job_block("preflight")
         machine = step_block(
             preflight, "阻断校验版本、checksum 与通用仓 10 资产机器契约"
         )
         self.assertNotIn("continue-on-error", machine)
         documentation = step_block(
-            preflight, "非阻断校验 Markdown 发布展示措辞"
+            preflight, "阻断校验 Markdown 发布状态契约"
         )
-        self.assertIn("continue-on-error: true", documentation)
+        self.assertNotIn("continue-on-error", documentation)
         self.assertIn("--scope docs", documentation)
         maintenance = step_block(
             preflight, "校验 A/B provenance 文档一致性（main/PR 不访问私有仓）"
         )
-        self.assertIn("continue-on-error: true", maintenance)
-        self.assertEqual(WORKFLOW.count("continue-on-error: true"), 2)
+        self.assertNotIn("continue-on-error", maintenance)
+        self.assertEqual(WORKFLOW.count("continue-on-error: true"), 0)
         release_provenance = step_block(
             job_block("release-assets"), "校验 Release body 的 A/B provenance 声明"
         )
@@ -203,7 +203,11 @@ class CIWorkflowContractTests(unittest.TestCase):
         def docs_drift(root: Path, relative: str) -> str:
             value = original_read(root, relative)
             if relative == "README.md":
-                return value.replace("- `releaseState`：`FORMAL`", "", 1)
+                return value.replace(
+                    "<!-- ifly-release-status:",
+                    "<!-- removed-release-status:",
+                    1,
+                )
             return value
 
         with mock.patch.object(repository_contract, "read", side_effect=docs_drift):

@@ -18,6 +18,8 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 ## 6.2.4 当前发布状态
 
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.2.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4"} -->
+
 当前最新公开正式版是 [`6.2.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4)（2026-08-17）。`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`；10 个资产已完成无 Token 匿名下载，正式消费 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 为 `success`。
 
 - `releaseState`：`FORMAL`
