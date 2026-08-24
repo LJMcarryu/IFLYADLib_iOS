@@ -31,7 +31,7 @@ from download_draft_release import run as run_draft_download  # noqa: E402
 
 
 REPOSITORY = "LJMcarryu/IFLYADLib_iOS"
-TAG = "6.2.4"
+TAG = "6.3.0"
 TARGET = "1" * 40
 CANDIDATE_ID = "2" * 64
 CANDIDATE_BRANCH = f"release-candidate/{TAG}-{CANDIDATE_ID}"

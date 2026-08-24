@@ -16,24 +16,24 @@
 重型验证 job 最长运行 55 分钟，结束后由无 Token、只读的 summary job 汇总 Candidate、Release、
 checkout commit、资产库存身份和全部 job 结论；summary 对上游失败继续失败关闭。
 
-## 6.2.4 当前发布状态
+## 6.3.0 当前发布状态
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.2.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4"} -->
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.0","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0"} -->
 
-当前最新公开正式版是 [`6.2.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4)（2026-08-17）。`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`；10 个资产已完成无 Token 匿名下载，正式消费 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 为 `success`。
+当前最新公开正式版是 [`6.3.0`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0)（2026-08-25）。`IFLYADLib-modelA-6.3.0.zip` 的冻结 SHA-256 为 `fdf7c98bf1332b78cc6e2c7a840dd8cc804fb607e754cc457f969ce6e448a6f2`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，无 Token 匿名下载和正式消费由同一发布流水线按冻结身份验收。
 
 - `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`b0f745d582ce2bed5110702cff972be4153e5038`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`7b08118b43a0c4441de4c76a64f34fa54b3fe889`
-- `candidateId`：`61f427469346615982e0225fad8187611794cc0a54c452da83073e89fd5ea1bd`
+- `binarySourceCommit`（SDK 二进制源码提交）：`38eb0715f889fe2d585641891923511c9cc3e43e`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`0e667f9f1a2d615d3f7e15a552f093c903ff1a57`
+- `candidateId`：`1b69dab08ac31e756b707d824b2548c2c2cfd66b343007d00e43efdbee795c44`
 
-`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结；仓库根 `release-state.json` 的 `6.2.4/CLOSED` 记录发布闭环事实。
+`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结。`release-state.json` 只由编排器在候选和闭环阶段受控推进，本次内容更新不手工修改该文件。
 
 正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
 
-`6.2.3` 的发布后证据 [Run 31939141466](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31939141466) 仅作为历史记录保留，不得替代 `6.2.4` 的独立发布证据。
+`6.2.4` 的发布后证据 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 仅作为历史记录保留，不得替代 `6.3.0` 的独立发布证据。
 
-`6.2.4` 不沿用历史版本的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
+`6.3.0` 不沿用历史版本的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
 
 正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
 
@@ -73,7 +73,7 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
    - 确认 `IFLYADLib.podspec` 的 `Core` 显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`，且最终 Core Mach-O 在 iOS 11～13 不形成 ATT 强依赖；
    - 将 `build/modelA/release/swiftpm-resources/spm/` 同步到本仓 `spm/`，不将该中间目录作为 Release 资产上传；
    - 同步 README、CHANGELOG、迁移说明和示例工程 Podfile/Xcode deployment target；
-- NativeFeed API 变更须同步固定页和列表页，并复验数据层只持 Ad、Cell 不持 Session/Binding、进屏 Ad 级 attach、离屏按容器 detach、回屏恢复、最后引用释放自动终止和可选 `destroy`；`6.2.4` 还须验证外部 CTA 默认关闭、同 Cell/专属 wrapper/window-local 三种归属、祖先路径固定、运行中 reparent 71503 拒绝回调和 `detachFromCurrentContainer`；
+- NativeFeed API 变更须同步固定页和列表页，并复验数据层只持 Ad、Cell 不持 Session/Binding、进屏 Ad 级 attach、离屏按容器 detach、回屏恢复、最后引用释放自动终止和可选 `destroy`；`6.3.0` 还须验证 permissive 外部 CTA、点击时租约与可见性验收、媒体交互优先、结构化 `71503` point 和 `detachFromCurrentContainer`；
    - 正式资产和 checksum 均已就绪后，将 `releaseState` 切换为 `FORMAL`，但在 tag/Release 与匿名验证完成前继续明确标注“尚未公开发布”；发布闭环后才写入正式发布日期和“最新公开正式版本”；
    - 在私有仓执行 `python3 scripts/verify-model-a-release-metadata.py --version "${VERSION}"`，闭环校验产物、checksum 和两个分发清单。
 

@@ -124,7 +124,7 @@ def localize_package_manifest(source: str) -> str:
 def localize_consumer_manifest(source: str) -> str:
     pattern = re.compile(
         r'\.package\(\s*url:\s*"https://github\.com/LJMcarryu/'
-        r'IFLYADLib_iOS\.git"\s*,\s*exact:\s*"6\.2\.4"\s*\)',
+        r'IFLYADLib_iOS\.git"\s*,\s*exact:\s*"6\.3\.0"\s*\)',
         re.S,
     )
     localized, count = pattern.subn('.package(path: "../IFLYADLib_iOS")', source)
@@ -186,7 +186,7 @@ def localize_podfile(source: str) -> str:
     pattern = re.compile(
         r"(?m)^(?P<indent>[ \t]*)pod 'IFLYADLib', :podspec => "
         r"'https://raw\.githubusercontent\.com/LJMcarryu/IFLYADLib_iOS/"
-        r"6\.2\.4/IFLYADLib\.podspec'[ \t]*$"
+        r"6\.3\.0/IFLYADLib\.podspec'[ \t]*$"
     )
     localized, count = pattern.subn(
         r"\g<indent>pod 'IFLYADLib', :path => '../IFLYADLib'", source
@@ -221,7 +221,7 @@ def main() -> int:
     parser.add_argument("--asset-dir", type=Path, required=True)
     parser.add_argument("--repository-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--version", default="6.2.4")
+    parser.add_argument("--version", default="6.3.0")
     args = parser.parse_args()
     try:
         if args.kind == "swiftpm":

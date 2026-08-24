@@ -104,7 +104,7 @@ jobs:
           MANUAL_CANARY_CANDIDATE_ID: ${{ inputs.canary_candidate_id }}
         run: |
           set -euo pipefail
-          version='6.2.4'
+          version='6.3.0'
           release_mode='local'
           event_tag=''
           draft_release_id=''
@@ -367,7 +367,7 @@ jobs:
           def has_objc_flag(config):
               return "-ObjC" in shlex.split((config or {}).get("OTHER_LDFLAGS", ""))
 
-          assert spec["version"] == "6.2.4", spec["version"]
+          assert spec["version"] == "6.3.0", spec["version"]
           assert has_objc_flag(spec.get("pod_target_xcconfig"))
           assert has_objc_flag(spec.get("user_target_xcconfig"))
           core = next(item for item in spec["subspecs"] if item["name"] == "Core")

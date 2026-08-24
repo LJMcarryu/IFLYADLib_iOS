@@ -194,16 +194,16 @@ class ReleaseStateTests(unittest.TestCase):
             release_state.validate_state(invalid_publication)
 
         next_frozen = copy.deepcopy(frozen)
-        next_frozen["version"] = "6.2.4"
+        next_frozen["version"] = "6.3.0"
         release_state.validate_state_transition(self.state, next_frozen)
         with self.assertRaises(release_state.ReleaseStateError):
             release_state.validate_state_transition(self.state, frozen)
 
         cross_version_closed = copy.deepcopy(self.state)
-        cross_version_closed["version"] = "6.2.4"
-        cross_version_closed["publication"]["tagName"] = "6.2.4"
+        cross_version_closed["version"] = "6.3.0"
+        cross_version_closed["publication"]["tagName"] = "6.3.0"
         cross_version_closed["publication"]["releaseUrl"] = (
-            "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4"
+            "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0"
         )
         with self.assertRaises(release_state.ReleaseStateError):
             release_state.validate_state_transition(self.state, cross_version_closed)

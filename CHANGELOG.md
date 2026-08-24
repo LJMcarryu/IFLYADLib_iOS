@@ -2,9 +2,26 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
-## [6.2.4] - 2026-08-17
+## [6.3.0] - 2026-08-25
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.2.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4"} -->
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.0","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0"} -->
+
+- `releaseState`：`FORMAL`
+- `binarySourceCommit`（SDK 二进制源码提交）：`38eb0715f889fe2d585641891923511c9cc3e43e`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`0e667f9f1a2d615d3f7e15a552f093c903ff1a57`
+- `candidateId`：`1b69dab08ac31e756b707d824b2548c2c2cfd66b343007d00e43efdbee795c44`
+- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.0.zip` 的冻结 SHA-256 为 `fdf7c98bf1332b78cc6e2c7a840dd8cc804fb607e754cc457f969ce6e448a6f2`。公开库存固定为 10 项，由发布流水线执行无 Token 匿名下载、逐项 SHA-256 与正式消费验证。
+- Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
+
+### 变更
+
+- NativeFeed 外部 CTA 统一采用 permissive attach：开启 `allowsExternalClickViews` 后允许 CTA 后挂载、后布局、跨层级和大面积范围，不再要求同 Cell、共同 wrapper、几何相邻、固定祖先路径或面积比例。
+- 点击时继续校验当前 Ad/container/generation 的独占租约、双方同 window/scene、CTA 有效尺寸与可见交互、容器前台且至少 `2/3` 可见；`UIWindow`、页面根和 container 本身继续失败关闭。
+- 父级广告点击为媒体 `UIControl` 和非 SDK 手势退让；显式注册的 CTA 自身仍归 SDK，`closeView` 子树继续隔离。
+- 所有 71503 统一返回稳定 `[71503/<point>]` 与中文处理提示，覆盖 attach 和运行时 acceptance；失败不补曝光、监测或跳转。
+- 收口点击跳转、落地页回调和转场生命周期，保证完成、失败、取消和页面关闭路径只终结一次。
+
+## [6.2.4] - 2026-08-17
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`b0f745d582ce2bed5110702cff972be4153e5038`
