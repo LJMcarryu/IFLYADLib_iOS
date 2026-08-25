@@ -294,7 +294,9 @@ NativeFeed 的数据由媒体渲染，SDK 负责曝光、点击、跳转、关�
 - `attachWithViewBinder:error:` 必须在主线程同步调用；`containerView` 必填，视频素材必须提供普通 `UIView` 作为 `videoView`。
 - `interactionType` 为 `Exposure` 或 `Unknown` 时，`clickViews` 传 `@[]`；为 `Redirect` 或 `Download` 时只传实际点击视图。
 - 如确实需要把 CTA 放在广告容器外，显式设置 `binder.allowsExternalClickViews = YES`，并保证 CTA 与广告处于同一 window/scene、可见且可交互。常规接入优先把 CTA 放在容器内部。
+- 外部 CTA 不满足可见性或交互条件时，delegate 会通过 `nativeFeedAd:didRejectClickWithError:` 返回 `IFLYAdErrorCodeNativeFeedClickViewsInvalid`（`71503`）；业务应记录并修正视图层级，不要自行跳转。
 - Cell 离屏、复用或切换为普通内容时，必须对具体容器调用 `detachAdFromContainerView:`；不要用旧 `indexPath` 反查广告。
+- 固定单容器且明确知道当前广告对象时，也可以调用 `detachFromCurrentContainer`；可复用列表仍优先按容器调用 `detachAdFromContainerView:`。
 - 列表数据层持有 `IFLYNativeFeedAd`，Cell 只负责渲染和 attach/detach。条目暂时离屏可继续持有同一 Ad；永久删除或页面退出时 detach、置空 delegate 并释放 Ad。
 - SDK 管理视频播放器。绑定且曝光后可使用 `startPlay`、`pausePlay`、`resumePlay`、`stopPlay` 控制播放。
 
