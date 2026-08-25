@@ -2,6 +2,8 @@
 
 `IFLYADLib` 是面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频。本文只介绍外部接入所需的公开能力；完整 API 以 framework 公开头为准。
 
+## 6.3.0 发布状态
+
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.0","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0"} -->
 
 当前正式版本：[`6.3.0`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0)。生产项目请固定到具体版本，不要依赖 `main` 分支。

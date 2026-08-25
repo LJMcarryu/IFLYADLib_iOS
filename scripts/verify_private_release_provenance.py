@@ -17,6 +17,9 @@ CURRENT_VERSION = "6.3.0"
 PENDING_BINARY = "__IFLYADLIB_6_3_0_BINARY_SOURCE_COMMIT_PENDING__"
 PENDING_METADATA = "__IFLYADLIB_6_3_0_RELEASE_METADATA_COMMIT_PENDING__"
 ALLOWED_METADATA_FILES = {"Package.swift", "README.md", "CONTEXT.md"}
+PUBLIC_RELEASE_STATUS_RE = re.compile(
+    r"<!--\s*ifly-release-status:\s*(\{[^\r\n]*\})\s*-->"
+)
 
 
 class VerificationError(RuntimeError):
@@ -26,6 +29,23 @@ class VerificationError(RuntimeError):
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise VerificationError(message)
+
+
+def has_public_release_status(document: str) -> bool:
+    matches = PUBLIC_RELEASE_STATUS_RE.findall(document)
+    if len(matches) != 1:
+        return False
+    try:
+        marker = json.loads(matches[0])
+    except json.JSONDecodeError:
+        return False
+    return marker == {
+        "schemaVersion": 1,
+        "version": CURRENT_VERSION,
+        "releaseState": "FORMAL",
+        "distribution": "github-release",
+        "releaseUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0",
+    }
 
 
 def _find(document: str, label: str) -> list[str]:
@@ -75,7 +95,9 @@ def parse_document(document: str, label: str) -> tuple[str, str, str]:
 
 
 def validate_documents(paths: list[Path]) -> tuple[str, str, str]:
-    values = [parse_document(path.read_text(encoding="utf-8"), str(path)) for path in paths]
+    readme = paths[0].read_text(encoding="utf-8")
+    source_paths = paths[1:] if has_public_release_status(readme) else paths
+    values = [parse_document(path.read_text(encoding="utf-8"), str(path)) for path in source_paths]
     require(len(set(values)) == 1, "README/CHANGELOG/RELEASING 的 releaseState/A/B 不一致")
     state, binary, metadata = values[0]
     pending = state == "PENDING" and binary == PENDING_BINARY and metadata == PENDING_METADATA

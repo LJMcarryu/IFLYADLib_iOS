@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -182,6 +183,9 @@ HISTORICAL_REVIEW_POLICY_MARKERS = (
     "strict=false",
     "requireManual=false",
 )
+PUBLIC_RELEASE_STATUS_RE = re.compile(
+    r"<!--\s*ifly-release-status:\s*(\{[^\r\n]*\})\s*-->"
+)
 
 
 def read(root: Path, relative: str) -> str:
@@ -201,6 +205,25 @@ def current_version_section(document: str, label: str) -> str:
     return document[start:end]
 
 
+def is_public_readme(document: str) -> bool:
+    """公开 README 只保留机器可读版本标记，不承载内部发布 provenance。"""
+
+    matches = PUBLIC_RELEASE_STATUS_RE.findall(document)
+    if len(matches) != 1:
+        return False
+    try:
+        marker = json.loads(matches[0])
+    except ValueError:
+        return False
+    return marker == {
+        "schemaVersion": 1,
+        "version": VERSION,
+        "releaseState": "FORMAL",
+        "distribution": "github-release",
+        "releaseUrl": f"https://github.com/{REPOSITORY}/releases/tag/{VERSION}",
+    } and "当前正式版本：[`6.3.0`](" in document
+
+
 def require_formal_combined_sha256(
     documents: dict[str, str], checksums: dict[str, str]
 ) -> str:
@@ -210,7 +233,10 @@ def require_formal_combined_sha256(
         r".{0,300}?冻结 SHA-256(?: 为|：)?\s*`([0-9a-f]{64})`",
         re.S,
     )
-    for label in ("README", "CHANGELOG", "RELEASING"):
+    labels = ("CHANGELOG", "RELEASING") if is_public_readme(documents["README"]) else (
+        "README", "CHANGELOG", "RELEASING"
+    )
+    for label in labels:
         matches = pattern.findall(documents[label])
         assert len(matches) == 1, f"{label} 必须唯一记录本版正式合并包 SHA-256"
         values[label] = matches[0]
@@ -231,6 +257,8 @@ def require_markers(
     documents: dict[str, str], expected: dict[str, tuple[str, ...]], stage: str
 ) -> None:
     for label, markers in expected.items():
+        if label == "README" and is_public_readme(documents[label]):
+            continue
         scoped = stage_document(documents[label], label)
         for marker in markers:
             assert marker in scoped, f"{label} {stage}缺少发布事实：{marker}"
@@ -238,6 +266,8 @@ def require_markers(
 
 def require_formal_identity(documents: dict[str, str], package: str) -> None:
     for label in ("README", "CHANGELOG", "RELEASING"):
+        if label == "README" and is_public_readme(documents[label]):
+            continue
         current = current_version_section(documents[label], label)
         assert "- `releaseState`：`FORMAL`" in current, (
             f"{label} 的 {VERSION} 章节未声明 releaseState=FORMAL"
@@ -294,6 +324,8 @@ def verify(root: Path, version: str, mode: str) -> str:
     podfile = read(root, "IFLYADLibSimple/Podfile")
     package = read(root, "Package.swift")
     for label, document in (("README", readme), ("RELEASING", releasing)):
+        if label == "README" and is_public_readme(document):
+            continue
         current = current_version_section(document, label)
         assert STRICT_REVIEW_POLICY in current, f"{label} 缺少 6.3.0 严格扫描策略"
         assert RISK_AUTHORIZATION_BOUNDARY in current, (

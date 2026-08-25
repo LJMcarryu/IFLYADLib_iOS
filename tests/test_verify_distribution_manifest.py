@@ -62,12 +62,12 @@ class DistributionManifestTests(unittest.TestCase):
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             source = source.replace(
-                "当前最新公开正式版为 `IFLYADLib 6.3.0`",
+                "当前正式版本：[`6.3.0`]",
                 "当前最新公开正式版仍为 `IFLYADLib 6.2.4`",
                 1,
             )
             readme.write_text(source, encoding="utf-8")
-            with self.assertRaisesRegex(AssertionError, "发布后态缺少发布事实"):
+            with self.assertRaisesRegex(AssertionError, "严格扫描策略"):
                 verify(root, VERSION, "candidate")
 
     def test_rejects_historical_module_checksum(self) -> None:
@@ -101,19 +101,14 @@ class DistributionManifestTests(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, "禁止沿用历史合并包"):
                 verify(root, VERSION, "candidate")
 
-    def test_current_section_rejects_historical_review_policy(self) -> None:
+    def test_public_readme_does_not_require_internal_review_policy(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copy_contract_files(root)
             readme = root / "README.md"
-            readme.write_text(
-                readme.read_text(encoding="utf-8").replace(
-                    "failOnWarning=true", "failOnWarning=false", 1
-                ),
-                encoding="utf-8",
-            )
-            with self.assertRaisesRegex(AssertionError, "严格扫描策略"):
-                verify(root, VERSION, "local")
+            source = readme.read_text(encoding="utf-8")
+            self.assertNotIn("failOnWarning=", source)
+            self.assertEqual(verify(root, VERSION, "local"), "已发布资产本地复验")
 
     def test_rejects_binary_target_on_different_host(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
