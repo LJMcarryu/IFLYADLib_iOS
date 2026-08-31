@@ -62,8 +62,8 @@ class DistributionManifestTests(unittest.TestCase):
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             source = source.replace(
-                "当前正式版本：[`6.3.0`]",
-                "当前最新公开正式版仍为 `IFLYADLib 6.2.4`",
+                "当前正式版本：[`6.3.1`]",
+                "当前最新公开正式版仍为 `IFLYADLib 6.3.0`",
                 1,
             )
             readme.write_text(source, encoding="utf-8")
@@ -90,7 +90,7 @@ class DistributionManifestTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copy_contract_files(root)
-            current = "fdf7c98bf1332b78cc6e2c7a840dd8cc804fb607e754cc457f969ce6e448a6f2"
+            current = "4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5"
             historical = next(iter(PREVIOUS_COMBINED_SHA256))
             for relative in ("README.md", "CHANGELOG.md", "RELEASING.md"):
                 path = root / relative
