@@ -2,11 +2,11 @@
 
 `IFLYADLib` 是面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频。本文只介绍外部接入所需的公开能力；完整 API 以 framework 公开头为准。
 
-## 6.3.0 发布状态
+## 6.3.1 发布状态
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.0","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0"} -->
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.1","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1"} -->
 
-当前正式版本：[`6.3.0`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0)。生产项目请固定到具体版本，不要依赖 `main` 分支。
+当前正式版本：[`6.3.1`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1)。生产项目请固定到具体版本，不要依赖 `main` 分支。
 
 ## 能力矩阵
 
@@ -43,7 +43,7 @@ platform :ios, '11.0'
 target 'YourApp' do
   use_frameworks!
   pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.0/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.1/IFLYADLib.podspec'
 end
 ```
 
@@ -64,7 +64,7 @@ open YourApp.xcworkspace
 https://github.com/LJMcarryu/IFLYADLib_iOS.git
 ```
 
-选择版本 `6.3.0`，再按需要选择 `Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward` 或 `Full` product。SwiftPM 会自动投递资源；在 App target 的 `Other Linker Flags` 中添加：
+选择版本 `6.3.1`，再按需要选择 `Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward` 或 `Full` product。SwiftPM 会自动投递资源；在 App target 的 `Other Linker Flags` 中添加：
 
 ```text
 -ObjC
@@ -72,7 +72,7 @@ https://github.com/LJMcarryu/IFLYADLib_iOS.git
 
 ### 手动集成
 
-从 [Release 6.3.0](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0) 下载对应压缩包：
+从 [Release 6.3.1](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1) 下载对应压缩包：
 
 1. 将需要的 `.xcframework` 加入 App target，Embed 选择 **Do Not Embed**。
 2. 将压缩包中的资源 bundle 加入 **Copy Bundle Resources**。
