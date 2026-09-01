@@ -42,6 +42,7 @@ platform :ios, '11.0'
 
 target 'YourApp' do
   use_frameworks!
+  # 默认安装 Full，包含开屏、Banner、插屏、自渲染信息流和激励视频五种广告。
   pod 'IFLYADLib',
       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.1/IFLYADLib.podspec'
 end
@@ -54,7 +55,29 @@ pod install
 open YourApp.xcworkspace
 ```
 
-默认 `Full` 包含全部五种广告；若只需要部分能力，可使用 `Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward` 或 `Full` subspec。
+上面的裸写法等价于选择 `Full`，会安装全部五种广告。如果只需要部分能力，请将 `pod` 行替换为对应 subspec；同一个 target 不要同时写裸 `IFLYADLib` 和其他 subspec：
+
+```ruby
+# 只接入开屏：Core 和 VideoUI 会自动带入
+pod 'IFLYADLib/Splash',
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.1/IFLYADLib.podspec'
+
+# 只接入 Banner + 自渲染信息流：两个格式共用一份 Core
+pod 'IFLYADLib/Banner',
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.1/IFLYADLib.podspec'
+pod 'IFLYADLib/NativeFeed',
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.1/IFLYADLib.podspec'
+
+# 只接入基础 Core（不包含任何广告格式）
+pod 'IFLYADLib/Core',
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.1/IFLYADLib.podspec'
+
+# 显式写 Full，和最上面的裸写法等价
+pod 'IFLYADLib/Full',
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.1/IFLYADLib.podspec'
+```
+
+选择 `Splash`、`Interstitial` 或 `Reward` 时，`Core`、`VideoUI` 及所需资源会由依赖关系自动安装；`Banner` 和 `NativeFeed` 只自动依赖 `Core`。替换 Podfile 后重新执行 `pod install`，再打开生成的 `.xcworkspace`。
 
 ### Swift Package Manager
 
@@ -69,6 +92,34 @@ https://github.com/LJMcarryu/IFLYADLib_iOS.git
 ```text
 -ObjC
 ```
+
+在 Xcode 中，product 的选择直接对应要接入的广告能力：只接开屏就选 `Splash`，同时接 Banner 和信息流就选 `Banner`、`NativeFeed`，需要全部能力就选 `Full`。如果使用 `Package.swift`，可以使用下面的完整片段（把 `YourApp` 换成自己的 target 名称）：
+
+```swift
+// swift-tools-version:5.9
+import PackageDescription
+
+let package = Package(
+    name: "YourApp",
+    platforms: [
+        .iOS("11.0")
+    ],
+    dependencies: [
+        .package(url: "https://github.com/LJMcarryu/IFLYADLib_iOS.git", from: "6.3.1")
+    ],
+    targets: [
+        .target(
+            name: "YourApp",
+            dependencies: [
+                .product(name: "Banner", package: "IFLYADLib"),
+                .product(name: "NativeFeed", package: "IFLYADLib")
+            ]
+        )
+    ]
+)
+```
+
+格式 product 会自动依赖 `Core`（视频格式还会依赖 `VideoUI`）；无需再手动添加这些内部依赖。若改为全量接入，将上例两个 product 替换为 `.product(name: "Full", package: "IFLYADLib")`。
 
 ### 手动集成
 
