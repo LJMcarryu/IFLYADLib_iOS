@@ -13,7 +13,7 @@ from urllib.parse import quote, urlsplit
 from urllib.request import Request, urlopen
 
 PRIVATE_SOURCE_REPOSITORY = "LJMcarryu/IFLYADLibDemo"
-CURRENT_VERSION = "6.3.1"
+CURRENT_VERSION = "6.3.5"
 PENDING_BINARY = "__IFLYADLIB_6_3_1_BINARY_SOURCE_COMMIT_PENDING__"
 PENDING_METADATA = "__IFLYADLIB_6_3_1_RELEASE_METADATA_COMMIT_PENDING__"
 ALLOWED_METADATA_FILES = {"Package.swift", "README.md", "CONTEXT.md"}
@@ -44,7 +44,7 @@ def has_public_release_status(document: str) -> bool:
         "version": CURRENT_VERSION,
         "releaseState": "FORMAL",
         "distribution": "github-release",
-        "releaseUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1",
+        "releaseUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5",
     }
 
 

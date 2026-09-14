@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""校验 6.3.1 通用分发清单、版本状态与 10 资产静态契约。"""
+"""校验 6.3.5 通用分发清单、版本状态与 10 资产静态契约。"""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 
-VERSION = "6.3.1"
+VERSION = "6.3.5"
 RELEASE_DATE = "2026-09-01"
 REPOSITORY = "LJMcarryu/IFLYADLib_iOS"
 EXPECTED = {
@@ -92,19 +92,19 @@ PENDING_IDENTITY_MARKERS = (
     "- `releaseState`：`PENDING`",
     "__IFLYADLIB_6_3_1_BINARY_SOURCE_COMMIT_PENDING__",
     "__IFLYADLIB_6_3_1_RELEASE_METADATA_COMMIT_PENDING__",
-    "下列 checksum 为 6.3.1 唯一 PENDING 占位",
+    "下列 checksum 为 6.3.5 唯一 PENDING 占位",
 )
 PREPUBLICATION_MARKERS = (
     "最新公开正式版仍为 `IFLYADLib 6.3.0`",
-    "`main` 正在准备全渠道共享优化版 `6.3.1`",
+    "`main` 正在准备全渠道共享优化版 `6.3.5`",
     "正式签名资产、tag、Release 和匿名消费验证均未生成",
-    "当前 `6.3.1` URL 不可用于生产依赖",
-    "## [6.3.1] - 待发布",
+    "当前 `6.3.5` URL 不可用于生产依赖",
+    "## [6.3.5] - 待发布",
     "正式签名资产、7 个 SwiftPM checksum、tag、Release 与匿名消费验证尚未生成",
-    "`main` 正在准备 `6.3.1`",
+    "`main` 正在准备 `6.3.5`",
     "该版正式资产、checksum、tag、Release 与匿名消费验证均未生成",
-    "### `6.3.1` 发布准备",
-    "`6.3.1` 当前为 `PENDING`",
+    "### `6.3.5` 发布准备",
+    "`6.3.5` 当前为 `PENDING`",
     "正式资产、tag 和 Release 尚不存在",
     "正式资产公开前 `pod install` 失败是预期结果",
     "正式资产、tag 和 Release 尚不存在，当前远程依赖不可用",
@@ -113,19 +113,19 @@ FROZEN_REQUIRED_MARKERS = {
     "README": (
         "- `releaseState`：`FORMAL`",
         "当前最新公开正式版仍为 `IFLYADLib 6.3.0`",
-        "IFLYADLib-modelA-6.3.1.zip",
+        "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
     ),
     "CHANGELOG": (
         "- `releaseState`：`FORMAL`",
-        "## [6.3.1] - 待发布",
-        "IFLYADLib-modelA-6.3.1.zip",
+        "## [6.3.5] - 待发布",
+        "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
     ),
     "RELEASING": (
         "- `releaseState`：`FORMAL`",
         "当前最新公开正式版仍是 [`6.3.0`]",
-        "IFLYADLib-modelA-6.3.1.zip",
+        "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
     ),
     "SECURITY": (
@@ -139,53 +139,53 @@ FROZEN_REQUIRED_MARKERS = {
 PUBLISHED_REQUIRED_MARKERS = {
     "README": (
         "- `releaseState`：`FORMAL`",
-        "当前最新公开正式版为 `IFLYADLib 6.3.1`",
+        "当前最新公开正式版为 `IFLYADLib 6.3.5`",
         f"已于 {RELEASE_DATE} 正式发布",
-        "IFLYADLib-modelA-6.3.1.zip",
+        "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
         "匿名下载",
     ),
     "CHANGELOG": (
         "- `releaseState`：`FORMAL`",
-        f"## [6.3.1] - {RELEASE_DATE}",
-        "IFLYADLib-modelA-6.3.1.zip",
+        f"## [6.3.5] - {RELEASE_DATE}",
+        "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
         "匿名下载",
     ),
     "RELEASING": (
         "- `releaseState`：`FORMAL`",
-        "当前最新公开正式版是 [`6.3.1`]",
-        "IFLYADLib-modelA-6.3.1.zip",
+        "当前最新公开正式版是 [`6.3.5`]",
+        "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
         "匿名下载",
     ),
     "SECURITY": (
-        "最新公开正式版本（当前为 `6.3.1`）",
-        f"`6.3.1` 已于 {RELEASE_DATE}",
+        "最新公开正式版本（当前为 `6.3.5`）",
+        f"`6.3.5` 已于 {RELEASE_DATE}",
     ),
     "DEMO": (
-        f"已于 {RELEASE_DATE} 正式发布的 `6.3.1`",
-        "不可变 `6.3.1` tag",
+        f"已于 {RELEASE_DATE} 正式发布的 `6.3.5`",
+        "不可变 `6.3.5` tag",
     ),
     "PODFILE": (
-        "IFLYADLib 6.3.1 已正式发布并完成匿名消费复验",
+        "IFLYADLib 6.3.5 已正式发布并完成匿名消费复验",
         "不可变 tag",
     ),
 }
 PUBLISHED_CLAIM_MARKERS = (
-    "当前最新公开正式版为 `IFLYADLib 6.3.1`",
-    f"## [6.3.1] - {RELEASE_DATE}",
-    "当前最新公开正式版是 [`6.3.1`]",
-    "最新公开正式版本（当前为 `6.3.1`）",
-    f"`6.3.1` 已于 {RELEASE_DATE}",
-    f"已于 {RELEASE_DATE} 正式发布的 `6.3.1`",
-    "IFLYADLib 6.3.1 已正式发布并完成匿名消费复验",
+    "当前最新公开正式版为 `IFLYADLib 6.3.5`",
+    f"## [6.3.5] - {RELEASE_DATE}",
+    "当前最新公开正式版是 [`6.3.5`]",
+    "最新公开正式版本（当前为 `6.3.5`）",
+    f"`6.3.5` 已于 {RELEASE_DATE}",
+    f"已于 {RELEASE_DATE} 正式发布的 `6.3.5`",
+    "IFLYADLib 6.3.5 已正式发布并完成匿名消费复验",
 )
 STRICT_REVIEW_POLICY = (
     "failOn=high`、`failOnWarning=true`、`strict=true`、"
     "`requireManual=true` 且接受名单为空"
 )
-RISK_AUTHORIZATION_BOUNDARY = "`6.3.1` 不沿用历史版本的启发式风险授权"
+RISK_AUTHORIZATION_BOUNDARY = "`6.3.5` 不沿用历史版本的启发式风险授权"
 HISTORICAL_REVIEW_POLICY_MARKERS = (
     "failOnWarning=false",
     "strict=false",
@@ -229,7 +229,7 @@ def is_public_readme(document: str) -> bool:
         "releaseState": "FORMAL",
         "distribution": "github-release",
         "releaseUrl": f"https://github.com/{REPOSITORY}/releases/tag/{VERSION}",
-    } and "当前正式版本：[`6.3.1`](" in document
+    } and "当前正式版本：[`6.3.5`](" in document
 
 
 def require_formal_combined_sha256(
@@ -335,12 +335,12 @@ def verify(root: Path, version: str, mode: str) -> str:
         if label == "README" and is_public_readme(document):
             continue
         current = current_version_section(document, label)
-        assert STRICT_REVIEW_POLICY in current, f"{label} 缺少 6.3.1 严格扫描策略"
+        assert STRICT_REVIEW_POLICY in current, f"{label} 缺少 6.3.5 严格扫描策略"
         assert RISK_AUTHORIZATION_BOUNDARY in current, (
-            f"{label} 缺少 6.3.1 不沿用历史风险授权的边界"
+            f"{label} 缺少 6.3.5 不沿用历史风险授权的边界"
         )
         leaked = [marker for marker in HISTORICAL_REVIEW_POLICY_MARKERS if marker in current]
-        assert not leaked, f"{label} 的 6.3.1 章节沿用了历史扫描策略：{leaked}"
+        assert not leaked, f"{label} 的 6.3.5 章节沿用了历史扫描策略：{leaked}"
 
     blocks = re.findall(
         r'\.binaryTarget\(\s*name:\s*"([^"]+)"\s*,'
@@ -384,8 +384,8 @@ def verify(root: Path, version: str, mode: str) -> str:
         assert mode == "local"
         assert "当前最新公开正式版仍为 `IFLYADLib 6.3.0`" in readme
         assert re.search(r"^## \[6\.3\.1\] - 待发布\s*$", changelog, re.M)
-        assert "`main` 正在准备 `6.3.1`" in releasing
-        assert "`6.3.1` 发布准备" in security
+        assert "`main` 正在准备 `6.3.5`" in releasing
+        assert "`6.3.5` 发布准备" in security
         assert "尚未生成或核对" in readme
         state = "准备"
     else:

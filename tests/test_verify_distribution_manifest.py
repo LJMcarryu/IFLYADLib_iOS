@@ -62,7 +62,7 @@ class DistributionManifestTests(unittest.TestCase):
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             source = source.replace(
-                "当前正式版本：[`6.3.1`]",
+                "当前正式版本：[`6.3.5`]",
                 "当前最新公开正式版仍为 `IFLYADLib 6.3.0`",
                 1,
             )

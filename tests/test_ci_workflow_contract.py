@@ -430,14 +430,14 @@ class CIWorkflowContractTests(unittest.TestCase):
                 repository_contract.validate_state_version(state, release_kind)
 
     def test_current_frozen_state_is_allowed_for_all_release_modes(self) -> None:
-        state = {"version": "6.3.1", "phase": "FROZEN"}
+        state = {"version": "6.3.5", "phase": "FROZEN"}
         for release_kind in ("local", "candidate", "tag", "formal"):
             with self.subTest(release_kind=release_kind):
                 repository_contract.validate_state_version(state, release_kind)
 
     def test_candidate_tag_and_formal_reject_current_non_frozen_state(self) -> None:
         for phase in ("PREPARING", "PUBLISHED", "VERIFIED", "CLOSED"):
-            state = {"version": "6.3.1", "phase": phase}
+            state = {"version": "6.3.5", "phase": phase}
             for release_kind in ("candidate", "tag", "formal"):
                 with self.subTest(
                     phase=phase, release_kind=release_kind

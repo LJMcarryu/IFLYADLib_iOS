@@ -221,7 +221,7 @@ def main() -> int:
     parser.add_argument("--asset-dir", type=Path, required=True)
     parser.add_argument("--repository-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--version", default="6.3.1")
+    parser.add_argument("--version", default="6.3.5")
     args = parser.parse_args()
     try:
         if args.kind == "swiftpm":
