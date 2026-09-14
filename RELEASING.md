@@ -20,7 +20,26 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5"} -->
 
-当前最新公开正式版是 [`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)（2026-09-01）。`IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，无 Token 匿名下载和正式消费由同一发布流水线按冻结身份验收。
+当前正式版本目标为 [`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)，已冻结待公开。冻结日期为 2026-09-14；正式发布日期以同版本 Release 和发布后消费验证为准。`IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，匿名下载和正式消费由同一发布流水线按冻结身份验收。
+
+- `releaseState`：`FORMAL`
+- `binarySourceCommit`（SDK 二进制源码提交）：`82d8cab58eba588104eee9bc89063952a277af65`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b1bc50e272c29dd817cfcee8bbeeb9d60dfaca89`
+- `candidateId`：`17cccada18787f54c2faca204769d245a3ee29adf40f6c85c679896c28f16ba4`
+
+`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结。`release-state.json` 当前保留上一正式版 `6.3.1/CLOSED`，只由编排器在候选和闭环阶段推进；此文档提交不手工修改该文件。
+
+正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
+
+`6.3.5` 不沿用历史版本的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
+
+正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
+
+## 6.3.1 历史发布记录
+
+> 以下内容来自不可变 `6.3.1` Tag，所有“当前”和“本版本”均指该历史版本。
+
+当前最新公开正式版是 [`6.3.1`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1)（2026-09-01）。`IFLYADLib-modelA-6.3.1.zip` 的冻结 SHA-256 为 `4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，无 Token 匿名下载和正式消费由同一发布流水线按冻结身份验收。
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`b7e46a9f06897924d3d69d4d6a7e43f6237d8579`
@@ -31,9 +50,9 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
 
-`6.3.0` 的发布后证据仅作为历史记录保留，不得替代 `6.3.5` 的独立发布证据。
+`6.3.0` 的发布后证据仅作为历史记录保留，不得替代 `6.3.1` 的独立发布证据。
 
-`6.3.5` 不沿用历史版本的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
+`6.3.1` 不沿用历史版本的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
 
 正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
 

@@ -2,15 +2,33 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
-## [6.3.5] - 2026-09-01
+## [6.3.5] - 已冻结待公开
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5"} -->
+
+冻结日期：2026-09-14；正式发布日期由发布流水线完成公开及消费验证后记录。
+
+- `releaseState`：`FORMAL`
+- `binarySourceCommit`（SDK 二进制源码提交）：`82d8cab58eba588104eee9bc89063952a277af65`
+- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b1bc50e272c29dd817cfcee8bbeeb9d60dfaca89`
+- `candidateId`：`17cccada18787f54c2faca204769d245a3ee29adf40f6c85c679896c28f16ba4`
+- `IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`。7 个 SwiftPM checksum 与 10 项资产已冻结；匿名下载、逐项 SHA-256 和正式消费验证由发布流水线执行。
+- Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
+
+### 变更
+
+- 统一版本至 `6.3.5`，保留五种广告形式及模型 A 的七模块组合能力；公开 API 和错误码保持。
+- 加强五种广告的加载代次、回调重入、曝光检测停止与终态资源清理；共享图片下载支持各订阅独立取消。
+- 修复开屏全交互回流、视频暂停恢复及完播关闭边界，插屏视频素材验真在后台完成并复核文件身份。
+- 增加公共请求阶段和广告生命周期诊断，硬化 Release 日志脱敏与裁剪；NativeFeed 点击使用独立落地页宿主，激励动画丢弃迟到 completion。
+
+## [6.3.1] - 2026-09-01
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`b7e46a9f06897924d3d69d4d6a7e43f6237d8579`
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b86f5d7dc5e1105194889bc60a5ee9eec40b611f`
 - `candidateId`：`74f506ec2562caac2d0f1f48a404c1c3b69a1a2d29463ce94067b18821d1f1d7`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5`。公开库存固定为 10 项，由发布流水线执行无 Token 匿名下载、逐项 SHA-256 与正式消费验证。
+- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.1.zip` 的冻结 SHA-256 为 `4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5`。公开库存固定为 10 项，由发布流水线执行无 Token 匿名下载、逐项 SHA-256 与正式消费验证。
 - Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
 
 ### 变更

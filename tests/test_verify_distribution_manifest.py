@@ -41,7 +41,7 @@ def copy_contract_files(destination: Path) -> None:
 
 class DistributionManifestTests(unittest.TestCase):
     def test_current_release_ready_repository_passes_all_static_modes(self) -> None:
-        self.assertEqual(verify(ROOT, VERSION, "local"), "已发布资产本地复验")
+        self.assertEqual(verify(ROOT, VERSION, "local"), "已冻结正式资产")
         self.assertEqual(
             verify(ROOT, VERSION, "candidate"),
             "Draft candidate 冻结资产预验",
@@ -70,6 +70,30 @@ class DistributionManifestTests(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, "严格扫描策略"):
                 verify(root, VERSION, "candidate")
 
+    def test_frozen_repository_rejects_premature_published_claim(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            copy_contract_files(root)
+            podfile = root / "IFLYADLibSimple/Podfile"
+            podfile.write_text(
+                podfile.read_text(encoding="utf-8").replace(
+                    "IFLYADLib 6.3.5 已冻结待公开",
+                    "IFLYADLib 6.3.5 已正式发布并完成匿名消费复验",
+                    1,
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(AssertionError, "发布后态缺少发布事实"):
+                verify(root, VERSION, "candidate")
+
+    def test_restored_history_does_not_replace_current_frozen_hash(self) -> None:
+        changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+        current, historical = changelog.split("## [6.3.1] - 2026-09-01", 1)
+        previous_hash = "4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5"
+        self.assertNotIn(previous_hash, current)
+        self.assertIn(previous_hash, historical.split("## [6.3.0]", 1)[0])
+        self.assertEqual(verify(ROOT, VERSION, "candidate"), "Draft candidate 冻结资产预验")
+
     def test_rejects_historical_module_checksum(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -90,7 +114,7 @@ class DistributionManifestTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copy_contract_files(root)
-            current = "4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5"
+            current = "e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884"
             historical = next(iter(PREVIOUS_COMBINED_SHA256))
             for relative in ("README.md", "CHANGELOG.md", "RELEASING.md"):
                 path = root / relative
@@ -108,7 +132,7 @@ class DistributionManifestTests(unittest.TestCase):
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             self.assertNotIn("failOnWarning=", source)
-            self.assertEqual(verify(root, VERSION, "local"), "已发布资产本地复验")
+            self.assertEqual(verify(root, VERSION, "local"), "已冻结正式资产")
 
     def test_rejects_binary_target_on_different_host(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

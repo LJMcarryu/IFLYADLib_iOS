@@ -1,4 +1,4 @@
-# IFLYADLib 6.3.5 已正式发布并完成匿名消费复验；本示例固定到不可变 tag。
+# IFLYADLib 6.3.5 已冻结待公开；本示例固定到目标不可变 tag。
 # 本示例通过不可变 tag 的 :podspec 直连本仓 Release，不依赖 trunk/CDN 索引。
 source 'https://cdn.cocoapods.org/'
 

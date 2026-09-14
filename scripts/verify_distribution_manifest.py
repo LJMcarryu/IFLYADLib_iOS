@@ -12,39 +12,47 @@ from urllib.parse import urlparse
 
 
 VERSION = "6.3.5"
-RELEASE_DATE = "2026-09-01"
+RELEASE_DATE = "2026-09-14"
 REPOSITORY = "LJMcarryu/IFLYADLib_iOS"
 EXPECTED = {
     "IFLYAdCore": (
         "IFLYAdCore.xcframework.zip",
-        "__IFLYADLIB_6_3_1_CORE_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_3_5_CORE_CHECKSUM_PENDING__",
     ),
     "IFLYAdVideoUI": (
         "IFLYAdVideoUI.xcframework.zip",
-        "__IFLYADLIB_6_3_1_VIDEO_UI_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_3_5_VIDEO_UI_CHECKSUM_PENDING__",
     ),
     "IFLYAdBanner": (
         "IFLYAdBanner.xcframework.zip",
-        "__IFLYADLIB_6_3_1_BANNER_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_3_5_BANNER_CHECKSUM_PENDING__",
     ),
     "IFLYAdSplash": (
         "IFLYAdSplash.xcframework.zip",
-        "__IFLYADLIB_6_3_1_SPLASH_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_3_5_SPLASH_CHECKSUM_PENDING__",
     ),
     "IFLYAdInterstitial": (
         "IFLYAdInterstitial.xcframework.zip",
-        "__IFLYADLIB_6_3_1_INTERSTITIAL_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_3_5_INTERSTITIAL_CHECKSUM_PENDING__",
     ),
     "IFLYAdNativeFeed": (
         "IFLYAdNativeFeed.xcframework.zip",
-        "__IFLYADLIB_6_3_1_NATIVE_FEED_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_3_5_NATIVE_FEED_CHECKSUM_PENDING__",
     ),
     "IFLYAdReward": (
         "IFLYAdReward.xcframework.zip",
-        "__IFLYADLIB_6_3_1_REWARD_CHECKSUM_PENDING__",
+        "__IFLYADLIB_6_3_5_REWARD_CHECKSUM_PENDING__",
     ),
 }
 PREVIOUS_CHECKSUMS = {
+    "17ced6f3ca92d8906e192390c196bd27436f1a2c41e31bba82c56e316a6ee22b",
+    "eab569075623cb906f57fe05dd83401d7a5665b3d7a47f5da1941c606ffac82a",
+    "5b1263cf054137cffc641633d3ff6e9bca1069019ddf55b7e22ca1e2fe541133",
+    "d960fb199482b3607ff0d11c2b47fec9c83d9cb2a5dab1b57b55142306843c42",
+    "3415f49a9f4da7c3e8fb102efac5155a59bc0a48cac606ff1ce88fc732a9baa7",
+    "c336e6643bc80c314682fb32f335640df86722463878ccf9cedd4b6503913866",
+    "21f95b0fb658812ec581f475a487daf9ab6f466fcbb6f610c3eaaf62357e8288",
+
     "096c72d0f4cfa69001e83bc06c0ab66fae34235a8d1f811d74f2f0123d6ceb38",
     "2985ac1b8af5071418a1de28fa831f9287f2cbf9fc68cd835f5a6b61700597a8",
     "65e9de1069232f8eb8939649dab2d9684a41ce9143303d7b42a68f2c39b23e73",
@@ -82,6 +90,7 @@ PREVIOUS_CHECKSUMS = {
     "8ef01583768f7d2b1c7f9a6089ddad3a7dc2c5d689a6af680a2842feec1d0759",
 }
 PREVIOUS_COMBINED_SHA256 = {
+    "4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5",
     "fdf7c98bf1332b78cc6e2c7a840dd8cc804fb607e754cc457f969ce6e448a6f2",
     "1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d",
     "f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673",
@@ -90,12 +99,12 @@ PREVIOUS_COMBINED_SHA256 = {
 RELEASE_MODES = {"local", "candidate", "tag", "formal"}
 PENDING_IDENTITY_MARKERS = (
     "- `releaseState`：`PENDING`",
-    "__IFLYADLIB_6_3_1_BINARY_SOURCE_COMMIT_PENDING__",
-    "__IFLYADLIB_6_3_1_RELEASE_METADATA_COMMIT_PENDING__",
+    "__IFLYADLIB_6_3_5_BINARY_SOURCE_COMMIT_PENDING__",
+    "__IFLYADLIB_6_3_5_RELEASE_METADATA_COMMIT_PENDING__",
     "下列 checksum 为 6.3.5 唯一 PENDING 占位",
 )
 PREPUBLICATION_MARKERS = (
-    "最新公开正式版仍为 `IFLYADLib 6.3.0`",
+    "最新公开正式版仍为 `IFLYADLib 6.3.1`",
     "`main` 正在准备全渠道共享优化版 `6.3.5`",
     "正式签名资产、tag、Release 和匿名消费验证均未生成",
     "当前 `6.3.5` URL 不可用于生产依赖",
@@ -111,29 +120,31 @@ PREPUBLICATION_MARKERS = (
 )
 FROZEN_REQUIRED_MARKERS = {
     "README": (
-        "- `releaseState`：`FORMAL`",
-        "当前最新公开正式版仍为 `IFLYADLib 6.3.0`",
-        "IFLYADLib-modelA-6.3.5.zip",
-        "冻结 SHA-256",
+        "已冻结待公开",
+        "正式可用性以同版本 Release 和发布后消费验证为准",
     ),
     "CHANGELOG": (
         "- `releaseState`：`FORMAL`",
-        "## [6.3.5] - 待发布",
+        "## [6.3.5] - 已冻结待公开",
         "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
     ),
     "RELEASING": (
         "- `releaseState`：`FORMAL`",
-        "当前最新公开正式版仍是 [`6.3.0`]",
+        "已冻结待公开",
         "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
     ),
     "SECURITY": (
-        "最新公开正式版本（当前为 `6.3.0`）",
-        "不属于受支持的公开正式版本",
+        "`6.3.5` 已冻结待公开",
+        "当前实际公开正式版为 [`6.3.1`]",
     ),
     "DEMO": (
-        "生产项目继续使用已发布的 `6.3.0`",
+        "已冻结待公开",
+        "不可变 `6.3.5` tag",
+    ),
+    "PODFILE": (
+        "IFLYADLib 6.3.5 已冻结待公开",
     ),
 }
 PUBLISHED_REQUIRED_MARKERS = {
@@ -176,7 +187,6 @@ PUBLISHED_CLAIM_MARKERS = (
     "当前最新公开正式版为 `IFLYADLib 6.3.5`",
     f"## [6.3.5] - {RELEASE_DATE}",
     "当前最新公开正式版是 [`6.3.5`]",
-    "最新公开正式版本（当前为 `6.3.5`）",
     f"`6.3.5` 已于 {RELEASE_DATE}",
     f"已于 {RELEASE_DATE} 正式发布的 `6.3.5`",
     "IFLYADLib 6.3.5 已正式发布并完成匿名消费复验",
@@ -265,7 +275,7 @@ def require_markers(
     documents: dict[str, str], expected: dict[str, tuple[str, ...]], stage: str
 ) -> None:
     for label, markers in expected.items():
-        if label == "README" and is_public_readme(documents[label]):
+        if label == "README" and is_public_readme(documents[label]) and stage != "冻结态":
             continue
         scoped = stage_document(documents[label], label)
         for marker in markers:
@@ -312,7 +322,9 @@ def require_published(
     require_formal_identity(documents, package)
     require_markers(documents, PUBLISHED_REQUIRED_MARKERS, "发布后态")
     for marker in PREPUBLICATION_MARKERS:
-        assert marker not in "\n".join(documents.values()) + package, (
+        assert marker not in "\n".join(
+            stage_document(document, label) for label, document in documents.items()
+        ) + package, (
             f"发布后态残留未发布文案：{marker}"
         )
     require_formal_combined_sha256(documents, checksums)
@@ -382,8 +394,8 @@ def verify(root: Path, version: str, mode: str) -> str:
 
     if all_pending:
         assert mode == "local"
-        assert "当前最新公开正式版仍为 `IFLYADLib 6.3.0`" in readme
-        assert re.search(r"^## \[6\.3\.1\] - 待发布\s*$", changelog, re.M)
+        assert "当前最新公开正式版仍为 `IFLYADLib 6.3.1`" in readme
+        assert re.search(r"^## \[6\.3\.5\] - 待发布\s*$", changelog, re.M)
         assert "`main` 正在准备 `6.3.5`" in releasing
         assert "`6.3.5` 发布准备" in security
         assert "尚未生成或核对" in readme

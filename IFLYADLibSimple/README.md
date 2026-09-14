@@ -1,6 +1,6 @@
 # IFLYADLibSimple — IFLYADLib 接入示例
 
-面向媒体接入方的最小示例，仅使用公开 API，演示开屏、Banner、插屏、自渲染信息流和激励视频。当前示例对应已于 2026-09-01 正式发布的 `6.3.5`。
+面向媒体接入方的最小示例，仅使用公开 API，演示开屏、Banner、插屏、自渲染信息流和激励视频。当前示例对应 `6.3.5` 冻结目标，已冻结待公开；正式可用性以同版本 Release 和发布后消费验证为准。
 
 ## 运行
 
@@ -9,7 +9,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-- Podfile 已固定到不可变 `6.3.5` tag 及同版本 Release 资产。
+- Podfile 的版本目标固定到不可变 `6.3.5` tag 及同版本 Release 资产，发布流水线完成后可用于远程消费。
 - 正式资产必须包含 arm64 真机及 arm64/x86_64 模拟器切片。真机运行请在「Signing & Capabilities」选择自己的开发者 Team。
 - 工程最低支持 iOS 11.0，默认安装 `Full`。
 
