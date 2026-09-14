@@ -234,7 +234,7 @@ class CIWorkflowContractTests(unittest.TestCase):
             value = original_read(root, relative)
             if relative == "IFLYADLib.podspec":
                 return re.sub(
-                    r"(s\.version\s*=\s*['\"])6\.3\.1",
+                    r"(s\.version\s*=\s*['\"])6\.3\.5",
                     r"\g<1>6.3.2",
                     value,
                     count=1,
@@ -421,7 +421,7 @@ class CIWorkflowContractTests(unittest.TestCase):
             self.assertEqual(0, result.returncode, result.stderr)
 
     def test_previous_closed_state_is_allowed_only_on_local_main(self) -> None:
-        state = {"version": "6.3.0", "phase": "CLOSED"}
+        state = {"version": "6.3.1", "phase": "CLOSED"}
         repository_contract.validate_state_version(state, "local")
         for release_kind in ("candidate", "tag", "formal"):
             with self.subTest(release_kind=release_kind), self.assertRaises(

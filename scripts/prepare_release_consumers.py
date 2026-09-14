@@ -124,7 +124,7 @@ def localize_package_manifest(source: str) -> str:
 def localize_consumer_manifest(source: str) -> str:
     pattern = re.compile(
         r'\.package\(\s*url:\s*"https://github\.com/LJMcarryu/'
-        r'IFLYADLib_iOS\.git"\s*,\s*exact:\s*"6\.3\.1"\s*\)',
+        r'IFLYADLib_iOS\.git"\s*,\s*exact:\s*"6\.3\.5"\s*\)',
         re.S,
     )
     localized, count = pattern.subn('.package(path: "../IFLYADLib_iOS")', source)
@@ -186,7 +186,7 @@ def localize_podfile(source: str) -> str:
     pattern = re.compile(
         r"(?m)^(?P<indent>[ \t]*)pod 'IFLYADLib', :podspec => "
         r"'https://raw\.githubusercontent\.com/LJMcarryu/IFLYADLib_iOS/"
-        r"6\.3\.1/IFLYADLib\.podspec'[ \t]*$"
+        r"6\.3\.5/IFLYADLib\.podspec'[ \t]*$"
     )
     localized, count = pattern.subn(
         r"\g<indent>pod 'IFLYADLib', :path => '../IFLYADLib'", source
