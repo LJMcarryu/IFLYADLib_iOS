@@ -2,7 +2,7 @@
 
 ## 支持的版本
 
-`6.3.5` 已冻结待公开。当前实际公开正式版为 [`6.3.1`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1)，继续提供安全更新。
+`6.3.5` 的签名资产已冻结。公开日期和消费结论以 `release-state.json` 的 `publication` 字段及同版本 Release 为准；`publication=null` 表示尚未公开。本版文档准备时，最近一份已完成发布和消费验证的历史证据为 [`6.3.1`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1)。
 
 下表是 `6.3.5` 完成正式公开与消费验证后生效的支持策略：
 
@@ -15,7 +15,7 @@
 
 ### `6.3.5` 冻结证据
 
-正式签名资产和 checksum 已于 2026-09-14 冻结，A/B、候选身份与合并包 SHA-256 见 [RELEASING](RELEASING.md#635-当前发布状态)。10 个资产的匿名下载和消费验证由发布流水线完成后记录。
+正式签名资产和 checksum 已于 2026-09-14 冻结，A/B、候选身份与合并包 SHA-256 见 [RELEASING](RELEASING.md#635-冻结与发布记录)。10 个资产的匿名下载和消费验证结论由发布流水线记录在机器状态中。
 
 ## 报告安全漏洞
 

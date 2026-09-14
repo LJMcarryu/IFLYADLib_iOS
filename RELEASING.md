@@ -16,18 +16,18 @@
 重型验证 job 最长运行 55 分钟，结束后由无 Token、只读的 summary job 汇总 Candidate、Release、
 checkout commit、资产库存身份和全部 job 结论；summary 对上游失败继续失败关闭。
 
-## 6.3.5 当前发布状态
+## 6.3.5 冻结与发布记录
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5"} -->
 
-当前正式版本目标为 [`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)，已冻结待公开。冻结日期为 2026-09-14；正式发布日期以同版本 Release 和发布后消费验证为准。`IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，匿名下载和正式消费由同一发布流水线按冻结身份验收。
+当前正式版本目标为 [`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)，签名资产已冻结。冻结日期为 2026-09-14；公开日期和消费结论以 `release-state.json` 的 `publication` 字段及同版本 Release 为准，`publication=null` 表示尚未公开。`IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，匿名下载和正式消费由同一发布流水线按冻结身份验收。
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`82d8cab58eba588104eee9bc89063952a277af65`
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b1bc50e272c29dd817cfcee8bbeeb9d60dfaca89`
 - `candidateId`：`17cccada18787f54c2faca204769d245a3ee29adf40f6c85c679896c28f16ba4`
 
-`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结。`release-state.json` 当前保留上一正式版 `6.3.1/CLOSED`，只由编排器在候选和闭环阶段推进；此文档提交不手工修改该文件。
+`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结。`release-state.json` 只由编排器在候选和闭环阶段推进；本版文档准备时保留的上一份完整发布证据为 `6.3.1/CLOSED`，历史记录见下文。本文不手工修改该文件。
 
 正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
 

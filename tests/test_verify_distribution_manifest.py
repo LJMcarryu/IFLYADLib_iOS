@@ -77,7 +77,7 @@ class DistributionManifestTests(unittest.TestCase):
             podfile = root / "IFLYADLibSimple/Podfile"
             podfile.write_text(
                 podfile.read_text(encoding="utf-8").replace(
-                    "IFLYADLib 6.3.5 已冻结待公开",
+                    "IFLYADLib 6.3.5 签名资产已冻结",
                     "IFLYADLib 6.3.5 已正式发布并完成匿名消费复验",
                     1,
                 ),

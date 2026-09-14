@@ -2,11 +2,11 @@
 
 本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
-## [6.3.5] - 已冻结待公开
+## [6.3.5] - 冻结与发布记录
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5"} -->
 
-冻结日期：2026-09-14；正式发布日期由发布流水线完成公开及消费验证后记录。
+签名资产已冻结，冻结日期为 2026-09-14。公开日期和消费结论以 `release-state.json` 的 `publication` 字段及同版本 Release 为准；`publication=null` 表示尚未公开。
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`82d8cab58eba588104eee9bc89063952a277af65`

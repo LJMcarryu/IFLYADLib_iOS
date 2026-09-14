@@ -120,31 +120,31 @@ PREPUBLICATION_MARKERS = (
 )
 FROZEN_REQUIRED_MARKERS = {
     "README": (
-        "已冻结待公开",
+        "签名资产已冻结",
         "正式可用性以同版本 Release 和发布后消费验证为准",
     ),
     "CHANGELOG": (
         "- `releaseState`：`FORMAL`",
-        "## [6.3.5] - 已冻结待公开",
+        "## [6.3.5] - 冻结与发布记录",
         "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
     ),
     "RELEASING": (
         "- `releaseState`：`FORMAL`",
-        "已冻结待公开",
+        "签名资产已冻结",
         "IFLYADLib-modelA-6.3.5.zip",
         "冻结 SHA-256",
     ),
     "SECURITY": (
-        "`6.3.5` 已冻结待公开",
-        "当前实际公开正式版为 [`6.3.1`]",
+        "`6.3.5` 的签名资产已冻结",
+        "最近一份已完成发布和消费验证的历史证据为 [`6.3.1`]",
     ),
     "DEMO": (
-        "已冻结待公开",
+        "签名资产已冻结",
         "不可变 `6.3.5` tag",
     ),
     "PODFILE": (
-        "IFLYADLib 6.3.5 已冻结待公开",
+        "IFLYADLib 6.3.5 签名资产已冻结",
     ),
 }
 PUBLISHED_REQUIRED_MARKERS = {
