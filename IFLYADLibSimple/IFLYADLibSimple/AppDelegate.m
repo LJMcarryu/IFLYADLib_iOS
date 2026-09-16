@@ -27,7 +27,7 @@
     self.window.rootViewController = navigationController;
     [self.window makeKeyAndVisible];
 
-    /// 设置是否开启个性化推荐
+    /// 记录媒体侧个性化选择；不代替宿主隐私同意或 ATT，也不会阻止广告请求。
     [IFLYAdConfig setPersonalizedEnabled:YES];
     /// 示例工程默认开启日志，媒体正式上线前可关闭。
     [IFLYAdConfig setLogEnabled:YES];

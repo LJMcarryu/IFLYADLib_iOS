@@ -279,11 +279,15 @@ jobs:
               ':(exclude)scripts/download_release_anonymously.py' \
               ':(exclude)scripts/download_draft_release.py' \
               ':(exclude)scripts/release_asset_downloader.py' \
+              ':(exclude)scripts/github_http_retry.py' \
+              ':(exclude)scripts/verify_private_release_provenance.py' \
               ':(exclude)scripts/prepare_release_consumers.py' \
               ':(exclude)scripts/verify_distribution_manifest.py' \
               ':(exclude)scripts/verify_repository_contract.py' \
               ':(exclude)tests/test_ci_workflow_contract.py' \
               ':(exclude)tests/test_release_asset_downloader.py' \
+              ':(exclude)tests/test_github_http_retry.py' \
+              ':(exclude)tests/test_network_retry_integration.py' \
               ':(exclude)tests/test_prepare_release_consumers.py')
             if [[ -n "$unexpected_paths" ]]; then
               echo '手动正式复验的 main 相对 tag 修改了非获准 CI/发布文档路径：' >&2

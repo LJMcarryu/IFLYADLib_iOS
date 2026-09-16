@@ -10,11 +10,16 @@ import re
 import socket
 import ssl
 import time
+import sys
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener, urlopen
 
+
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from github_http_retry import call_with_retry, retry_delay
 
 TOKEN_ENVIRONMENT_VARIABLES = (
     "GH_TOKEN",
@@ -312,11 +317,13 @@ class ApiOnlyRedirectHandler(HTTPRedirectHandler):
 
 
 def read_json(request: Request) -> dict:
-    opener = build_opener(ApiOnlyRedirectHandler())
-    with opener.open(request, timeout=60) as response:
-        value = json.loads(response.read().decode("utf-8"))
-    require(isinstance(value, dict), "GitHub API 响应不是对象")
-    return value
+    def request_once():
+        opener = build_opener(ApiOnlyRedirectHandler())
+        with opener.open(request, timeout=60) as response:
+            value = json.loads(response.read().decode("utf-8"))
+        require(isinstance(value, dict), "GitHub API 响应不是对象")
+        return value
+    return call_with_retry(request_once)
 
 
 def _verify_existing_asset(asset: dict, destination: Path) -> str | None:
@@ -357,18 +364,7 @@ def _write_and_verify(response, asset: dict, destination: Path) -> str:
 
 
 def _retryable_download_error(error: BaseException) -> bool:
-    if isinstance(error, HTTPError):
-        return error.code in {408, 429} or 500 <= error.code <= 599
-    if isinstance(error, URLError):
-        reason = error.reason
-        return isinstance(
-            reason,
-            (TimeoutError, socket.timeout, ssl.SSLError, ConnectionError),
-        )
-    return isinstance(
-        error,
-        (TimeoutError, socket.timeout, ssl.SSLError, ConnectionError),
-    )
+    return retry_delay(error, 1) is not None
 
 
 def download_with_retry(
@@ -400,11 +396,7 @@ def download_with_retry(
                 or attempt == max_attempts
             ):
                 raise
-            delay = min(
-                DOWNLOAD_INITIAL_BACKOFF_SECONDS * (2 ** (attempt - 1)),
-                DOWNLOAD_MAX_BACKOFF_SECONDS,
-            )
-            sleeper(delay)
+            sleeper(retry_delay(error, attempt))
     raise AssertionError("unreachable")
 
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import shutil
 import sys
@@ -15,6 +16,9 @@ sys.path.insert(0, str(SCRIPTS))
 from verify_distribution_manifest import (  # noqa: E402
     PREVIOUS_CHECKSUMS,
     PREVIOUS_COMBINED_SHA256,
+    PUBLIC_RELEASE_STATUS_RE,
+    REPOSITORY,
+    STRICT_REVIEW_POLICY,
     VERSION,
     verify,
 )
@@ -55,36 +59,32 @@ class DistributionManifestTests(unittest.TestCase):
             "正式 Release 冻结文档与清单复验",
         )
 
-    def test_candidate_rejects_prepublication_claim(self) -> None:
+    def test_candidate_rejects_release_status_version_drift(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copy_contract_files(root)
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             source = source.replace(
-                "当前正式版本：[`6.3.5`]",
-                "当前最新公开正式版仍为 `IFLYADLib 6.3.0`",
+                '"version":"6.3.5"',
+                '"version":"6.3.0"',
                 1,
             )
             readme.write_text(source, encoding="utf-8")
-            with self.assertRaisesRegex(AssertionError, "严格扫描策略"):
+            with self.assertRaisesRegex(AssertionError, "发布状态标记漂移"):
                 verify(root, VERSION, "candidate")
 
-    def test_frozen_repository_rejects_premature_published_claim(self) -> None:
+    def test_public_podfile_comments_do_not_control_release_stage(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copy_contract_files(root)
             podfile = root / "IFLYADLibSimple/Podfile"
             podfile.write_text(
-                podfile.read_text(encoding="utf-8").replace(
-                    "IFLYADLib 6.3.5 签名资产已冻结",
-                    "IFLYADLib 6.3.5 已正式发布并完成匿名消费复验",
-                    1,
-                ),
+                "# IFLYADLib 6.3.5 已正式发布并完成匿名消费复验\n"
+                + podfile.read_text(encoding="utf-8"),
                 encoding="utf-8",
             )
-            with self.assertRaisesRegex(AssertionError, "发布后态缺少发布事实"):
-                verify(root, VERSION, "candidate")
+            self.assertEqual(verify(root, VERSION, "candidate"), "Draft candidate 冻结资产预验")
 
     def test_restored_history_does_not_replace_current_frozen_hash(self) -> None:
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
@@ -133,6 +133,108 @@ class DistributionManifestTests(unittest.TestCase):
             source = readme.read_text(encoding="utf-8")
             self.assertNotIn("failOnWarning=", source)
             self.assertEqual(verify(root, VERSION, "local"), "已冻结正式资产")
+
+    def test_public_guides_do_not_require_release_engineering_prose(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            copy_contract_files(root)
+            path = root / "README.md"
+            marker = PUBLIC_RELEASE_STATUS_RE.search(path.read_text(encoding="utf-8"))
+            self.assertIsNotNone(marker)
+            path.write_text(
+                "# SDK 接入\n\n## 当前版本\n\n" + marker.group(0)
+                + f"\n\n正式版本：[{VERSION}](https://github.com/{REPOSITORY}/releases/tag/{VERSION})\n",
+                encoding="utf-8",
+            )
+            (root / "IFLYADLibSimple/README.md").write_text(
+                f"# 示例工程\n\n本示例固定 SDK {VERSION}，安装后打开 workspace。\n",
+                encoding="utf-8",
+            )
+            podfile = root / "IFLYADLibSimple/Podfile"
+            podfile.write_text(
+                "\n".join(line for line in podfile.read_text(encoding="utf-8").splitlines()
+                          if not line.lstrip().startswith("#")) + "\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(verify(root, VERSION, "formal"), "正式 Release 冻结文档与清单复验")
+
+    def test_public_readme_rejects_malformed_duplicate_or_drifted_markers(self) -> None:
+        document = (ROOT / "README.md").read_text(encoding="utf-8")
+        match = PUBLIC_RELEASE_STATUS_RE.search(document)
+        self.assertIsNotNone(match)
+        original = match.group(0)
+        marker = json.loads(match.group(1))
+        mutations = [
+            "<!-- ifly-release-status: broken -->",
+            original + "\n" + original,
+            original + "\n<!-- ifly-release-status: broken -->",
+            original.replace('"schemaVersion":1', '"schemaVersion":1,"schemaVersion":1'),
+        ]
+        for field, value in (
+            ("schemaVersion", True),
+            ("releaseState", "PENDING"),
+            ("distribution", "trunk"),
+            ("releaseUrl", f"https://github.com/other/repo/releases/tag/{VERSION}"),
+            ("unexpected", "field"),
+        ):
+            changed = dict(marker, **{field: value})
+            mutations.append("<!-- ifly-release-status: " + json.dumps(changed) + " -->")
+        for replacement in mutations:
+            with self.subTest(marker=replacement), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                copy_contract_files(root)
+                (root / "README.md").write_text(document.replace(original, replacement, 1), encoding="utf-8")
+                with self.assertRaisesRegex(AssertionError, "发布状态标记"):
+                    verify(root, VERSION, "local")
+
+    def test_markerless_readme_still_requires_legacy_review_policy(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            copy_contract_files(root)
+            (root / "README.md").write_text(f"# SDK\n\n## {VERSION} 版本\n", encoding="utf-8")
+            with self.assertRaisesRegex(AssertionError, "README 缺少 6.3.5 严格扫描策略"):
+                verify(root, VERSION, "local")
+
+    def test_public_guides_still_require_maintainer_release_facts(self) -> None:
+        for relative, original, expected in (
+            ("CHANGELOG.md", "- `releaseState`：`FORMAL`", "未声明 releaseState=FORMAL"),
+            ("RELEASING.md", "- `releaseState`：`FORMAL`", "未声明 releaseState=FORMAL"),
+            ("RELEASING.md", STRICT_REVIEW_POLICY, "严格扫描策略"),
+            ("CHANGELOG.md", "冻结 SHA-256", "冻结态缺少发布事实"),
+        ):
+            with self.subTest(document=relative, fact=original), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                copy_contract_files(root)
+                path = root / relative
+                document = path.read_text(encoding="utf-8")
+                self.assertIn(original, document)
+                path.write_text(document.replace(original, "已删除的事实", 1), encoding="utf-8")
+                with self.assertRaisesRegex(AssertionError, expected):
+                    verify(root, VERSION, "local")
+
+    def test_public_demo_and_security_require_current_version(self) -> None:
+        for relative in ("IFLYADLibSimple/README.md", "SECURITY.md"):
+            with self.subTest(document=relative), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                copy_contract_files(root)
+                path = root / relative
+                path.write_text(path.read_text(encoding="utf-8").replace(VERSION, "6.3.50"), encoding="utf-8")
+                with self.assertRaisesRegex(AssertionError, "缺少当前版本"):
+                    verify(root, VERSION, "local")
+
+    def test_extra_or_mutable_demo_dependency_is_rejected(self) -> None:
+        for dependency in (
+            "pod 'IFLYADLib', :git => 'https://github.com/LJMcarryu/IFLYADLib_iOS.git'",
+            "pod 'IFLYADLib/Core', :path => '../local-sdk'",
+            "pod('IFLYADLib', :path => '../local-sdk')",
+        ):
+            with self.subTest(dependency=dependency), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                copy_contract_files(root)
+                path = root / "IFLYADLibSimple/Podfile"
+                path.write_text(path.read_text(encoding="utf-8") + dependency + "\n", encoding="utf-8")
+                with self.assertRaisesRegex(AssertionError, "活跃 :podspec"):
+                    verify(root, VERSION, "local")
 
     def test_rejects_binary_target_on_different_host(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

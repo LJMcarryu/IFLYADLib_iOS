@@ -12,6 +12,9 @@ from pathlib import Path
 from urllib.parse import quote, urlsplit
 from urllib.request import Request, urlopen
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from github_http_retry import call_with_retry
+
 PRIVATE_SOURCE_REPOSITORY = "LJMcarryu/IFLYADLibDemo"
 CURRENT_VERSION = "6.3.5"
 PENDING_BINARY = "__IFLYADLIB_6_3_5_BINARY_SOURCE_COMMIT_PENDING__"
@@ -158,8 +161,10 @@ def compare_with_private(binary: str, metadata: str, token: str) -> None:
     })
     require((urlsplit(request.full_url).hostname or "").lower() == "api.github.com",
             "令牌只能发送至 api.github.com")
-    with urlopen(request, timeout=60) as response:
-        comparison = json.loads(response.read().decode("utf-8"))
+    def request_once():
+        with urlopen(request, timeout=60) as response:
+            return json.loads(response.read().decode("utf-8"))
+    comparison = call_with_retry(request_once)
     validate_compare(comparison, binary, metadata)
 
 

@@ -89,7 +89,7 @@
     [self resetAdCard];
 }
 
-// 卡片布局参考私有库 Demo：深色媒体区（视频承载/图片叠加）+ 下方一行「广告角标 | 描述 | 圆形关闭」。
+// 卡片上方显示视频或图片，下方放置广告角标、描述和关闭按钮。
 - (void)buildNativeAdCardAtY:(CGFloat)y contentWidth:(CGFloat)contentWidth margin:(CGFloat)margin {
     self.adContainer = [[UIView alloc] initWithFrame:CGRectMake(margin, y, contentWidth, 230)];
     self.adContainer.backgroundColor = UIColor.whiteColor;

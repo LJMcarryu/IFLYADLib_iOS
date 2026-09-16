@@ -23,7 +23,7 @@ static NSString *const IFLYNativeFeedListAdCellID = @"native-feed-list-ad";
 @implementation IFLYNativeFeedListItem
 @end
 
-/// Cell 只保存媒体 UI 和业务 item identity，不保存 Ad、Session 或 Binding。
+/// Cell 保存媒体 UI 和对应条目标识；广告对象由列表数据层持有。
 @interface IFLYNativeFeedListCell : UITableViewCell
 @property (nonatomic, copy, nullable) NSString *representedItemIdentifier;
 @property (nonatomic, strong) UIView *cardView;
@@ -307,7 +307,7 @@ static NSString *const IFLYNativeFeedListAdCellID = @"native-feed-list-ad";
     explanation.numberOfLines = 3;
     explanation.font = [UIFont systemFontOfSize:13];
     explanation.textColor = [IFLYADUtil demoSecondaryLabelColor];
-    explanation.text = @"稳定 item ID 的数据层只持 Ad；Cell 不持 Session/Binding。进屏按 Ad attach，离屏按容器 detach，回屏使用原 Ad。";
+    explanation.text = @"滚动到广告行查看素材，滑出后再滑回可恢复同一条广告。点“淘汰广告”结束该条广告；接入时由数据层持有 Ad，Cell 负责挂载与解绑。";
     [header addSubview:explanation];
     self.statusLabel = [[UILabel alloc] initWithFrame:CGRectMake(16, 70, CGRectGetWidth(header.bounds) - 32, 24)];
     self.statusLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;

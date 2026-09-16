@@ -20,14 +20,16 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5"} -->
 
-当前正式版本目标为 [`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)，签名资产已冻结。冻结日期为 2026-09-14；公开日期和消费结论以 `release-state.json` 的 `publication` 字段及同版本 Release 为准，`publication=null` 表示尚未公开。`IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，匿名下载和正式消费由同一发布流水线按冻结身份验收。
+`6.3.5` 已于 2026-09-14T12:39:11Z 正式公开，发布后的 [CocoaPods / SwiftPM 消费验证](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/34844597431)为 `success`；本仓 `release-state.json` 为 `6.3.5/CLOSED`。Tag 和发布资产保持不可变。
+
+当前正式版本为 [`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)，签名资产已冻结。冻结日期为 2026-09-14；公开日期和消费结论以 `release-state.json` 的 `publication` 字段及同版本 Release 为准，`publication=null` 表示尚未公开。`IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，匿名下载和正式消费由同一发布流水线按冻结身份验收。
 
 - `releaseState`：`FORMAL`
 - `binarySourceCommit`（SDK 二进制源码提交）：`82d8cab58eba588104eee9bc89063952a277af65`
 - `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b1bc50e272c29dd817cfcee8bbeeb9d60dfaca89`
 - `candidateId`：`17cccada18787f54c2faca204769d245a3ee29adf40f6c85c679896c28f16ba4`
 
-`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结。`release-state.json` 只由编排器在候选和闭环阶段推进；本版文档准备时保留的上一份完整发布证据为 `6.3.1/CLOSED`，历史记录见下文。本文不手工修改该文件。
+`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结。`release-state.json` 只由编排器在候选和闭环阶段推进；本版正式消费成功后已推进到 `6.3.5/CLOSED`，上一版记录见下文。本文不手工修改该文件。
 
 正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
 
@@ -71,7 +73,8 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 1. **核对私有源码仓正式产物生成**：编排器必须使用干净的已提交源码、项目批准的 Xcode 版本和稳定签名身份；下列命令仅用于复现单项产物问题，正式发布仍由编排器执行并留存 receipt。
 
    ```bash
-   export DEVELOPER_DIR=/Applications/Xcode_26.3.app/Contents/Developer
+   export DEVELOPER_DIR='<本机获准 Xcode.app>/Contents/Developer'
+   xcodebuild -version  # 必须与当前计划的 version/build 精确一致
    export IFLY_SDK_CODESIGN_IDENTITY='<已批准的签名身份>'
    VERSION='<新版本>'
    MODEL_A_BASE_URL="https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/${VERSION}"
@@ -83,7 +86,7 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
      --base-url "${MODEL_A_BASE_URL}"
    ```
 
-   `release-gate.sh` 负责源码、公开头、iOS 11、行为和实际 XCFramework 门禁；打包脚本负责 7 个模块、合并包、签名、资源闭包和最终分发扫描。
+   `release-gate.sh` 负责源码、公开头、iOS 11、行为和实际 XCFramework 门禁；打包脚本负责 7 个模块、合并包、签名、资源闭包和分发产物门禁；Apple Review 仅在显式执行 `apple-scan` 时运行。
 
 2. **核对私有仓与本公开仓的发布元数据**：
 
@@ -92,7 +95,7 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
    - 确认 `IFLYADLib.podspec` 的 `Core` 显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`，且最终 Core Mach-O 在 iOS 11～13 不形成 ATT 强依赖；
    - 将 `build/modelA/release/swiftpm-resources/spm/` 同步到本仓 `spm/`，不将该中间目录作为 Release 资产上传；
    - 同步 README、CHANGELOG、迁移说明和示例工程 Podfile/Xcode deployment target；
-- NativeFeed API 变更须同步固定页和列表页，并复验数据层只持 Ad、Cell 不持 Session/Binding、进屏 Ad 级 attach、离屏按容器 detach、回屏恢复、最后引用释放自动终止和可选 `destroy`；`6.3.5` 还须验证 permissive 外部 CTA、点击时租约与可见性验收、媒体交互优先、结构化 `71503` point、Banner 四阶段结构化日志和 `detachFromCurrentContainer`；
+   - NativeFeed API 变更须同步固定页和列表页，并复验数据层只持 Ad、Cell 不持 Session/Binding、进屏 Ad 级 attach、离屏按容器 detach、回屏恢复、最后引用释放自动终止和可选 `destroy`；`6.3.5` 还须验证 permissive 外部 CTA、点击时租约与可见性验收、媒体交互优先、结构化 `71503` point、Banner 四阶段结构化日志和 `detachFromCurrentContainer`；
    - 正式资产和 checksum 均已就绪后，将 `releaseState` 切换为 `FORMAL`，但在 tag/Release 与匿名验证完成前继续明确标注“尚未公开发布”；发布闭环后才写入正式发布日期和“最新公开正式版本”；
    - 在私有仓执行 `python3 scripts/verify-model-a-release-metadata.py --version "${VERSION}"`，闭环校验产物、checksum 和两个分发清单。
 

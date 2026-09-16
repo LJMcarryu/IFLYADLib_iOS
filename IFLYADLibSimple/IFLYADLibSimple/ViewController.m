@@ -40,14 +40,14 @@
     CGFloat y = 24;
 
     UILabel *versionLabel =
-        [IFLYADUtil createSectionTitleWithText:[NSString stringWithFormat:@"SDK Version: %@", [IFLYAdTool sdkVersion]]
+        [IFLYADUtil createSectionTitleWithText:[NSString stringWithFormat:@"SDK 版本：%@", [IFLYAdTool sdkVersion]]
                                          frame:CGRectMake(margin, y, contentWidth, 20)];
     versionLabel.textAlignment = NSTextAlignmentCenter;
     [scrollView addSubview:versionLabel];
     y += 36;
 
     UILabel *descLabel = [IFLYADUtil
-        createSectionTitleWithText:@"本工程演示媒体侧常用接入流程：初始化、加载、展示、回调、销毁。示例代码只使用 SDK 公开 API。"
+        createSectionTitleWithText:@"先配置自己的广告位，再选择示例。内置广告按 Load → Ready → Show 操作；信息流由媒体渲染后挂载。详细步骤见示例 README。"
                              frame:CGRectMake(margin, y, contentWidth, 52)];
     descLabel.textAlignment = NSTextAlignmentCenter;
     [scrollView addSubview:descLabel];

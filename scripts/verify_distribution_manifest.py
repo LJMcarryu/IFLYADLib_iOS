@@ -226,20 +226,34 @@ def current_version_section(document: str, label: str) -> str:
 def is_public_readme(document: str) -> bool:
     """公开 README 只保留机器可读版本标记，不承载内部发布 provenance。"""
 
+    marker_count = document.count("ifly-release-status")
+    if marker_count == 0:
+        return False
     matches = PUBLIC_RELEASE_STATUS_RE.findall(document)
-    if len(matches) != 1:
-        return False
+    assert marker_count == 1 and len(matches) == 1, "README 发布状态标记必须唯一且格式合法"
+
+    def unique_fields(pairs: list[tuple[str, object]]) -> dict[str, object]:
+        fields: dict[str, object] = {}
+        for key, value in pairs:
+            assert key not in fields, f"README 发布状态标记包含重复字段：{key}"
+            fields[key] = value
+        return fields
+
     try:
-        marker = json.loads(matches[0])
-    except ValueError:
-        return False
-    return marker == {
+        marker = json.loads(matches[0], object_pairs_hook=unique_fields)
+    except ValueError as error:
+        raise AssertionError("README 发布状态标记不是合法 JSON") from error
+    expected = {
         "schemaVersion": 1,
         "version": VERSION,
         "releaseState": "FORMAL",
         "distribution": "github-release",
         "releaseUrl": f"https://github.com/{REPOSITORY}/releases/tag/{VERSION}",
-    } and "当前正式版本：[`6.3.5`](" in document
+    }
+    assert marker == expected and type(marker.get("schemaVersion")) is int, (
+        f"README 发布状态标记漂移：{marker}"
+    )
+    return True
 
 
 def require_formal_combined_sha256(
@@ -266,6 +280,8 @@ def require_formal_combined_sha256(
 
 
 def stage_document(document: str, label: str) -> str:
+    if label == "README" and is_public_readme(document):
+        return document
     if label in {"README", "CHANGELOG", "RELEASING"}:
         return current_version_section(document, label)
     return document
@@ -274,8 +290,11 @@ def stage_document(document: str, label: str) -> str:
 def require_markers(
     documents: dict[str, str], expected: dict[str, tuple[str, ...]], stage: str
 ) -> None:
+    public_readme = is_public_readme(documents["README"])
     for label, markers in expected.items():
-        if label == "README" and is_public_readme(documents[label]) and stage != "冻结态":
+        # 接入文档不承载冻结流程；机器标记、版本展示和实际 Pod 依赖在各自入口验证。
+        # CHANGELOG / RELEASING 仍须满足当前阶段的维护事实和摘要约束。
+        if public_readme and label in {"README", "DEMO", "PODFILE", "SECURITY"}:
             continue
         scoped = stage_document(documents[label], label)
         for marker in markers:
@@ -343,6 +362,12 @@ def verify(root: Path, version: str, mode: str) -> str:
     demo_readme = read(root, "IFLYADLibSimple/README.md")
     podfile = read(root, "IFLYADLibSimple/Podfile")
     package = read(root, "Package.swift")
+    public_readme = is_public_readme(readme)
+    if public_readme:
+        for label, document in (("DEMO", demo_readme), ("SECURITY", security)):
+            assert re.search(rf"(?<![\d.]){re.escape(VERSION)}(?![\d.])", document), (
+                f"{label} 缺少当前版本 {VERSION} 展示"
+            )
     for label, document in (("README", readme), ("RELEASING", releasing)):
         if label == "README" and is_public_readme(document):
             continue
@@ -409,7 +434,20 @@ def verify(root: Path, version: str, mode: str) -> str:
             "DEMO": demo_readme,
             "PODFILE": podfile,
         }
-        if has_published_claim(documents):
+        if public_readme:
+            # 公开接入文档由结构化状态标记声明版本；资产冻结后，维护文档可同时
+            # 记录正式发布时间，不再从 README / Demo / Podfile 的具体句式推断阶段。
+            # 发布及消费结果仍由 release-state 和正式消费工作流校验。
+            require_formal_identity(documents, package)
+            require_markers(documents, FROZEN_REQUIRED_MARKERS, "冻结态")
+            require_formal_combined_sha256(documents, checksums)
+            state = {
+                "local": "已冻结正式资产",
+                "candidate": "Draft candidate 冻结资产预验",
+                "tag": "不可变 tag 冻结资产复验",
+                "formal": "正式 Release 冻结文档与清单复验",
+            }[mode]
+        elif has_published_claim(documents):
             require_published(documents, package, checksums)
             if mode == "candidate":
                 state = "Draft candidate 冻结资产预验"
@@ -471,8 +509,13 @@ def verify(root: Path, version: str, mode: str) -> str:
         r"(?m)^[ \t]*pod 'IFLYADLib', :podspec => '([^']+)'[ \t]*$",
         podfile,
     )
-    assert active_podspec_urls == [expected_podspec_url], (
-        f"Demo 活跃 :podspec 依赖非预期：{active_podspec_urls}"
+    active_sdk_dependencies = re.findall(
+        r"(?m)^[ \t]*pod(?:[ \t]+|[ \t]*\()[\"']IFLYADLib(?:/[^\"'\r\n]*)?"
+        r"[\"'][^\r\n]*$",
+        podfile,
+    )
+    assert active_podspec_urls == [expected_podspec_url] and len(active_sdk_dependencies) == 1, (
+        f"Demo 活跃 :podspec 依赖非预期：{active_sdk_dependencies}"
     )
     return state
 

@@ -1,10 +1,12 @@
 # 更新日志
 
-本项目遵循语义化版本。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
+版本的兼容变化以各节变更和目标版本公开头为准；历史补丁版本也可能包含需要修改媒体代码的 API 迁移。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
 ## [6.3.5] - 冻结与发布记录
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5"} -->
+
+正式发布于 2026-09-14；本版本的消费结果见 [RELEASING](RELEASING.md)。历史章节只描述各自版本，不替代当前接入契约。
 
 签名资产已冻结，冻结日期为 2026-09-14。公开日期和消费结论以 `release-state.json` 的 `publication` 字段及同版本 Release 为准；`publication=null` 表示尚未公开。
 
@@ -151,7 +153,7 @@
 
 ### 移除
 
-- 移除旧的 `ecpm`、`actionText`、`rawAdData`、`sponsored`、`ThreeImages` 和 `winNoticeAvailable` 公开 API。该版本需要业务代码迁移并重新编译，详见 README「从 6.0.14 升级到 6.1.0」。
+- 移除旧的 `ecpm`、`actionText`、`rawAdData`、`sponsored`、`ThreeImages` 和 `winNoticeAvailable` 公开 API。该版本需要业务代码迁移并重新编译，迁移说明见 [6.1.0 Tag 的 README](https://github.com/LJMcarryu/IFLYADLib_iOS/blob/6.1.0/README.md)。
 
 ## [6.0.14] - 2026-07-20
 
@@ -309,3 +311,11 @@
 [6.0.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.1
 [6.0.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.0
 [5.5.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/5.5.1
+
+[6.3.5]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5
+
+[6.3.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1
+
+[6.3.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0
+
+[6.2.4]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4
