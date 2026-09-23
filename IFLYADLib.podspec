@@ -8,11 +8,11 @@
 
 Pod::Spec.new do |s|
   s.name = 'IFLYADLib'
-  s.version = '6.3.5'
+  s.version = '6.4.0'
   s.summary = 'IFLYADLib model A composable SDK distribution.'
   s.homepage = 'https://github.com/LJMcarryu/IFLYADLib_iOS'
   s.author = 'LJMcarryu'
-  s.source = { :http => 'https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.3.5/IFLYADLib-modelA-6.3.5.zip' }
+  s.source = { :http => 'https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.4.0/IFLYADLib-modelA-6.4.0.zip' }
   s.license = { :type => 'MIT', :file => 'LICENSE' }
 
   # iOS 11 声明只可随重新构建并验证过的新版本二进制发布；不得套用到旧 release 产物。
