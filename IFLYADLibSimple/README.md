@@ -1,12 +1,12 @@
 # IFLYADLibSimple 接入示例
 
-本工程使用 `IFLYADLib 6.3.5`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
+本工程使用 `IFLYADLib 6.4.0`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
 
 自己的 App 如何安装 SDK、各格式的公开接口与完整配置，见[仓库接入指南](../README.md)。
 
-> `6.4.0` 当前是待联调候选，尚未发布；本示例的 `Podfile` 继续固定公开正式版 `6.3.5`，因此直接运行示例时不会获得候选行为。历史 Tag、Release 和资产保持不变。
+> 本示例的 `Podfile` 固定正式版本 `6.4.0`。版本公开状态与消费验证结论以 `release-state.json.publication` 和同版本 GitHub Release 的实际状态为准。
 >
-> 使用后续候选产物联调时，公开 API 方法签名不变。展示、落地页、外跳回流、曝光判断和 UI 生命周期应归属广告的实际来源 window/Scene；无来源时只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底，独立落地页始终属于来源 Scene。开屏 rootVC 仍须入窗；Scene 宿主的 `customWindow` 必须可见、尺寸有限且为正、已关联 Scene，并与 `rootVC.window` 同 Scene，可以是非 key、高 `windowLevel`、无 rootVC。非法输入展示失败，修正后可以重试。
+> `6.4.0` 的公开 API 方法签名不变。展示、落地页、外跳回流、曝光判断和 UI 生命周期应归属广告的实际来源 window/Scene；无来源时只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底，独立落地页始终属于来源 Scene。开屏 rootVC 仍须入窗；Scene 宿主的 `customWindow` 必须可见、尺寸有限且为正、已关联 Scene，并与 `rootVC.window` 同 Scene，可以是非 key、高 `windowLevel`、无 rootVC。非法输入展示失败，修正后可以重试。
 
 ## 下载与运行
 
@@ -21,7 +21,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-已有仓库时，进入本目录从 `pod install` 开始。Podfile 固定使用公开 `6.3.5` Podspec，默认安装 `Full`；更新示例源码不会自动升级 SDK。
+已有仓库时，进入本目录从 `pod install` 开始。Podfile 固定使用公开 `6.4.0` Podspec，默认安装 `Full`；更新示例源码不会自动升级 SDK。
 
 1. 在 Xcode 选择 **IFLYADLibSimple** scheme 和一个已安装的 iPhone 模拟器或真机。
 2. 按下方说明替换广告位，真机运行时在 **Signing & Capabilities** 设置签名，再 Build & Run。

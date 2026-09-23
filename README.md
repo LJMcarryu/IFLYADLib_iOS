@@ -4,19 +4,17 @@
 
 ## 当前版本
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.3.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5"} -->
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.0","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.0"} -->
 
-## 6.4.0 候选联调说明
+## 6.4.0 冻结与发布记录
 
-<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.0","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.3.5"} -->
-
-`6.4.0` 目前是待联调候选，尚未发布。当前公开正式版和生产依赖仍为 [`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)；已发布的 Tag、Release 和资产不追溯改变。
+`6.4.0` 的正式分发资料与签名资产已经冻结。当前正式版本：[`6.4.0`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.0)；是否已完成公开及消费验证，以 `release-state.json.publication` 和同版本 GitHub Release 的实际状态为准。
 
 - 公开 API 方法签名不变。
 - 共享 UIScene 适配将展示、落地页、外跳回流、曝光判断和 UI 生命周期绑定到广告的实际来源 window/Scene。没有来源时，仅在前台应用 Scene 唯一且明确时兜底，不跨 Scene 随机选择；独立落地页始终属于来源 Scene。
 - 开屏的 rootVC 仍须已经入窗。在 Scene 宿主中使用 `customWindow` 时，窗口必须可见、尺寸有限且为正、已经关联 Scene，并与 `rootVC.window` 属于同一 Scene；它可以不是 key window，可以使用较高 `windowLevel`，也可以不设置 rootVC。输入无效时展示失败，修正窗口后可重试。
 
-当前正式版本：[`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)。生产项目请固定具体版本；更新示例工程时可以跟随本仓 `main`，示例依赖仍固定为 `6.3.5`。
+生产项目请固定具体版本；更新示例工程时可以跟随本仓 `main`，示例依赖固定为 `6.4.0`。
 
 ## 先读什么
 
@@ -41,7 +39,7 @@
 ## 环境要求
 
 - iOS 11.0 及以上。
-- SwiftPM 清单使用 Swift tools 5.9；`6.3.5` 已在 Xcode `26.3`（Build `17C529`）验证，其他 Xcode 版本须由接入项目自行验证。
+- SwiftPM 清单使用 Swift tools 5.9；`6.4.0` 正式候选在 Xcode `26.2`（Build `17C52`）完成构建与自动化门禁，其他 Xcode 版本须由接入项目自行验证。
 - SDK 是静态 XCFramework，最终 App 必须链接 `-ObjC`，不需要 Embed & Sign。
 - CocoaPods 和 SwiftPM 会自动投递 SDK 资源与 `PrivacyInfo.xcprivacy`；手动集成时需复制 Release 压缩包中的资源。
 - 入口头：
@@ -64,7 +62,7 @@ target 'YourApp' do
   use_frameworks!
   # 默认安装 Full，包含开屏、Banner、插屏、自渲染信息流和激励视频五种广告。
   pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.0/IFLYADLib.podspec'
 end
 ```
 
@@ -80,21 +78,21 @@ open YourApp.xcworkspace
 ```ruby
 # 只接入开屏：Core 和 VideoUI 会自动带入
 pod 'IFLYADLib/Splash',
-    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.0/IFLYADLib.podspec'
 
 # 只接入 Banner + 自渲染信息流：两个格式共用一份 Core
 pod 'IFLYADLib/Banner',
-    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.0/IFLYADLib.podspec'
 pod 'IFLYADLib/NativeFeed',
-    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.0/IFLYADLib.podspec'
 
 # 只接入基础 Core（不包含任何广告格式）
 pod 'IFLYADLib/Core',
-    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.0/IFLYADLib.podspec'
 
 # 显式写 Full，和最上面的裸写法等价
 pod 'IFLYADLib/Full',
-    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'
+    :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.0/IFLYADLib.podspec'
 ```
 
 选择 `Splash`、`Interstitial` 或 `Reward` 时，`Core`、`VideoUI` 及所需资源会由依赖关系自动安装；`Banner` 和 `NativeFeed` 只自动依赖 `Core`。替换 Podfile 后重新执行 `pod install`，再打开生成的 `.xcworkspace`。
@@ -107,7 +105,7 @@ pod 'IFLYADLib/Full',
 https://github.com/LJMcarryu/IFLYADLib_iOS.git
 ```
 
-选择依赖规则 **Exact Version**，版本填 `6.3.5`，再按需要选择 `Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward` 或 `Full` product。SwiftPM 会自动投递资源；在 App target 的 `Other Linker Flags` 中添加：
+选择依赖规则 **Exact Version**，版本填 `6.4.0`，再按需要选择 `Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward` 或 `Full` product。SwiftPM 会自动投递资源；在 App target 的 `Other Linker Flags` 中添加：
 
 ```text
 -ObjC
@@ -125,7 +123,7 @@ let package = Package(
         .iOS("11.0")
     ],
     dependencies: [
-        .package(url: "https://github.com/LJMcarryu/IFLYADLib_iOS.git", exact: "6.3.5")
+        .package(url: "https://github.com/LJMcarryu/IFLYADLib_iOS.git", exact: "6.4.0")
     ],
     targets: [
         .target(
@@ -143,7 +141,7 @@ let package = Package(
 
 ### 下载与手动集成
 
-[Release 6.3.5](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5) 提供 `IFLYADLib-modelA-6.3.5.zip` 完整压缩包和各模块的 `.xcframework.zip`。首次接入建议使用 CocoaPods 或 SwiftPM，由包管理器处理模块依赖、公开头和资源。
+[Release 6.4.0](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.0) 提供 `IFLYADLib-modelA-6.4.0.zip` 完整压缩包和各模块的 `.xcframework.zip`。首次接入建议使用 CocoaPods 或 SwiftPM，由包管理器处理模块依赖、公开头和资源。
 
 手动接入须把所选格式及其依赖一起加入 App target，Embed 选择 **Do Not Embed**：
 

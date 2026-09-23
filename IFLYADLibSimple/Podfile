@@ -1,10 +1,9 @@
-# 本示例固定使用公开 6.3.5 版本；通过 Podspec URL 安装，不依赖 trunk 索引。
+# 本示例固定使用公开 6.4.0 版本；通过 Podspec URL 安装，不依赖 trunk 索引。
 source 'https://cdn.cocoapods.org/'
 
 platform :ios, '11.0'
 
-# 6.4.0 当前仅为待联调候选，尚未发布；示例继续使用公开正式版 6.3.5。
-# 候选公开 API 方法签名不变。UIScene 展示、落地页、外跳回流、曝光和 UI 生命周期绑定实际来源 window/Scene；
+# 6.4.0 公开 API 方法签名不变。UIScene 展示、落地页、外跳回流、曝光和 UI 生命周期绑定实际来源 window/Scene；
 # 无来源时只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底，独立落地页始终属于来源 Scene。
 # 开屏 rootVC 仍须入窗；Scene 宿主的 customWindow 须可见、尺寸有限且为正、已关联且与 rootVC.window 同 Scene，
 # 可为非 key、高 windowLevel、无 rootVC；非法输入展示失败，修正后可重试。历史 Tag、Release 和资产保持不变。
@@ -13,11 +12,11 @@ target 'IFLYADLibSimple' do
   use_frameworks!
 
   # 示例包含全部五种广告，使用 Full；安装后打开生成的 .xcworkspace。
-  pod 'IFLYADLib', :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'
+  pod 'IFLYADLib', :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.0/IFLYADLib.podspec'
 
   # 业务 App 可按需选择广告形式，例如：
   #   pod 'IFLYADLib/Splash',
-  #       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'
+  #       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.0/IFLYADLib.podspec'
   # 统一导入 <IFLYADLib/IFLYADLib.h>。
   # 若裁剪此示例，须同时移除未安装格式的页面编译源和首页入口，详见 README。
 end
