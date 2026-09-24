@@ -7,10 +7,12 @@ import zipfile
 from pathlib import Path
 
 
-SCRIPTS = Path(__file__).resolve().parents[1] / "scripts"
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS = ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from prepare_release_consumers import (  # noqa: E402
+    CURRENT_VERSION,
     VerificationError,
     prepare_cocoapods,
     prepare_swiftpm,
@@ -19,7 +21,7 @@ from prepare_release_consumers import (  # noqa: E402
 from release_asset_downloader import MODULE_ASSET_NAMES, expected_assets  # noqa: E402
 
 
-VERSION = "6.3.5"
+VERSION = CURRENT_VERSION
 
 
 def write_zip(path: Path, entries: dict[str, bytes]) -> None:
@@ -57,7 +59,7 @@ def create_repository(root: Path) -> None:
         "let package = Package(name: \"consumer\", dependencies: [\n"
         "  .package(\n"
         '    url: "https://github.com/LJMcarryu/IFLYADLib_iOS.git",\n'
-        '    exact: "6.3.5"\n'
+        f'    exact: "{VERSION}"\n'
         "  )\n"
         "], targets: [])\n",
         encoding="utf-8",
@@ -72,7 +74,7 @@ def create_repository(root: Path) -> None:
         "platform :ios, '11.0'\n"
         "target 'IFLYADLibSimple' do\n"
         "  pod 'IFLYADLib', :podspec => "
-        "'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.3.5/IFLYADLib.podspec'\n"
+        f"'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/{VERSION}/IFLYADLib.podspec'\n"
         "end\n",
         encoding="utf-8",
     )
@@ -94,6 +96,16 @@ def create_assets(root: Path) -> None:
 
 
 class PrepareReleaseConsumersTests(unittest.TestCase):
+    def test_committed_swiftpm_consumer_targets_current_release(self) -> None:
+        fixture = ROOT / ".github/fixtures/swiftpm-consumer"
+        package = (fixture / "Package.swift").read_text(encoding="utf-8")
+        marker = (
+            fixture / "Sources/ReleaseConsumer/ReleaseConsumer.swift"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(f'exact: "{CURRENT_VERSION}"', package)
+        self.assertIn(f'IFLYADLib-{CURRENT_VERSION}', marker)
+
     def test_prepares_local_swiftpm_and_cocoapods_consumers(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

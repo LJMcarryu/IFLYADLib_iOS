@@ -18,7 +18,6 @@ from verify_distribution_manifest import (  # noqa: E402
     PREVIOUS_COMBINED_SHA256,
     PUBLIC_RELEASE_STATUS_RE,
     REPOSITORY,
-    STRICT_REVIEW_POLICY,
     VERSION,
     verify,
 )
@@ -66,8 +65,8 @@ class DistributionManifestTests(unittest.TestCase):
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             source = source.replace(
+                f'"version":"{VERSION}"',
                 '"version":"6.3.5"',
-                '"version":"6.3.0"',
                 1,
             )
             readme.write_text(source, encoding="utf-8")
@@ -88,10 +87,10 @@ class DistributionManifestTests(unittest.TestCase):
 
     def test_restored_history_does_not_replace_current_frozen_hash(self) -> None:
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-        current, historical = changelog.split("## [6.3.1] - 2026-09-01", 1)
-        previous_hash = "4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5"
+        current, historical = changelog.split("## [6.3.5] - 冻结与发布记录", 1)
+        previous_hash = "e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884"
         self.assertNotIn(previous_hash, current)
-        self.assertIn(previous_hash, historical.split("## [6.3.0]", 1)[0])
+        self.assertIn(previous_hash, historical.split("## [6.3.1]", 1)[0])
         self.assertEqual(verify(ROOT, VERSION, "candidate"), "Draft candidate 冻结资产预验")
 
     def test_rejects_historical_module_checksum(self) -> None:
@@ -102,7 +101,7 @@ class DistributionManifestTests(unittest.TestCase):
             source = package.read_text(encoding="utf-8")
             source = re.sub(
                 r'checksum:\s*"[0-9a-f]{64}"',
-                f'checksum: "{next(iter(PREVIOUS_CHECKSUMS))}"',
+                'checksum: "587a94d47380fc73398b8d31e7fa9e63c3954a90ee290e17dc763abb1b5bd77e"',
                 source,
                 count=1,
             )
@@ -110,20 +109,15 @@ class DistributionManifestTests(unittest.TestCase):
             with self.assertRaisesRegex(AssertionError, "不得混用"):
                 verify(root, VERSION, "candidate")
 
-    def test_rejects_historical_combined_sha256(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            copy_contract_files(root)
-            current = "e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884"
-            historical = next(iter(PREVIOUS_COMBINED_SHA256))
-            for relative in ("README.md", "CHANGELOG.md", "RELEASING.md"):
-                path = root / relative
-                path.write_text(
-                    path.read_text(encoding="utf-8").replace(current, historical),
-                    encoding="utf-8",
-                )
-            with self.assertRaisesRegex(AssertionError, "禁止沿用历史合并包"):
-                verify(root, VERSION, "candidate")
+    def test_previous_hash_sets_include_6_3_5_assets(self) -> None:
+        self.assertIn(
+            "587a94d47380fc73398b8d31e7fa9e63c3954a90ee290e17dc763abb1b5bd77e",
+            PREVIOUS_CHECKSUMS,
+        )
+        self.assertIn(
+            "e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884",
+            PREVIOUS_COMBINED_SHA256,
+        )
 
     def test_public_readme_does_not_require_internal_review_policy(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -192,24 +186,22 @@ class DistributionManifestTests(unittest.TestCase):
             root = Path(temporary)
             copy_contract_files(root)
             (root / "README.md").write_text(f"# SDK\n\n## {VERSION} 版本\n", encoding="utf-8")
-            with self.assertRaisesRegex(AssertionError, "README 缺少 6.3.5 严格扫描策略"):
+            with self.assertRaisesRegex(
+                AssertionError, rf"README 缺少 {re.escape(VERSION)} 严格扫描策略"
+            ):
                 verify(root, VERSION, "local")
 
-    def test_public_guides_still_require_maintainer_release_facts(self) -> None:
-        for relative, original, expected in (
-            ("CHANGELOG.md", "- `releaseState`：`FORMAL`", "未声明 releaseState=FORMAL"),
-            ("RELEASING.md", "- `releaseState`：`FORMAL`", "未声明 releaseState=FORMAL"),
-            ("RELEASING.md", STRICT_REVIEW_POLICY, "严格扫描策略"),
-            ("CHANGELOG.md", "冻结 SHA-256", "冻结态缺少发布事实"),
-        ):
-            with self.subTest(document=relative, fact=original), tempfile.TemporaryDirectory() as temporary:
+    def test_public_guides_require_structured_release_status(self) -> None:
+        for relative in ("CHANGELOG.md", "RELEASING.md"):
+            with self.subTest(document=relative), tempfile.TemporaryDirectory() as temporary:
                 root = Path(temporary)
                 copy_contract_files(root)
                 path = root / relative
                 document = path.read_text(encoding="utf-8")
-                self.assertIn(original, document)
-                path.write_text(document.replace(original, "已删除的事实", 1), encoding="utf-8")
-                with self.assertRaisesRegex(AssertionError, expected):
+                marker = PUBLIC_RELEASE_STATUS_RE.search(document)
+                self.assertIsNotNone(marker)
+                path.write_text(document.replace(marker.group(0), "", 1), encoding="utf-8")
+                with self.assertRaisesRegex(AssertionError, "发布状态标记漂移"):
                     verify(root, VERSION, "local")
 
     def test_public_demo_and_security_require_current_version(self) -> None:
@@ -218,7 +210,7 @@ class DistributionManifestTests(unittest.TestCase):
                 root = Path(temporary)
                 copy_contract_files(root)
                 path = root / relative
-                path.write_text(path.read_text(encoding="utf-8").replace(VERSION, "6.3.50"), encoding="utf-8")
+                path.write_text(path.read_text(encoding="utf-8").replace(VERSION, "6.4.00"), encoding="utf-8")
                 with self.assertRaisesRegex(AssertionError, "缺少当前版本"):
                     verify(root, VERSION, "local")
 

@@ -174,6 +174,7 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertIn("release_mode='candidate'", preflight)
         self.assertIn("release_mode='tag'", preflight)
         self.assertIn("release_mode='formal'", preflight)
+        self.assertIn(f"version='{repository_contract.VERSION}'", preflight)
 
     def test_machine_and_document_contracts_are_blocking(self) -> None:
         preflight = job_block("preflight")
@@ -187,9 +188,11 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertNotIn("continue-on-error", documentation)
         self.assertIn("--scope docs", documentation)
         maintenance = step_block(
-            preflight, "校验 A/B provenance 文档一致性（main/PR 不访问私有仓）"
+            preflight, "校验 A/B provenance 状态（main/PR 不访问私有仓）"
         )
         self.assertNotIn("continue-on-error", maintenance)
+        self.assertIn("--release-state release-state.json", maintenance)
+        self.assertNotIn("--readme", maintenance)
         self.assertEqual(WORKFLOW.count("continue-on-error: true"), 0)
         release_provenance = step_block(
             job_block("release-assets"), "校验 Release body 的 A/B provenance 声明"
@@ -234,8 +237,8 @@ class CIWorkflowContractTests(unittest.TestCase):
             value = original_read(root, relative)
             if relative == "IFLYADLib.podspec":
                 return re.sub(
-                    r"(s\.version\s*=\s*['\"])6\.3\.5",
-                    r"\g<1>6.3.2",
+                    rf"(s\.version\s*=\s*['\"]){re.escape(repository_contract.VERSION)}",
+                    r"\g<1>0.0.0",
                     value,
                     count=1,
                 )
@@ -421,7 +424,7 @@ class CIWorkflowContractTests(unittest.TestCase):
             self.assertEqual(0, result.returncode, result.stderr)
 
     def test_previous_closed_state_is_allowed_only_on_local_main(self) -> None:
-        state = {"version": "6.3.1", "phase": "CLOSED"}
+        state = {"version": repository_contract.PREVIOUS_RELEASE_VERSION, "phase": "CLOSED"}
         repository_contract.validate_state_version(state, "local")
         for release_kind in ("candidate", "tag", "formal"):
             with self.subTest(release_kind=release_kind), self.assertRaises(
@@ -430,14 +433,14 @@ class CIWorkflowContractTests(unittest.TestCase):
                 repository_contract.validate_state_version(state, release_kind)
 
     def test_current_frozen_state_is_allowed_for_all_release_modes(self) -> None:
-        state = {"version": "6.3.5", "phase": "FROZEN"}
+        state = {"version": repository_contract.VERSION, "phase": "FROZEN"}
         for release_kind in ("local", "candidate", "tag", "formal"):
             with self.subTest(release_kind=release_kind):
                 repository_contract.validate_state_version(state, release_kind)
 
     def test_candidate_tag_and_formal_reject_current_non_frozen_state(self) -> None:
         for phase in ("PREPARING", "PUBLISHED", "VERIFIED", "CLOSED"):
-            state = {"version": "6.3.5", "phase": phase}
+            state = {"version": repository_contract.VERSION, "phase": phase}
             for release_kind in ("candidate", "tag", "formal"):
                 with self.subTest(
                     phase=phase, release_kind=release_kind

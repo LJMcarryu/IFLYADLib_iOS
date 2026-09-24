@@ -18,7 +18,7 @@ from verify_distribution_manifest import (
     VERSION,
 )
 
-PREVIOUS_RELEASE_VERSION = "6.3.1"
+PREVIOUS_RELEASE_VERSION = "6.3.5"
 RELEASE_STATUS_RE = re.compile(
     r"<!--\s*ifly-release-status:\s*(\{[^\r\n]*\})\s*-->"
 )

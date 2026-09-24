@@ -104,7 +104,7 @@ jobs:
           MANUAL_CANARY_CANDIDATE_ID: ${{ inputs.canary_candidate_id }}
         run: |
           set -euo pipefail
-          version='6.3.5'
+          version='6.4.0'
           release_mode='local'
           event_tag=''
           draft_release_id=''
@@ -234,13 +234,11 @@ jobs:
       - name: 校验 Package.swift 可解析
         run: swift package dump-package > "$RUNNER_TEMP/ifly-package.json"
 
-      - name: 校验 A/B provenance 文档一致性（main/PR 不访问私有仓）
+      - name: 校验 A/B provenance 状态（main/PR 不访问私有仓）
         if: steps.release-mode.outputs.release_mode == 'local'
         run: |
           python3 scripts/verify_private_release_provenance.py \
-            --readme README.md \
-            --changelog CHANGELOG.md \
-            --releasing RELEASING.md \
+            --release-state release-state.json \
             --skip-compare
 
       - name: Candidate/tag/正式态校验 A/B provenance（私有仓 compare）
@@ -269,6 +267,7 @@ jobs:
             unexpected_paths=$(git diff --name-only "$RELEASE_VERSION^{commit}" HEAD -- . \
               ':(exclude).github/workflows/ci.yml' \
               ':(exclude).github/fixtures/swiftpm-consumer/Package.swift' \
+              ':(exclude).github/fixtures/swiftpm-consumer/Sources/ReleaseConsumer/ReleaseConsumer.swift' \
               ':(exclude)Package.swift' \
               ':(exclude)README.md' \
               ':(exclude)CHANGELOG.md' \
@@ -288,7 +287,8 @@ jobs:
               ':(exclude)tests/test_release_asset_downloader.py' \
               ':(exclude)tests/test_github_http_retry.py' \
               ':(exclude)tests/test_network_retry_integration.py' \
-              ':(exclude)tests/test_prepare_release_consumers.py')
+              ':(exclude)tests/test_prepare_release_consumers.py' \
+              ':(exclude)tests/test_verify_distribution_manifest.py')
             if [[ -n "$unexpected_paths" ]]; then
               echo '手动正式复验的 main 相对 tag 修改了非获准 CI/发布文档路径：' >&2
               echo "$unexpected_paths" >&2
@@ -371,7 +371,7 @@ jobs:
           def has_objc_flag(config):
               return "-ObjC" in shlex.split((config or {}).get("OTHER_LDFLAGS", ""))
 
-          assert spec["version"] == "6.3.5", spec["version"]
+          assert spec["version"] == "6.4.0", spec["version"]
           assert has_objc_flag(spec.get("pod_target_xcconfig"))
           assert has_objc_flag(spec.get("user_target_xcconfig"))
           core = next(item for item in spec["subspecs"] if item["name"] == "Core")
