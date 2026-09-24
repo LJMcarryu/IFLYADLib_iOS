@@ -12,7 +12,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/LJMcarryu/IFLYADLib_iOS.git",
-            exact: "6.3.5"
+            exact: "6.4.0"
         ),
     ],
     targets: [

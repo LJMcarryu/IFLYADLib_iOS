@@ -16,9 +16,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from github_http_retry import call_with_retry
 
 PRIVATE_SOURCE_REPOSITORY = "LJMcarryu/IFLYADLibDemo"
-CURRENT_VERSION = "6.3.5"
-PENDING_BINARY = "__IFLYADLIB_6_3_5_BINARY_SOURCE_COMMIT_PENDING__"
-PENDING_METADATA = "__IFLYADLIB_6_3_5_RELEASE_METADATA_COMMIT_PENDING__"
+CURRENT_VERSION = "6.4.0"
+PENDING_BINARY = "__IFLYADLIB_6_4_0_BINARY_SOURCE_COMMIT_PENDING__"
+PENDING_METADATA = "__IFLYADLIB_6_4_0_RELEASE_METADATA_COMMIT_PENDING__"
 ALLOWED_METADATA_FILES = {"Package.swift", "README.md", "CONTEXT.md"}
 PUBLIC_RELEASE_STATUS_RE = re.compile(
     r"<!--\s*ifly-release-status:\s*(\{[^\r\n]*\})\s*-->"
@@ -47,7 +47,7 @@ def has_public_release_status(document: str) -> bool:
         "version": CURRENT_VERSION,
         "releaseState": "FORMAL",
         "distribution": "github-release",
-        "releaseUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5",
+        "releaseUrl": f"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/{CURRENT_VERSION}",
     }
 
 
