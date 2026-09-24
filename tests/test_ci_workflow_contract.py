@@ -199,6 +199,9 @@ class CIWorkflowContractTests(unittest.TestCase):
         )
         self.assertIn("--release-state release-state.json", release_provenance)
         self.assertNotIn("--readme", release_provenance)
+        podspec = step_block(preflight, "校验 CocoaPods 清单与最终 App 链接契约")
+        self.assertIn('Path("release-state.json")', podspec)
+        self.assertIn('spec["version"] == state["version"]', podspec)
 
     def test_docs_drift_is_isolated_but_checksum_drift_fails_machine_scope(self) -> None:
         original_read = repository_contract.read
@@ -236,8 +239,9 @@ class CIWorkflowContractTests(unittest.TestCase):
         def version_drift(root: Path, relative: str) -> str:
             value = original_read(root, relative)
             if relative == "IFLYADLib.podspec":
+                repository_version = repository_contract.machine_state(ROOT)["version"]
                 return re.sub(
-                    rf"(s\.version\s*=\s*['\"]){re.escape(repository_contract.VERSION)}",
+                    rf"(s\.version\s*=\s*['\"]){re.escape(repository_version)}",
                     r"\g<1>0.0.0",
                     value,
                     count=1,

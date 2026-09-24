@@ -16,11 +16,15 @@ sys.path.insert(0, str(SCRIPTS))
 from verify_distribution_manifest import (  # noqa: E402
     PREVIOUS_CHECKSUMS,
     PREVIOUS_COMBINED_SHA256,
+    PREVIOUS_RELEASE_VERSION,
     PUBLIC_RELEASE_STATUS_RE,
     REPOSITORY,
     VERSION,
     verify,
 )
+
+ROOT_STATE = json.loads((ROOT / "release-state.json").read_text(encoding="utf-8"))
+REPOSITORY_VERSION = ROOT_STATE["version"]
 
 
 CONTRACT_FILES = (
@@ -43,35 +47,46 @@ def copy_contract_files(destination: Path) -> None:
 
 
 class DistributionManifestTests(unittest.TestCase):
-    def test_current_release_ready_repository_passes_all_static_modes(self) -> None:
-        self.assertEqual(verify(ROOT, VERSION, "local"), "已冻结正式资产")
-        self.assertEqual(
-            verify(ROOT, VERSION, "candidate"),
-            "Draft candidate 冻结资产预验",
-        )
-        self.assertEqual(
-            verify(ROOT, VERSION, "tag"),
-            "不可变 tag 冻结资产复验",
-        )
-        self.assertEqual(
-            verify(ROOT, VERSION, "formal"),
-            "正式 Release 冻结文档与清单复验",
-        )
+    def test_repository_release_ready_for_its_allowed_static_modes(self) -> None:
+        self.assertEqual(verify(ROOT, REPOSITORY_VERSION, "local"), "已冻结正式资产")
+        if REPOSITORY_VERSION == VERSION:
+            self.assertEqual(
+                verify(ROOT, VERSION, "candidate"),
+                "Draft candidate 冻结资产预验",
+            )
+            self.assertEqual(
+                verify(ROOT, VERSION, "tag"),
+                "不可变 tag 冻结资产复验",
+            )
+            self.assertEqual(
+                verify(ROOT, VERSION, "formal"),
+                "正式 Release 冻结文档与清单复验",
+            )
+        else:
+            self.assertEqual(REPOSITORY_VERSION, PREVIOUS_RELEASE_VERSION)
+            self.assertEqual(ROOT_STATE["phase"], "CLOSED")
 
-    def test_candidate_rejects_release_status_version_drift(self) -> None:
+    def test_previous_release_is_rejected_outside_local_bootstrap(self) -> None:
+        for mode in ("candidate", "tag", "formal"):
+            with self.subTest(mode=mode), self.assertRaisesRegex(
+                AssertionError, "只允许 local bootstrap"
+            ):
+                verify(ROOT, PREVIOUS_RELEASE_VERSION, mode)
+
+    def test_rejects_release_status_version_drift(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copy_contract_files(root)
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             source = source.replace(
-                f'"version":"{VERSION}"',
-                '"version":"6.3.5"',
+                f'"version":"{REPOSITORY_VERSION}"',
+                '"version":"0.0.0"',
                 1,
             )
             readme.write_text(source, encoding="utf-8")
             with self.assertRaisesRegex(AssertionError, "发布状态标记漂移"):
-                verify(root, VERSION, "candidate")
+                verify(root, REPOSITORY_VERSION, "local")
 
     def test_public_podfile_comments_do_not_control_release_stage(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -83,15 +98,19 @@ class DistributionManifestTests(unittest.TestCase):
                 + podfile.read_text(encoding="utf-8"),
                 encoding="utf-8",
             )
-            self.assertEqual(verify(root, VERSION, "candidate"), "Draft candidate 冻结资产预验")
+            self.assertEqual(verify(root, REPOSITORY_VERSION, "local"), "已冻结正式资产")
 
     def test_restored_history_does_not_replace_current_frozen_hash(self) -> None:
         changelog = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
-        current, historical = changelog.split("## [6.3.5] - 冻结与发布记录", 1)
         previous_hash = "e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884"
-        self.assertNotIn(previous_hash, current)
-        self.assertIn(previous_hash, historical.split("## [6.3.1]", 1)[0])
-        self.assertEqual(verify(ROOT, VERSION, "candidate"), "Draft candidate 冻结资产预验")
+        if REPOSITORY_VERSION == VERSION:
+            current, historical = changelog.split("## [6.3.5] - 冻结与发布记录", 1)
+            self.assertNotIn(previous_hash, current)
+            self.assertIn(previous_hash, historical.split("## [6.3.1]", 1)[0])
+        else:
+            self.assertEqual(REPOSITORY_VERSION, PREVIOUS_RELEASE_VERSION)
+            self.assertIn(previous_hash, changelog.split("## [6.3.1]", 1)[0])
+        self.assertEqual(verify(ROOT, REPOSITORY_VERSION, "local"), "已冻结正式资产")
 
     def test_rejects_historical_module_checksum(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -101,13 +120,13 @@ class DistributionManifestTests(unittest.TestCase):
             source = package.read_text(encoding="utf-8")
             source = re.sub(
                 r'checksum:\s*"[0-9a-f]{64}"',
-                'checksum: "587a94d47380fc73398b8d31e7fa9e63c3954a90ee290e17dc763abb1b5bd77e"',
+                'checksum: "17ced6f3ca92d8906e192390c196bd27436f1a2c41e31bba82c56e316a6ee22b"',
                 source,
                 count=1,
             )
             package.write_text(source, encoding="utf-8")
             with self.assertRaisesRegex(AssertionError, "不得混用"):
-                verify(root, VERSION, "candidate")
+                verify(root, REPOSITORY_VERSION, "local")
 
     def test_previous_hash_sets_include_6_3_5_assets(self) -> None:
         self.assertIn(
@@ -126,7 +145,7 @@ class DistributionManifestTests(unittest.TestCase):
             readme = root / "README.md"
             source = readme.read_text(encoding="utf-8")
             self.assertNotIn("failOnWarning=", source)
-            self.assertEqual(verify(root, VERSION, "local"), "已冻结正式资产")
+            self.assertEqual(verify(root, REPOSITORY_VERSION, "local"), "已冻结正式资产")
 
     def test_public_guides_do_not_require_release_engineering_prose(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -137,11 +156,12 @@ class DistributionManifestTests(unittest.TestCase):
             self.assertIsNotNone(marker)
             path.write_text(
                 "# SDK 接入\n\n## 当前版本\n\n" + marker.group(0)
-                + f"\n\n正式版本：[{VERSION}](https://github.com/{REPOSITORY}/releases/tag/{VERSION})\n",
+                + f"\n\n正式版本：[{REPOSITORY_VERSION}]"
+                f"(https://github.com/{REPOSITORY}/releases/tag/{REPOSITORY_VERSION})\n",
                 encoding="utf-8",
             )
             (root / "IFLYADLibSimple/README.md").write_text(
-                f"# 示例工程\n\n本示例固定 SDK {VERSION}，安装后打开 workspace。\n",
+                f"# 示例工程\n\n本示例固定 SDK {REPOSITORY_VERSION}，安装后打开 workspace。\n",
                 encoding="utf-8",
             )
             podfile = root / "IFLYADLibSimple/Podfile"
@@ -150,7 +170,7 @@ class DistributionManifestTests(unittest.TestCase):
                           if not line.lstrip().startswith("#")) + "\n",
                 encoding="utf-8",
             )
-            self.assertEqual(verify(root, VERSION, "formal"), "正式 Release 冻结文档与清单复验")
+            self.assertEqual(verify(root, REPOSITORY_VERSION, "local"), "已冻结正式资产")
 
     def test_public_readme_rejects_malformed_duplicate_or_drifted_markers(self) -> None:
         document = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -168,7 +188,7 @@ class DistributionManifestTests(unittest.TestCase):
             ("schemaVersion", True),
             ("releaseState", "PENDING"),
             ("distribution", "trunk"),
-            ("releaseUrl", f"https://github.com/other/repo/releases/tag/{VERSION}"),
+            ("releaseUrl", f"https://github.com/other/repo/releases/tag/{REPOSITORY_VERSION}"),
             ("unexpected", "field"),
         ):
             changed = dict(marker, **{field: value})
@@ -179,17 +199,20 @@ class DistributionManifestTests(unittest.TestCase):
                 copy_contract_files(root)
                 (root / "README.md").write_text(document.replace(original, replacement, 1), encoding="utf-8")
                 with self.assertRaisesRegex(AssertionError, "发布状态标记"):
-                    verify(root, VERSION, "local")
+                    verify(root, REPOSITORY_VERSION, "local")
 
     def test_markerless_readme_still_requires_legacy_review_policy(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copy_contract_files(root)
-            (root / "README.md").write_text(f"# SDK\n\n## {VERSION} 版本\n", encoding="utf-8")
+            (root / "README.md").write_text(
+                f"# SDK\n\n## {REPOSITORY_VERSION} 版本\n", encoding="utf-8"
+            )
             with self.assertRaisesRegex(
-                AssertionError, rf"README 缺少 {re.escape(VERSION)} 严格扫描策略"
+                AssertionError,
+                rf"README 缺少 {re.escape(REPOSITORY_VERSION)} 严格扫描策略",
             ):
-                verify(root, VERSION, "local")
+                verify(root, REPOSITORY_VERSION, "local")
 
     def test_public_guides_require_structured_release_status(self) -> None:
         for relative in ("CHANGELOG.md", "RELEASING.md"):
@@ -202,7 +225,7 @@ class DistributionManifestTests(unittest.TestCase):
                 self.assertIsNotNone(marker)
                 path.write_text(document.replace(marker.group(0), "", 1), encoding="utf-8")
                 with self.assertRaisesRegex(AssertionError, "发布状态标记漂移"):
-                    verify(root, VERSION, "local")
+                    verify(root, REPOSITORY_VERSION, "local")
 
     def test_public_demo_and_security_require_current_version(self) -> None:
         for relative in ("IFLYADLibSimple/README.md", "SECURITY.md"):
@@ -210,9 +233,12 @@ class DistributionManifestTests(unittest.TestCase):
                 root = Path(temporary)
                 copy_contract_files(root)
                 path = root / relative
-                path.write_text(path.read_text(encoding="utf-8").replace(VERSION, "6.4.00"), encoding="utf-8")
+                path.write_text(
+                    path.read_text(encoding="utf-8").replace(REPOSITORY_VERSION, "0.0.0"),
+                    encoding="utf-8",
+                )
                 with self.assertRaisesRegex(AssertionError, "缺少当前版本"):
-                    verify(root, VERSION, "local")
+                    verify(root, REPOSITORY_VERSION, "local")
 
     def test_extra_or_mutable_demo_dependency_is_rejected(self) -> None:
         for dependency in (
@@ -226,7 +252,7 @@ class DistributionManifestTests(unittest.TestCase):
                 path = root / "IFLYADLibSimple/Podfile"
                 path.write_text(path.read_text(encoding="utf-8") + dependency + "\n", encoding="utf-8")
                 with self.assertRaisesRegex(AssertionError, "活跃 :podspec"):
-                    verify(root, VERSION, "local")
+                    verify(root, REPOSITORY_VERSION, "local")
 
     def test_rejects_binary_target_on_different_host(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -242,7 +268,7 @@ class DistributionManifestTests(unittest.TestCase):
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(AssertionError, "URL 非预期"):
-                verify(root, VERSION, "local")
+                verify(root, REPOSITORY_VERSION, "local")
 
     def test_rejects_podspec_combined_asset_on_different_host(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -258,7 +284,7 @@ class DistributionManifestTests(unittest.TestCase):
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(AssertionError, "合并包 URL 非预期"):
-                verify(root, VERSION, "local")
+                verify(root, REPOSITORY_VERSION, "local")
 
     def test_rejects_demo_podspec_url_only_present_in_comment(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -269,7 +295,7 @@ class DistributionManifestTests(unittest.TestCase):
             active = (
                 "  pod 'IFLYADLib', :podspec => "
                 "'https://raw.githubusercontent.com/LJMcarryu/"
-                f"IFLYADLib_iOS/{VERSION}/IFLYADLib.podspec'"
+                f"IFLYADLib_iOS/{REPOSITORY_VERSION}/IFLYADLib.podspec'"
             )
             podfile.write_text(
                 source.replace(
@@ -281,7 +307,7 @@ class DistributionManifestTests(unittest.TestCase):
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(AssertionError, "活跃 :podspec"):
-                verify(root, VERSION, "local")
+                verify(root, REPOSITORY_VERSION, "local")
 
 
 if __name__ == "__main__":

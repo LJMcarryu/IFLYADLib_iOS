@@ -14,11 +14,11 @@ sys.path.insert(0, str(Path.cwd() / "scripts"))
 from verify_distribution_manifest import (
     EXPECTED,
     PREVIOUS_CHECKSUMS,
+    PREVIOUS_RELEASE_CHECKSUMS,
+    PREVIOUS_RELEASE_VERSION,
     REPOSITORY,
     VERSION,
 )
-
-PREVIOUS_RELEASE_VERSION = "6.3.5"
 RELEASE_STATUS_RE = re.compile(
     r"<!--\s*ifly-release-status:\s*(\{[^\r\n]*\})\s*-->"
 )
@@ -37,7 +37,7 @@ def read(root: Path, relative: str) -> str:
     return (root / relative).read_text(encoding="utf-8")
 
 
-def verify_release_status(label: str, document: str) -> None:
+def verify_release_status(label: str, document: str, version: str) -> None:
     markers = RELEASE_STATUS_RE.findall(document)
     require(len(markers) == 1, f"{label} 发布状态标记数量错误: {len(markers)}")
     try:
@@ -46,10 +46,10 @@ def verify_release_status(label: str, document: str) -> None:
         raise ContractError(f"{label} 发布状态标记不是合法 JSON") from error
     expected = {
         "schemaVersion": 1,
-        "version": VERSION,
+        "version": version,
         "releaseState": "FORMAL",
         "distribution": "github-release",
-        "releaseUrl": f"https://github.com/{REPOSITORY}/releases/tag/{VERSION}",
+        "releaseUrl": f"https://github.com/{REPOSITORY}/releases/tag/{version}",
     }
     require(marker == expected, f"{label} 发布状态标记漂移: {marker}")
 
@@ -84,6 +84,7 @@ def verify_machine(root: Path, release_kind: str) -> None:
     require(release_kind in {"local", "candidate", "tag", "formal"}, "非法发布模式")
     state = machine_state(root)
     validate_state_version(state, release_kind)
+    distribution_version = state["version"]
     package = read(root, "Package.swift")
     podspec = read(root, "IFLYADLib.podspec")
     podfile = read(root, "IFLYADLibSimple/Podfile")
@@ -102,7 +103,7 @@ def verify_machine(root: Path, release_kind: str) -> None:
     for name, url, checksum in blocks:
         asset, pending = EXPECTED[name]
         expected_url = (
-            f"https://github.com/{REPOSITORY}/releases/download/{VERSION}/{asset}"
+            f"https://github.com/{REPOSITORY}/releases/download/{distribution_version}/{asset}"
         )
         require(url == expected_url, f"{name} URL 不精确")
         require(Path(urlparse(url).path).name == asset, f"{name} 资产名不匹配")
@@ -110,10 +111,13 @@ def verify_machine(root: Path, release_kind: str) -> None:
         assets.add(asset)
 
     pending = all(checksums[name] == EXPECTED[name][1] for name in EXPECTED)
+    rejected_checksums = PREVIOUS_CHECKSUMS
+    if distribution_version == PREVIOUS_RELEASE_VERSION:
+        rejected_checksums = PREVIOUS_CHECKSUMS - PREVIOUS_RELEASE_CHECKSUMS
     final = all(
         re.fullmatch(r"[0-9a-f]{64}", value)
         and value != "0" * 64
-        and value not in PREVIOUS_CHECKSUMS
+        and value not in rejected_checksums
         for value in checksums.values()
     )
     require(pending or final, "checksum 必须全部为精确 PENDING 或全部为本版 SHA-256")
@@ -128,14 +132,14 @@ def verify_machine(root: Path, release_kind: str) -> None:
 
     version = re.findall(r"s\.version\s*=\s*'([^']+)'", podspec)
     sources = re.findall(r":http\s*=>\s*'([^']+)'", podspec)
-    require(version == [VERSION], f"podspec 版本错误: {version}")
-    combined = f"IFLYADLib-modelA-{VERSION}.zip"
+    require(version == [distribution_version], f"podspec 版本错误: {version}")
+    combined = f"IFLYADLib-modelA-{distribution_version}.zip"
     expected_source = (
-        f"https://github.com/{REPOSITORY}/releases/download/{VERSION}/{combined}"
+        f"https://github.com/{REPOSITORY}/releases/download/{distribution_version}/{combined}"
     )
     require(sources == [expected_source], f"podspec source 错误: {sources}")
     expected_podspec = (
-        f"https://raw.githubusercontent.com/{REPOSITORY}/{VERSION}/IFLYADLib.podspec"
+        f"https://raw.githubusercontent.com/{REPOSITORY}/{distribution_version}/IFLYADLib.podspec"
     )
     active = re.findall(
         r"(?m)^[ \t]*pod 'IFLYADLib', :podspec => '([^']+)'[ \t]*$",
@@ -149,6 +153,7 @@ def verify_machine(root: Path, release_kind: str) -> None:
 def verify_docs(root: Path, _release_kind: str) -> None:
     state = machine_state(root)
     validate_state_version(state, _release_kind)
+    distribution_version = state["version"]
     documents = {
         name: read(root, name)
         for name in ("README.md", "CHANGELOG.md", "RELEASING.md", "SECURITY.md")
@@ -157,11 +162,14 @@ def verify_docs(root: Path, _release_kind: str) -> None:
     if state.get("phase") == "PREPARING":
         require("待发布" in documents["CHANGELOG.md"], "CHANGELOG 缺少待发布展示")
         require("PENDING" in documents["RELEASING.md"], "RELEASING 缺少 PENDING 展示")
-        require(VERSION in demo and "发布准备" in demo, "Demo 缺少发布准备说明")
+        require(
+            distribution_version in demo and "发布准备" in demo,
+            "Demo 缺少发布准备说明",
+        )
     else:
         for label in ("README.md", "CHANGELOG.md", "RELEASING.md"):
-            verify_release_status(label, documents[label])
-        require(VERSION in demo, "Demo 缺少当前版本展示")
+            verify_release_status(label, documents[label], distribution_version)
+        require(distribution_version in demo, "Demo 缺少当前版本展示")
 
 
 def main() -> int:

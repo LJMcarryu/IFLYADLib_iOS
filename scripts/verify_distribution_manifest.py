@@ -12,6 +12,7 @@ from urllib.parse import urlparse
 
 
 VERSION = "6.4.0"
+PREVIOUS_RELEASE_VERSION = "6.3.5"
 RELEASE_DATE = "2026-09-24"
 REPOSITORY = "LJMcarryu/IFLYADLib_iOS"
 EXPECTED = {
@@ -44,8 +45,7 @@ EXPECTED = {
         "__IFLYADLIB_6_4_0_REWARD_CHECKSUM_PENDING__",
     ),
 }
-PREVIOUS_CHECKSUMS = {
-    # 6.3.5
+PREVIOUS_RELEASE_CHECKSUMS = {
     "587a94d47380fc73398b8d31e7fa9e63c3954a90ee290e17dc763abb1b5bd77e",
     "93db72b02f44f42a6bd5406eb7252e5222729c8d12a548c89f2408abd48ba700",
     "9afe08d47f2883eeac0b1f1fc0a230b0b49c1a83ba61280bc1e38503eafe4e57",
@@ -53,7 +53,8 @@ PREVIOUS_CHECKSUMS = {
     "bd491514f69e058e35a44816cf120ee56a9a234285993b786d07c58383ca39b0",
     "19ed9dcb46b7c9772b1a6bd7e9601409bcada60f862182621a0092d8a8fd517f",
     "68a69824c7390594e34d5ca81e3c9a240a9101de64a2a57ccd43ff182690c766",
-
+}
+PREVIOUS_CHECKSUMS = PREVIOUS_RELEASE_CHECKSUMS | {
     "17ced6f3ca92d8906e192390c196bd27436f1a2c41e31bba82c56e316a6ee22b",
     "eab569075623cb906f57fe05dd83401d7a5665b3d7a47f5da1941c606ffac82a",
     "5b1263cf054137cffc641633d3ff6e9bca1069019ddf55b7e22ca1e2fe541133",
@@ -221,20 +222,20 @@ def read(root: Path, relative: str) -> str:
     return (root / relative).read_text(encoding="utf-8")
 
 
-def current_version_section(document: str, label: str) -> str:
+def current_version_section(document: str, label: str, version: str = VERSION) -> str:
     heading = re.compile(
-        rf"^##[ \t]+(?:\[{re.escape(VERSION)}\]|{re.escape(VERSION)})(?:[ \t]|$).*$",
+        rf"^##[ \t]+(?:\[{re.escape(version)}\]|{re.escape(version)})(?:[ \t]|$).*$",
         re.M,
     )
     matches = list(heading.finditer(document))
-    assert len(matches) == 1, f"{label} 必须唯一声明 {VERSION} 二级章节"
+    assert len(matches) == 1, f"{label} 必须唯一声明 {version} 二级章节"
     start = matches[0].start()
     following = re.search(r"^#{1,2}[ \t]+", document[matches[0].end():], re.M)
     end = matches[0].end() + following.start() if following else len(document)
     return document[start:end]
 
 
-def is_public_readme(document: str) -> bool:
+def is_public_readme(document: str, version: str = VERSION) -> bool:
     """公开 README 只保留机器可读版本标记，不承载内部发布 provenance。"""
 
     marker_count = document.count("ifly-release-status")
@@ -256,10 +257,10 @@ def is_public_readme(document: str) -> bool:
         raise AssertionError("README 发布状态标记不是合法 JSON") from error
     expected = {
         "schemaVersion": 1,
-        "version": VERSION,
+        "version": version,
         "releaseState": "FORMAL",
         "distribution": "github-release",
-        "releaseUrl": f"https://github.com/{REPOSITORY}/releases/tag/{VERSION}",
+        "releaseUrl": f"https://github.com/{REPOSITORY}/releases/tag/{version}",
     }
     assert marker == expected and type(marker.get("schemaVersion")) is int, (
         f"README 发布状态标记漂移：{marker}"
@@ -361,10 +362,17 @@ def require_published(
 
 
 def verify(root: Path, version: str, mode: str) -> str:
-    if version != VERSION:
-        raise AssertionError(f"本门禁只接受版本 {VERSION}，实际为 {version}")
     if mode not in RELEASE_MODES:
         raise AssertionError(f"非法 CI 发布模式: {mode}")
+    if version == PREVIOUS_RELEASE_VERSION:
+        assert mode == "local", (
+            f"历史正式版本 {PREVIOUS_RELEASE_VERSION} 只允许 local bootstrap 校验"
+        )
+    elif version != VERSION:
+        raise AssertionError(
+            f"本门禁只接受当前版本 {VERSION}，或 local bootstrap 版本 "
+            f"{PREVIOUS_RELEASE_VERSION}；实际为 {version}"
+        )
 
     readme = read(root, "README.md")
     changelog = read(root, "CHANGELOG.md")
@@ -373,21 +381,21 @@ def verify(root: Path, version: str, mode: str) -> str:
     demo_readme = read(root, "IFLYADLibSimple/README.md")
     podfile = read(root, "IFLYADLibSimple/Podfile")
     package = read(root, "Package.swift")
-    public_readme = is_public_readme(readme)
+    public_readme = is_public_readme(readme, version)
     if public_readme:
         for label, document in (("DEMO", demo_readme), ("SECURITY", security)):
-            assert re.search(rf"(?<![\d.]){re.escape(VERSION)}(?![\d.])", document), (
-                f"{label} 缺少当前版本 {VERSION} 展示"
+            assert re.search(rf"(?<![\d.]){re.escape(version)}(?![\d.])", document), (
+                f"{label} 缺少当前版本 {version} 展示"
             )
     if not public_readme:
         for label, document in (("README", readme), ("RELEASING", releasing)):
-            current = current_version_section(document, label)
-            assert STRICT_REVIEW_POLICY in current, f"{label} 缺少 {VERSION} 严格扫描策略"
+            current = current_version_section(document, label, version)
+            assert STRICT_REVIEW_POLICY in current, f"{label} 缺少 {version} 严格扫描策略"
             assert RISK_AUTHORIZATION_BOUNDARY in current, (
-                f"{label} 缺少 {VERSION} 不沿用历史风险授权的边界"
+                f"{label} 缺少 {version} 不沿用历史风险授权的边界"
             )
             leaked = [marker for marker in HISTORICAL_REVIEW_POLICY_MARKERS if marker in current]
-            assert not leaked, f"{label} 的 {VERSION} 章节沿用了历史扫描策略：{leaked}"
+            assert not leaked, f"{label} 的 {version} 章节沿用了历史扫描策略：{leaked}"
 
     blocks = re.findall(
         r'\.binaryTarget\(\s*name:\s*"([^"]+)"\s*,'
@@ -414,10 +422,13 @@ def verify(root: Path, version: str, mode: str) -> str:
         checksums[name] = checksum
 
     all_pending = all(checksums[name] == EXPECTED[name][1] for name in EXPECTED)
+    rejected_checksums = PREVIOUS_CHECKSUMS
+    if version == PREVIOUS_RELEASE_VERSION:
+        rejected_checksums = PREVIOUS_CHECKSUMS - PREVIOUS_RELEASE_CHECKSUMS
     all_final = all(
         re.fullmatch(r"[0-9a-f]{64}", checksums[name])
         and checksums[name] != "0" * 64
-        and checksums[name] not in PREVIOUS_CHECKSUMS
+        and checksums[name] not in rejected_checksums
         for name in EXPECTED
     )
     assert all_pending or all_final, (
@@ -448,7 +459,7 @@ def verify(root: Path, version: str, mode: str) -> str:
             # 公开文档用结构化状态标记声明版本；A/B、库存身份和发布阶段由
             # release-state.json 与 verify_repository_contract.py 校验。
             for label in ("CHANGELOG", "RELEASING"):
-                assert is_public_readme(documents[label]), f"{label} 发布状态标记漂移"
+                assert is_public_readme(documents[label], version), f"{label} 发布状态标记漂移"
             state = {
                 "local": "已冻结正式资产",
                 "candidate": "Draft candidate 冻结资产预验",

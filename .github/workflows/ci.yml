@@ -367,11 +367,12 @@ jobs:
           from pathlib import Path
 
           spec = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+          state = json.loads(Path("release-state.json").read_text(encoding="utf-8"))
 
           def has_objc_flag(config):
               return "-ObjC" in shlex.split((config or {}).get("OTHER_LDFLAGS", ""))
 
-          assert spec["version"] == "6.4.0", spec["version"]
+          assert spec["version"] == state["version"], (spec["version"], state["version"])
           assert has_objc_flag(spec.get("pod_target_xcconfig"))
           assert has_objc_flag(spec.get("user_target_xcconfig"))
           core = next(item for item in spec["subspecs"] if item["name"] == "Core")
