@@ -174,7 +174,8 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertIn("release_mode='candidate'", preflight)
         self.assertIn("release_mode='tag'", preflight)
         self.assertIn("release_mode='formal'", preflight)
-        self.assertIn(f"version='{repository_contract.VERSION}'", preflight)
+        self.assertIn('scripts/release-control.json', preflight)
+        self.assertIn('["targetVersion"]', preflight)
 
     def test_machine_and_document_contracts_are_blocking(self) -> None:
         preflight = job_block("preflight")
@@ -329,12 +330,10 @@ class CIWorkflowContractTests(unittest.TestCase):
             "- name: 正式态无 Token 匿名下载精确 10 个 Release 资产", 1
         )[1].split("- name: Candidate 认证下载", 1)[0]
         self.assertIn("scripts/download_release_anonymously.py", anonymous_step)
-        for name in (
-            "GH_TOKEN",
-            "GITHUB_TOKEN",
-            "GITHUB_AUTH_TOKEN",
-            "IFLY_PRIVATE_SOURCE_TOKEN",
-        ):
+        self.assertIn("GITHUB_TOKEN: ${{ github.event_name == 'workflow_dispatch' && github.token || '' }}", anonymous_step)
+        self.assertIn('--release-id "${{ github.event.release.id || inputs.formal_release_id }}"', anonymous_step)
+        self.assertIn('--event-path "$GITHUB_EVENT_PATH"', anonymous_step)
+        for name in ("GH_TOKEN", "GITHUB_AUTH_TOKEN", "IFLY_PRIVATE_SOURCE_TOKEN"):
             self.assertIn(f"-u {name}", anonymous_step)
 
     def test_release_concurrency_timeouts_and_summary_are_fail_closed(self) -> None:

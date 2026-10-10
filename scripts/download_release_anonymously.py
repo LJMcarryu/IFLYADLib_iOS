@@ -8,33 +8,44 @@ import json
 import os
 import sys
 from pathlib import Path
-from urllib.parse import quote
 
 from release_asset_downloader import (
-    TOKEN_ENVIRONMENT_VARIABLES,
     VerificationError,
-    anonymous_request,
     download_anonymously,
     prepare_destination,
-    read_json,
     validate_public_release,
     validate_repository_and_tag,
     verify_download_inventory,
     write_metadata,
 )
+from release_metadata_control import formal_release_metadata
+from github_http_retry import failure_classification
 
 
-def run(repository: str, tag: str, destination: Path, metadata_output: Path) -> None:
-    leaked = [name for name in TOKEN_ENVIRONMENT_VARIABLES if os.environ.get(name)]
-    if leaked:
-        raise VerificationError(f"匿名下载环境不得包含凭据变量: {leaked}")
+def run(
+    repository: str,
+    tag: str,
+    destination: Path,
+    metadata_output: Path,
+    *,
+    release_id: str,
+    event_name: str,
+    event_path: Path | None,
+) -> None:
     validate_repository_and_tag(repository, tag)
     prepare_destination(destination)
 
-    api_url = f"https://api.github.com/repos/{repository}/releases/tags/{quote(tag, safe='')}"
-    release = read_json(anonymous_request(api_url, "application/vnd.github+json"))
+    release = formal_release_metadata(
+        repository=repository,
+        tag=tag,
+        release_id=release_id,
+        event_name=event_name,
+        event_path=event_path,
+        token=os.environ.get("GITHUB_TOKEN", "").strip(),
+    )
     assets = validate_public_release(release, repository, tag)
     for name in sorted(assets):
+        # 控制 API 可认证；资产真实性仍必须由无 Authorization 的公开 URL 下载证明。
         download_anonymously(assets[name], destination / name)
     verify_download_inventory(destination, tag)
     write_metadata(metadata_output, release)
@@ -47,11 +58,22 @@ def main() -> int:
     parser.add_argument("--tag", required=True)
     parser.add_argument("--destination", required=True, type=Path)
     parser.add_argument("--metadata-output", required=True, type=Path)
+    parser.add_argument("--release-id", required=True)
+    parser.add_argument("--event-name", required=True)
+    parser.add_argument("--event-path", type=Path)
     args = parser.parse_args()
     try:
-        run(args.repository, args.tag, args.destination, args.metadata_output)
+        run(
+            args.repository,
+            args.tag,
+            args.destination,
+            args.metadata_output,
+            release_id=args.release_id,
+            event_name=args.event_name,
+            event_path=args.event_path,
+        )
     except (OSError, ValueError, json.JSONDecodeError, VerificationError) as error:
-        print(f"ERROR: {error}", file=sys.stderr)
+        print(f"ERROR[{failure_classification(error)}]: {error}", file=sys.stderr)
         return 1
     return 0
 

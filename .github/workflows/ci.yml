@@ -14,7 +14,12 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
-        description: 已发布且需要无 Token 复验的正式 Release tag；不得与 draft_release_id 同时填写
+        description: 正式复验 tag；必须同时提供 formal_release_id
+        required: false
+        default: ''
+        type: string
+      formal_release_id:
+        description: 正式复验的精确 Release ID；控制 API 认证查询，资产仍匿名下载
         required: false
         default: ''
         type: string
@@ -94,7 +99,9 @@ jobs:
           EVENT_SHA: ${{ github.sha }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
           RELEASE_EVENT_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_EVENT_ID: ${{ github.event.release.id }}
           MANUAL_RELEASE_TAG: ${{ inputs.release_tag }}
+          MANUAL_FORMAL_RELEASE_ID: ${{ inputs.formal_release_id }}
           MANUAL_DRAFT_RELEASE_ID: ${{ inputs.draft_release_id }}
           MANUAL_CANDIDATE_ID: ${{ inputs.candidate_id }}
           MANUAL_DISPATCH_NONCE: ${{ inputs.dispatch_nonce }}
@@ -104,10 +111,11 @@ jobs:
           MANUAL_CANARY_CANDIDATE_ID: ${{ inputs.canary_candidate_id }}
         run: |
           set -euo pipefail
-          version='6.4.0'
+          version="$(python3 -c 'import json; print(json.load(open("scripts/release-control.json"))["targetVersion"])')"
           release_mode='local'
           event_tag=''
           draft_release_id=''
+          formal_release_id=''
           candidate_id=''
           candidate_branch=''
 
@@ -116,12 +124,17 @@ jobs:
               echo '默认分支必须是 main' >&2
               exit 1
             fi
+            if [[ ( -n "$MANUAL_RELEASE_TAG" && -z "$MANUAL_FORMAL_RELEASE_ID" ) || ( -z "$MANUAL_RELEASE_TAG" && -n "$MANUAL_FORMAL_RELEASE_ID" ) ]]; then
+              echo 'release_tag 与 formal_release_id 必须同时提供' >&2
+              exit 1
+            fi
             if [[ -n "$MANUAL_RELEASE_TAG" && -n "$MANUAL_DRAFT_RELEASE_ID" ]]; then
-              echo 'release_tag 与 draft_release_id 互斥，不得同时填写' >&2
+              echo '正式 Release 与 draft_release_id 互斥' >&2
               exit 1
             fi
             if [[ "$MANUAL_CONTROL_PLANE_CANARY" == 'true' ]]; then
               test -z "$MANUAL_RELEASE_TAG"
+              test -z "$MANUAL_FORMAL_RELEASE_ID"
               test -z "$MANUAL_DRAFT_RELEASE_ID"
               test -z "$MANUAL_CANDIDATE_ID"
               [[ "$MANUAL_CANARY_TAG" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
@@ -141,6 +154,7 @@ jobs:
           if [[ "$EVENT_NAME" == 'release' ]]; then
             release_mode='formal'
             event_tag="$RELEASE_EVENT_TAG"
+            formal_release_id="$RELEASE_EVENT_ID"
           elif [[ "$EVENT_REF" == refs/tags/* ]]; then
             release_mode='tag'
             event_tag="$EVENT_REF_NAME"
@@ -151,6 +165,7 @@ jobs:
           elif [[ "$EVENT_NAME" == 'workflow_dispatch' && -n "$MANUAL_RELEASE_TAG" ]]; then
             release_mode='formal'
             event_tag="$MANUAL_RELEASE_TAG"
+            formal_release_id="$MANUAL_FORMAL_RELEASE_ID"
           fi
 
           if [[ "$release_mode" == 'candidate' ]]; then
@@ -172,6 +187,9 @@ jobs:
               echo "draft candidate 只允许从 $candidate_branch 触发" >&2
               exit 1
             fi
+          elif [[ "$release_mode" == 'formal' && ! "$formal_release_id" =~ ^[1-9][0-9]*$ ]]; then
+            echo '正式复验必须绑定精确 Release ID' >&2
+            exit 1
           elif [[ "$release_mode" != 'local' && "$event_tag" != "$version" ]]; then
             echo "正式门禁只接受 tag $version，实际为 $event_tag" >&2
             exit 1
@@ -201,6 +219,7 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "event_tag=$event_tag" >> "$GITHUB_OUTPUT"
           echo "draft_release_id=$draft_release_id" >> "$GITHUB_OUTPUT"
+          echo "formal_release_id=$formal_release_id" >> "$GITHUB_OUTPUT"
           echo "candidate_id=$candidate_id" >> "$GITHUB_OUTPUT"
           echo "candidate_branch=$candidate_branch" >> "$GITHUB_OUTPUT"
           echo "checkout_sha=$checkout_sha" >> "$GITHUB_OUTPUT"
@@ -209,6 +228,31 @@ jobs:
         env:
           PYTHONDONTWRITEBYTECODE: '1'
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+
+      - name: 校验版本控制状态拓扑
+        env:
+          VALIDATION_MODE: ${{ steps.release-mode.outputs.release_mode }}
+          RELEASE_TAG: ${{ steps.release-mode.outputs.event_tag }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, sys
+          from pathlib import Path
+          sys.path.insert(0, "scripts")
+          from release_metadata_control import read_release_control
+          mode = os.environ["VALIDATION_MODE"]
+          state_path = Path("release-state.json")
+          if mode in {"tag", "formal"}:
+              state_path = Path(os.environ["RUNNER_TEMP"]) / "release-control-state.json"
+              with state_path.open("wb") as output:
+                  subprocess.run(
+                      ["git", "show", f"refs/tags/{os.environ['RELEASE_TAG']}:release-state.json"],
+                      check=True, stdout=output,
+                  )
+          read_release_control(Path("scripts/release-control.json"),
+              repository="${{ github.repository }}", channel="general",
+              release_state_path=state_path, validation_mode=mode)
+          print("release-control 版本契约校验通过")
+          PY
 
       - name: 校验机器可读发布状态
         run: |
@@ -481,16 +525,20 @@ jobs:
       - name: 正式态无 Token 匿名下载精确 10 个 Release 资产
         if: needs.preflight.outputs.release_mode == 'formal'
         env:
+          GITHUB_TOKEN: ${{ github.event_name == 'workflow_dispatch' && github.token || '' }}
           RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
           RELEASE_REPOSITORY: ${{ github.repository }}
           ASSET_DIRECTORY: ${{ runner.temp }}/ifly-release-assets
           RELEASE_METADATA: ${{ runner.temp }}/ifly-release-metadata.json
         run: |
-          env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
+          env -u GH_TOKEN -u GITHUB_AUTH_TOKEN \
             -u IFLY_PRIVATE_SOURCE_TOKEN \
             python3 scripts/download_release_anonymously.py \
               --repository "$RELEASE_REPOSITORY" \
               --tag "$RELEASE_VERSION" \
+              --release-id "${{ github.event.release.id || inputs.formal_release_id }}" \
+              --event-name "${{ github.event_name }}" \
+              --event-path "$GITHUB_EVENT_PATH" \
               --destination "$ASSET_DIRECTORY" \
               --metadata-output "$RELEASE_METADATA"
 
