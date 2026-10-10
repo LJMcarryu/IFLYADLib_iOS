@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+import re
 import sys
 import tempfile
 import unittest
@@ -12,8 +14,11 @@ SCRIPTS = ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from prepare_release_consumers import (  # noqa: E402
+    CONTROLLED_SOURCE_VERSIONS,
     CURRENT_VERSION,
     VerificationError,
+    localize_consumer_manifest,
+    localize_podfile,
     prepare_cocoapods,
     prepare_swiftpm,
     safe_extract,
@@ -22,6 +27,9 @@ from release_asset_downloader import MODULE_ASSET_NAMES, expected_assets  # noqa
 
 
 VERSION = CURRENT_VERSION
+RELEASE_CONTROL = json.loads(
+    (ROOT / "scripts/release-control.json").read_text(encoding="utf-8")
+)
 
 
 def write_zip(path: Path, entries: dict[str, bytes]) -> None:
@@ -96,15 +104,44 @@ def create_assets(root: Path) -> None:
 
 
 class PrepareReleaseConsumersTests(unittest.TestCase):
-    def test_committed_swiftpm_consumer_targets_current_release(self) -> None:
+    def test_committed_consumers_target_one_controlled_release(self) -> None:
         fixture = ROOT / ".github/fixtures/swiftpm-consumer"
         package = (fixture / "Package.swift").read_text(encoding="utf-8")
         marker = (
             fixture / "Sources/ReleaseConsumer/ReleaseConsumer.swift"
         ).read_text(encoding="utf-8")
+        podfile = (ROOT / "IFLYADLibSimple/Podfile").read_text(encoding="utf-8")
 
-        self.assertIn(f'exact: "{CURRENT_VERSION}"', package)
-        self.assertIn(f'IFLYADLib-{CURRENT_VERSION}', marker)
+        dependency_versions = re.findall(r'exact:\s*"([0-9]+\.[0-9]+\.[0-9]+)"', package)
+        marker_versions = re.findall(r'IFLYADLib-([0-9]+\.[0-9]+\.[0-9]+)', marker)
+        pod_versions = re.findall(
+            r"(?m)^\s*pod 'IFLYADLib', :podspec => .*?/"
+            r"([0-9]+\.[0-9]+\.[0-9]+)/IFLYADLib\.podspec'\s*$",
+            podfile,
+        )
+
+        self.assertEqual(len(dependency_versions), 1)
+        self.assertEqual(marker_versions, dependency_versions)
+        self.assertEqual(pod_versions, dependency_versions)
+        self.assertIn(dependency_versions[0], CONTROLLED_SOURCE_VERSIONS)
+        self.assertIn('.package(path: "../IFLYADLib_iOS")', localize_consumer_manifest(package))
+        self.assertIn("pod 'IFLYADLib', :path => '../IFLYADLib'", localize_podfile(podfile))
+
+    def test_rejects_consumer_templates_outside_controlled_versions(self) -> None:
+        package = (
+            ROOT / ".github/fixtures/swiftpm-consumer/Package.swift"
+        ).read_text(encoding="utf-8")
+        podfile = (ROOT / "IFLYADLibSimple/Podfile").read_text(encoding="utf-8")
+        source_version = next(iter(re.findall(
+            r'exact:\s*"([0-9]+\.[0-9]+\.[0-9]+)"', package
+        )))
+        self.assertIn(source_version, {
+            RELEASE_CONTROL["closedVersion"], RELEASE_CONTROL["targetVersion"]
+        })
+        with self.assertRaisesRegex(VerificationError, "release-control 两态"):
+            localize_consumer_manifest(package.replace(source_version, "9.9.9"))
+        with self.assertRaisesRegex(VerificationError, "release-control 两态"):
+            localize_podfile(podfile.replace(source_version, "9.9.9"))
 
     def test_prepares_local_swiftpm_and_cocoapods_consumers(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

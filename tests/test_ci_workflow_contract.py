@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import re
 import subprocess
@@ -13,6 +14,8 @@ from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+ROOT_STATE = json.loads((ROOT / "release-state.json").read_text(encoding="utf-8"))
+ROOT_RELEASE_KIND = "candidate" if ROOT_STATE.get("phase") == "FROZEN" else "local"
 sys.path.insert(0, str(ROOT / "scripts"))
 import verify_repository_contract as repository_contract  # noqa: E402
 
@@ -218,9 +221,9 @@ class CIWorkflowContractTests(unittest.TestCase):
             return value
 
         with mock.patch.object(repository_contract, "read", side_effect=docs_drift):
-            repository_contract.verify_machine(ROOT, "local")
+            repository_contract.verify_machine(ROOT, ROOT_RELEASE_KIND)
             with self.assertRaises(repository_contract.ContractError):
-                repository_contract.verify_docs(ROOT, "local")
+                repository_contract.verify_docs(ROOT, ROOT_RELEASE_KIND)
 
         def checksum_drift(root: Path, relative: str) -> str:
             value = original_read(root, relative)
@@ -235,7 +238,7 @@ class CIWorkflowContractTests(unittest.TestCase):
 
         with mock.patch.object(repository_contract, "read", side_effect=checksum_drift):
             with self.assertRaises(repository_contract.ContractError):
-                repository_contract.verify_machine(ROOT, "local")
+                repository_contract.verify_machine(ROOT, ROOT_RELEASE_KIND)
 
         def version_drift(root: Path, relative: str) -> str:
             value = original_read(root, relative)
@@ -251,7 +254,7 @@ class CIWorkflowContractTests(unittest.TestCase):
 
         with mock.patch.object(repository_contract, "read", side_effect=version_drift):
             with self.assertRaises(repository_contract.ContractError):
-                repository_contract.verify_machine(ROOT, "local")
+                repository_contract.verify_machine(ROOT, ROOT_RELEASE_KIND)
 
     def test_tag_and_formal_post_facts_are_proved_by_event_specific_gates(self) -> None:
         preflight = job_block("preflight")
@@ -435,9 +438,37 @@ class CIWorkflowContractTests(unittest.TestCase):
             ):
                 repository_contract.validate_state_version(state, release_kind)
 
-    def test_current_frozen_state_is_allowed_for_all_release_modes(self) -> None:
+        target_closed = dict(ROOT_STATE)
+        target_closed.update({
+            "version": repository_contract.VERSION,
+            "phase": "CLOSED",
+        })
+        repository_contract.validate_state_version(target_closed, "local")
+        original_read = repository_contract.read
+
+        def target_closed_read(root: Path, relative: str) -> str:
+            if relative == "release-state.json":
+                return json.dumps(target_closed)
+            value = original_read(root, relative)
+            if relative in {
+                "Package.swift", "IFLYADLib.podspec", "IFLYADLibSimple/Podfile",
+            }:
+                return value.replace(
+                    repository_contract.VERSION,
+                    repository_contract.PREVIOUS_RELEASE_VERSION,
+                )
+            return value
+
+        with mock.patch.object(
+            repository_contract, "read", side_effect=target_closed_read
+        ), self.assertRaisesRegex(repository_contract.ContractError, "URL 不精确"):
+            repository_contract.verify_machine(ROOT, "local")
+
+    def test_current_frozen_state_is_allowed_only_for_release_modes(self) -> None:
         state = {"version": repository_contract.VERSION, "phase": "FROZEN"}
-        for release_kind in ("local", "candidate", "tag", "formal"):
+        with self.assertRaises(repository_contract.ContractError):
+            repository_contract.validate_state_version(state, "local")
+        for release_kind in ("candidate", "tag", "formal"):
             with self.subTest(release_kind=release_kind):
                 repository_contract.validate_state_version(state, release_kind)
 

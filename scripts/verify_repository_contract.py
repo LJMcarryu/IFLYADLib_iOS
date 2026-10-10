@@ -11,13 +11,14 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path.cwd() / "scripts"))
+from release_metadata_control import ReleaseControlError, validate_release_control
 from verify_distribution_manifest import (
-    EXPECTED,
-    PREVIOUS_CHECKSUMS,
-    PREVIOUS_RELEASE_CHECKSUMS,
     PREVIOUS_RELEASE_VERSION,
+    RELEASE_CONTROL,
     REPOSITORY,
     VERSION,
+    expected_targets,
+    valid_final_checksums,
 )
 RELEASE_STATUS_RE = re.compile(
     r"<!--\s*ifly-release-status:\s*(\{[^\r\n]*\})\s*-->"
@@ -60,31 +61,72 @@ def machine_state(root: Path) -> dict[str, object]:
     return state
 
 
-def validate_state_version(state: dict[str, object], release_kind: str) -> None:
+def repository_control(
+    root: Path,
+    state: dict[str, object],
+    release_kind: str,
+) -> dict[str, object]:
+    try:
+        return validate_release_control(
+            json.loads(read(root, "scripts/release-control.json")),
+            repository=REPOSITORY,
+            channel="general",
+            release_phase=state.get("phase"),
+            release_version=state.get("version"),
+            validation_mode=release_kind,
+        )
+    except ReleaseControlError as error:
+        raise ContractError(str(error)) from error
+
+
+def validate_state_version(
+    state: dict[str, object],
+    release_kind: str,
+    *,
+    closed_version: str = PREVIOUS_RELEASE_VERSION,
+    target_version: str = VERSION,
+    control_state: str = RELEASE_CONTROL["state"],
+) -> None:
     version = state.get("version")
     phase = state.get("phase")
+    if control_state == "BOOTSTRAP_CLOSED":
+        require(
+            release_kind == "local"
+            and version == closed_version
+            and phase == "CLOSED",
+            "BOOTSTRAP_CLOSED 只允许 closedVersion/CLOSED 的 local 校验",
+        )
+        return
+    require(control_state == "CANDIDATE", "非法 release-control state")
     if release_kind in {"candidate", "tag", "formal"}:
         require(
-            version == VERSION and phase == "FROZEN",
+            version == target_version and phase == "FROZEN",
             "candidate/tag/formal 必须使用当前分发版本的 FROZEN 状态",
         )
         return
-    if version == VERSION:
-        return
     require(
         release_kind == "local"
-        and version == PREVIOUS_RELEASE_VERSION
+        and version in {closed_version, target_version}
         and phase == "CLOSED",
-        "release-state 版本不匹配：普通 main 只允许保留上一版 CLOSED，"
-        "candidate/tag/formal 必须使用当前分发版本的 FROZEN 状态",
+        "CANDIDATE 的 local 校验只允许 closedVersion/targetVersion 的 CLOSED 状态",
     )
 
 
 def verify_machine(root: Path, release_kind: str) -> None:
     require(release_kind in {"local", "candidate", "tag", "formal"}, "非法发布模式")
     state = machine_state(root)
-    validate_state_version(state, release_kind)
+    control = repository_control(root, state, release_kind)
+    closed_version = control["closedVersion"]
+    target_version = control["targetVersion"]
+    validate_state_version(
+        state,
+        release_kind,
+        closed_version=closed_version,
+        target_version=target_version,
+        control_state=control["state"],
+    )
     distribution_version = state["version"]
+    expected = expected_targets(distribution_version)
     package = read(root, "Package.swift")
     podspec = read(root, "IFLYADLib.podspec")
     podfile = read(root, "IFLYADLibSimple/Podfile")
@@ -97,11 +139,11 @@ def verify_machine(root: Path, release_kind: str) -> None:
         re.S,
     )
     require(len(blocks) == 7, f"binaryTarget 数量错误: {len(blocks)}")
-    require({name for name, _, _ in blocks} == set(EXPECTED), "binaryTarget 集合错误")
+    require({name for name, _, _ in blocks} == set(expected), "binaryTarget 集合错误")
     checksums: dict[str, str] = {}
     assets: set[str] = set()
     for name, url, checksum in blocks:
-        asset, pending = EXPECTED[name]
+        asset, pending = expected[name]
         expected_url = (
             f"https://github.com/{REPOSITORY}/releases/download/{distribution_version}/{asset}"
         )
@@ -110,20 +152,16 @@ def verify_machine(root: Path, release_kind: str) -> None:
         checksums[name] = checksum
         assets.add(asset)
 
-    pending = all(checksums[name] == EXPECTED[name][1] for name in EXPECTED)
-    rejected_checksums = PREVIOUS_CHECKSUMS
-    if distribution_version == PREVIOUS_RELEASE_VERSION:
-        rejected_checksums = PREVIOUS_CHECKSUMS - PREVIOUS_RELEASE_CHECKSUMS
-    final = all(
-        re.fullmatch(r"[0-9a-f]{64}", value)
-        and value != "0" * 64
-        and value not in rejected_checksums
-        for value in checksums.values()
+    pending = all(checksums[name] == expected[name][1] for name in expected)
+    final = valid_final_checksums(
+        checksums,
+        version=distribution_version,
+        closed_version=closed_version,
     )
     require(pending or final, "checksum 必须全部为精确 PENDING 或全部为本版 SHA-256")
     require(len(set(checksums.values())) == 7, "七个模块 checksum 必须唯一")
     preparing = state.get("phase") == "PREPARING"
-    if state.get("version") == VERSION:
+    if state.get("version") == target_version:
         require(pending == preparing, "checksum 状态与 release-state phase 不一致")
     else:
         require(final, "上一版 CLOSED 与当前分发清单并存时必须使用最终 checksum")
@@ -152,7 +190,16 @@ def verify_machine(root: Path, release_kind: str) -> None:
 
 def verify_docs(root: Path, _release_kind: str) -> None:
     state = machine_state(root)
-    validate_state_version(state, _release_kind)
+    control = repository_control(root, state, _release_kind)
+    closed_version = control["closedVersion"]
+    target_version = control["targetVersion"]
+    validate_state_version(
+        state,
+        _release_kind,
+        closed_version=closed_version,
+        target_version=target_version,
+        control_state=control["state"],
+    )
     distribution_version = state["version"]
     documents = {
         name: read(root, name)

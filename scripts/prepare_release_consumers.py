@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import shutil
 import stat
@@ -18,7 +19,12 @@ from release_asset_downloader import (
     expected_assets,
 )
 
-CURRENT_VERSION = "6.4.0"
+RELEASE_CONTROL = json.loads(
+    Path(__file__).resolve().with_name("release-control.json").read_text(encoding="utf-8")
+)
+CLOSED_VERSION = RELEASE_CONTROL["closedVersion"]
+CURRENT_VERSION = RELEASE_CONTROL["targetVersion"]
+CONTROLLED_SOURCE_VERSIONS = frozenset({CLOSED_VERSION, CURRENT_VERSION})
 
 
 def require(condition: bool, message: str) -> None:
@@ -126,10 +132,20 @@ def localize_package_manifest(source: str) -> str:
 def localize_consumer_manifest(source: str) -> str:
     pattern = re.compile(
         r'\.package\(\s*url:\s*"https://github\.com/LJMcarryu/'
-        rf'IFLYADLib_iOS\.git"\s*,\s*exact:\s*"{re.escape(CURRENT_VERSION)}"\s*\)',
+        r'IFLYADLib_iOS\.git"\s*,\s*exact:\s*'
+        r'"(?P<version>[0-9]+\.[0-9]+\.[0-9]+)"\s*\)',
         re.S,
     )
-    localized, count = pattern.subn('.package(path: "../IFLYADLib_iOS")', source)
+
+    def replace(match: re.Match[str]) -> str:
+        source_version = match.group("version")
+        require(
+            source_version in CONTROLLED_SOURCE_VERSIONS,
+            f"SwiftPM 消费端版本不在 release-control 两态内: {source_version}",
+        )
+        return '.package(path: "../IFLYADLib_iOS")'
+
+    localized, count = pattern.subn(replace, source)
     require(count == 1, f"SwiftPM 消费端远程依赖数量不是 1: {count}")
     require("https://github.com" not in localized, "SwiftPM candidate 消费端仍引用远程仓")
     return localized
@@ -188,11 +204,18 @@ def localize_podfile(source: str) -> str:
     pattern = re.compile(
         r"(?m)^(?P<indent>[ \t]*)pod 'IFLYADLib', :podspec => "
         r"'https://raw\.githubusercontent\.com/LJMcarryu/IFLYADLib_iOS/"
-        rf"{re.escape(CURRENT_VERSION)}/IFLYADLib\.podspec'[ \t]*$"
+        r"(?P<version>[0-9]+\.[0-9]+\.[0-9]+)/IFLYADLib\.podspec'[ \t]*$"
     )
-    localized, count = pattern.subn(
-        r"\g<indent>pod 'IFLYADLib', :path => '../IFLYADLib'", source
-    )
+
+    def replace(match: re.Match[str]) -> str:
+        source_version = match.group("version")
+        require(
+            source_version in CONTROLLED_SOURCE_VERSIONS,
+            f"Demo Podfile 版本不在 release-control 两态内: {source_version}",
+        )
+        return f"{match.group('indent')}pod 'IFLYADLib', :path => '../IFLYADLib'"
+
+    localized, count = pattern.subn(replace, source)
     require(count == 1, f"Demo Podfile 正式依赖行数量不是 1: {count}")
     active_lines = [
         line for line in localized.splitlines() if line.lstrip().startswith("pod 'IFLYADLib'")

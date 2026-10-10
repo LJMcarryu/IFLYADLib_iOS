@@ -107,17 +107,35 @@ class ReleaseMetadataSourceTests(unittest.TestCase):
 
 
 class ReleaseVersionContractTests(unittest.TestCase):
-    def test_checked_in_bootstrap_contract(self) -> None:
+    def test_checked_in_release_control_contract(self) -> None:
         state = json.loads((ROOT / "release-state.json").read_text(encoding="utf-8"))
+        control = json.loads(
+            (ROOT / "scripts/release-control.json").read_text(encoding="utf-8")
+        )
+        validation_mode = "candidate" if state.get("phase") == "FROZEN" else "local"
         value = CONTROL.read_release_control(
             ROOT / "scripts/release-control.json",
             repository=REPOSITORY,
             channel=CHANNEL,
             release_state_path=ROOT / "release-state.json",
-            validation_mode="local",
+            validation_mode=validation_mode,
         )
-        self.assertEqual(value["state"], "BOOTSTRAP_CLOSED")
-        self.assertEqual(value["targetVersion"], state["version"])
+        self.assertEqual(value, control)
+        self.assertIn(value["state"], {"BOOTSTRAP_CLOSED", "CANDIDATE"})
+        if state["phase"] == "FROZEN":
+            self.assertEqual(value["state"], "CANDIDATE")
+            self.assertEqual(state["version"], value["targetVersion"])
+        elif value["state"] == "BOOTSTRAP_CLOSED":
+            self.assertEqual(state["phase"], "CLOSED")
+            self.assertEqual(value["targetVersion"], value["closedVersion"])
+            self.assertEqual(state["version"], value["closedVersion"])
+        else:
+            self.assertEqual(state["phase"], "CLOSED")
+            self.assertNotEqual(value["targetVersion"], value["closedVersion"])
+            self.assertIn(
+                state["version"],
+                {value["closedVersion"], value["targetVersion"]},
+            )
 
     def test_control_state_validation_mode_phase_topology(self) -> None:
         modes = (

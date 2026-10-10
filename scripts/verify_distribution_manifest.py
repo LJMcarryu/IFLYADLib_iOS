@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""校验 6.4.0 通用分发清单、版本状态与 10 资产静态契约。"""
+"""校验通用分发清单、版本状态与 10 资产静态契约。"""
 
 from __future__ import annotations
 
@@ -10,42 +10,59 @@ import sys
 from pathlib import Path
 from urllib.parse import urlparse
 
+from release_metadata_control import ReleaseControlError, validate_release_control
 
-VERSION = "6.4.0"
-PREVIOUS_RELEASE_VERSION = "6.3.5"
+
+RELEASE_CONTROL = json.loads(
+    Path(__file__).resolve().with_name("release-control.json").read_text(encoding="utf-8")
+)
+VERSION = RELEASE_CONTROL["targetVersion"]
+PREVIOUS_RELEASE_VERSION = RELEASE_CONTROL["closedVersion"]
+VERSION_TOKEN = VERSION.replace(".", "_")
 RELEASE_DATE = "2026-09-24"
 REPOSITORY = "LJMcarryu/IFLYADLib_iOS"
-EXPECTED = {
-    "IFLYAdCore": (
-        "IFLYAdCore.xcframework.zip",
-        "__IFLYADLIB_6_4_0_CORE_CHECKSUM_PENDING__",
-    ),
-    "IFLYAdVideoUI": (
-        "IFLYAdVideoUI.xcframework.zip",
-        "__IFLYADLIB_6_4_0_VIDEO_UI_CHECKSUM_PENDING__",
-    ),
-    "IFLYAdBanner": (
-        "IFLYAdBanner.xcframework.zip",
-        "__IFLYADLIB_6_4_0_BANNER_CHECKSUM_PENDING__",
-    ),
-    "IFLYAdSplash": (
-        "IFLYAdSplash.xcframework.zip",
-        "__IFLYADLIB_6_4_0_SPLASH_CHECKSUM_PENDING__",
-    ),
-    "IFLYAdInterstitial": (
-        "IFLYAdInterstitial.xcframework.zip",
-        "__IFLYADLIB_6_4_0_INTERSTITIAL_CHECKSUM_PENDING__",
-    ),
-    "IFLYAdNativeFeed": (
-        "IFLYAdNativeFeed.xcframework.zip",
-        "__IFLYADLIB_6_4_0_NATIVE_FEED_CHECKSUM_PENDING__",
-    ),
-    "IFLYAdReward": (
-        "IFLYAdReward.xcframework.zip",
-        "__IFLYADLIB_6_4_0_REWARD_CHECKSUM_PENDING__",
-    ),
+MODULE_ASSETS = {
+    "IFLYAdCore": "IFLYAdCore.xcframework.zip",
+    "IFLYAdVideoUI": "IFLYAdVideoUI.xcframework.zip",
+    "IFLYAdBanner": "IFLYAdBanner.xcframework.zip",
+    "IFLYAdSplash": "IFLYAdSplash.xcframework.zip",
+    "IFLYAdInterstitial": "IFLYAdInterstitial.xcframework.zip",
+    "IFLYAdNativeFeed": "IFLYAdNativeFeed.xcframework.zip",
+    "IFLYAdReward": "IFLYAdReward.xcframework.zip",
 }
+PENDING_NAMES = {
+    "IFLYAdCore": "CORE",
+    "IFLYAdVideoUI": "VIDEO_UI",
+    "IFLYAdBanner": "BANNER",
+    "IFLYAdSplash": "SPLASH",
+    "IFLYAdInterstitial": "INTERSTITIAL",
+    "IFLYAdNativeFeed": "NATIVE_FEED",
+    "IFLYAdReward": "REWARD",
+}
+
+
+def expected_targets(version: str) -> dict[str, tuple[str, str]]:
+    token = version.replace(".", "_")
+    return {
+        name: (
+            asset,
+            f"__IFLYADLIB_{token}_{PENDING_NAMES[name]}_CHECKSUM_PENDING__",
+        )
+        for name, asset in MODULE_ASSETS.items()
+    }
+
+
+EXPECTED = expected_targets(VERSION)
 PREVIOUS_RELEASE_CHECKSUMS = {
+    "b69a53833ddbbb9d8347bbbbcc41d90460da734fd45c5e60fb980da4d1e7d64f",
+    "b71a365dc49d4492d849bdeb0a85861ad0de9f788cd40a7f69899f41d35123fa",
+    "ef526997d2611a32a52176b439660a6eb9b3c309e637381e3bd8107ecf34c780",
+    "2d3c97c793869a706ec567b77a435c3ceb820b4d52e803d469f09937f583ec81",
+    "d46c33d02fe8c3dc3b47f1c35e39ef3a2f62d625475f47e28467800578960dcb",
+    "f68297f42195e367c7b0318a6900de1ea549ad921ef7e2b6e3eecd3b9ae80965",
+    "bf190adfa84b592aa33b8c1c62fb3a52a70c09f49c7fae5164a5cef0e62e72db",
+}
+PREVIOUS_CHECKSUMS = PREVIOUS_RELEASE_CHECKSUMS | {
     "587a94d47380fc73398b8d31e7fa9e63c3954a90ee290e17dc763abb1b5bd77e",
     "93db72b02f44f42a6bd5406eb7252e5222729c8d12a548c89f2408abd48ba700",
     "9afe08d47f2883eeac0b1f1fc0a230b0b49c1a83ba61280bc1e38503eafe4e57",
@@ -53,8 +70,6 @@ PREVIOUS_RELEASE_CHECKSUMS = {
     "bd491514f69e058e35a44816cf120ee56a9a234285993b786d07c58383ca39b0",
     "19ed9dcb46b7c9772b1a6bd7e9601409bcada60f862182621a0092d8a8fd517f",
     "68a69824c7390594e34d5ca81e3c9a240a9101de64a2a57ccd43ff182690c766",
-}
-PREVIOUS_CHECKSUMS = PREVIOUS_RELEASE_CHECKSUMS | {
     "17ced6f3ca92d8906e192390c196bd27436f1a2c41e31bba82c56e316a6ee22b",
     "eab569075623cb906f57fe05dd83401d7a5665b3d7a47f5da1941c606ffac82a",
     "5b1263cf054137cffc641633d3ff6e9bca1069019ddf55b7e22ca1e2fe541133",
@@ -111,21 +126,21 @@ PREVIOUS_COMBINED_SHA256 = {
 RELEASE_MODES = {"local", "candidate", "tag", "formal"}
 PENDING_IDENTITY_MARKERS = (
     "- `releaseState`：`PENDING`",
-    "__IFLYADLIB_6_4_0_BINARY_SOURCE_COMMIT_PENDING__",
-    "__IFLYADLIB_6_4_0_RELEASE_METADATA_COMMIT_PENDING__",
-    "下列 checksum 为 6.4.0 唯一 PENDING 占位",
+    f"__IFLYADLIB_{VERSION_TOKEN}_BINARY_SOURCE_COMMIT_PENDING__",
+    f"__IFLYADLIB_{VERSION_TOKEN}_RELEASE_METADATA_COMMIT_PENDING__",
+    f"下列 checksum 为 {VERSION} 唯一 PENDING 占位",
 )
 PREPUBLICATION_MARKERS = (
-    "最新公开正式版仍为 `IFLYADLib 6.3.5`",
-    "`main` 正在准备全渠道共享优化版 `6.4.0`",
+    f"最新公开正式版仍为 `IFLYADLib {PREVIOUS_RELEASE_VERSION}`",
+    f"`main` 正在准备全渠道共享优化版 `{VERSION}`",
     "正式签名资产、tag、Release 和匿名消费验证均未生成",
-    "当前 `6.4.0` URL 不可用于生产依赖",
-    "## [6.4.0] - 待发布",
+    f"当前 `{VERSION}` URL 不可用于生产依赖",
+    f"## [{VERSION}] - 待发布",
     "正式签名资产、7 个 SwiftPM checksum、tag、Release 与匿名消费验证尚未生成",
-    "`main` 正在准备 `6.4.0`",
+    f"`main` 正在准备 `{VERSION}`",
     "该版正式资产、checksum、tag、Release 与匿名消费验证均未生成",
-    "### `6.4.0` 发布准备",
-    "`6.4.0` 当前为 `PENDING`",
+    f"### `{VERSION}` 发布准备",
+    f"`{VERSION}` 当前为 `PENDING`",
     "正式资产、tag 和 Release 尚不存在",
     "正式资产公开前 `pod install` 失败是预期结果",
     "正式资产、tag 和 Release 尚不存在，当前远程依赖不可用",
@@ -137,77 +152,77 @@ FROZEN_REQUIRED_MARKERS = {
     ),
     "CHANGELOG": (
         "- `releaseState`：`FORMAL`",
-        "## [6.4.0] - 冻结与发布记录",
-        "IFLYADLib-modelA-6.4.0.zip",
+        f"## [{VERSION}] - 冻结与发布记录",
+        f"IFLYADLib-modelA-{VERSION}.zip",
         "冻结 SHA-256",
     ),
     "RELEASING": (
         "- `releaseState`：`FORMAL`",
         "签名资产已冻结",
-        "IFLYADLib-modelA-6.4.0.zip",
+        f"IFLYADLib-modelA-{VERSION}.zip",
         "冻结 SHA-256",
     ),
     "SECURITY": (
-        "`6.4.0` 的签名资产已冻结",
-        "最近一份已完成发布和消费验证的历史证据为 [`6.3.5`]",
+        f"`{VERSION}` 的签名资产已冻结",
+        f"最近一份已完成发布和消费验证的历史证据为 [`{PREVIOUS_RELEASE_VERSION}`]",
     ),
     "DEMO": (
         "签名资产已冻结",
-        "不可变 `6.4.0` tag",
+        f"不可变 `{VERSION}` tag",
     ),
     "PODFILE": (
-        "IFLYADLib 6.4.0 签名资产已冻结",
+        f"IFLYADLib {VERSION} 签名资产已冻结",
     ),
 }
 PUBLISHED_REQUIRED_MARKERS = {
     "README": (
         "- `releaseState`：`FORMAL`",
-        "当前最新公开正式版为 `IFLYADLib 6.4.0`",
+        f"当前最新公开正式版为 `IFLYADLib {VERSION}`",
         f"已于 {RELEASE_DATE} 正式发布",
-        "IFLYADLib-modelA-6.4.0.zip",
+        f"IFLYADLib-modelA-{VERSION}.zip",
         "冻结 SHA-256",
         "匿名下载",
     ),
     "CHANGELOG": (
         "- `releaseState`：`FORMAL`",
-        f"## [6.4.0] - {RELEASE_DATE}",
-        "IFLYADLib-modelA-6.4.0.zip",
+        f"## [{VERSION}] - {RELEASE_DATE}",
+        f"IFLYADLib-modelA-{VERSION}.zip",
         "冻结 SHA-256",
         "匿名下载",
     ),
     "RELEASING": (
         "- `releaseState`：`FORMAL`",
-        "当前最新公开正式版是 [`6.4.0`]",
-        "IFLYADLib-modelA-6.4.0.zip",
+        f"当前最新公开正式版是 [`{VERSION}`]",
+        f"IFLYADLib-modelA-{VERSION}.zip",
         "冻结 SHA-256",
         "匿名下载",
     ),
     "SECURITY": (
-        "最新公开正式版本（当前为 `6.4.0`）",
-        f"`6.4.0` 已于 {RELEASE_DATE}",
+        f"最新公开正式版本（当前为 `{VERSION}`）",
+        f"`{VERSION}` 已于 {RELEASE_DATE}",
     ),
     "DEMO": (
-        f"已于 {RELEASE_DATE} 正式发布的 `6.4.0`",
-        "不可变 `6.4.0` tag",
+        f"已于 {RELEASE_DATE} 正式发布的 `{VERSION}`",
+        f"不可变 `{VERSION}` tag",
     ),
     "PODFILE": (
-        "IFLYADLib 6.4.0 已正式发布并完成匿名消费复验",
+        f"IFLYADLib {VERSION} 已正式发布并完成匿名消费复验",
         "不可变 tag",
     ),
 }
 PUBLISHED_CLAIM_MARKERS = (
-    "当前最新公开正式版为 `IFLYADLib 6.4.0`",
-    f"## [6.4.0] - {RELEASE_DATE}",
-    "当前最新公开正式版是 [`6.4.0`]",
-    f"`6.4.0` 已于 {RELEASE_DATE}",
-    f"已于 {RELEASE_DATE} 正式发布的 `6.4.0`",
-    "IFLYADLib 6.4.0 已正式发布并完成匿名消费复验",
+    f"当前最新公开正式版为 `IFLYADLib {VERSION}`",
+    f"## [{VERSION}] - {RELEASE_DATE}",
+    f"当前最新公开正式版是 [`{VERSION}`]",
+    f"`{VERSION}` 已于 {RELEASE_DATE}",
+    f"已于 {RELEASE_DATE} 正式发布的 `{VERSION}`",
+    f"IFLYADLib {VERSION} 已正式发布并完成匿名消费复验",
 )
 STRICT_REVIEW_POLICY = (
     "failOn=high`、`failOnWarning=true`、`strict=true`、"
     "`requireManual=true` 且接受名单为空"
 )
-RISK_AUTHORIZATION_BOUNDARY = "`6.4.0` 不沿用历史版本的启发式风险授权"
+RISK_AUTHORIZATION_BOUNDARY = f"`{VERSION}` 不沿用历史版本的启发式风险授权"
 HISTORICAL_REVIEW_POLICY_MARKERS = (
     "failOnWarning=false",
     "strict=false",
@@ -220,6 +235,52 @@ PUBLIC_RELEASE_STATUS_RE = re.compile(
 
 def read(root: Path, relative: str) -> str:
     return (root / relative).read_text(encoding="utf-8")
+
+
+def release_versions(root: Path) -> tuple[str, str]:
+    control = json.loads(read(root, "scripts/release-control.json"))
+    assert control.get("repository") == REPOSITORY, "release-control repository 漂移"
+    assert control.get("channel") == "general", "release-control channel 漂移"
+    closed_version = control.get("closedVersion")
+    target_version = control.get("targetVersion")
+    assert isinstance(closed_version, str) and isinstance(target_version, str), (
+        "release-control 版本字段非法"
+    )
+    return closed_version, target_version
+
+
+def validated_release_control(root: Path, validation_mode: str) -> dict[str, object]:
+    state = json.loads(read(root, "release-state.json"))
+    assert state.get("repository") == REPOSITORY, "release-state repository 漂移"
+    assert state.get("channel") == "general", "release-state channel 漂移"
+    try:
+        return validate_release_control(
+            json.loads(read(root, "scripts/release-control.json")),
+            repository=REPOSITORY,
+            channel="general",
+            release_phase=state.get("phase"),
+            release_version=state.get("version"),
+            validation_mode=validation_mode,
+        )
+    except ReleaseControlError as error:
+        raise AssertionError(str(error)) from error
+
+
+def valid_final_checksums(
+    checksums: dict[str, str],
+    *,
+    version: str,
+    closed_version: str,
+) -> bool:
+    rejected_checksums = PREVIOUS_CHECKSUMS
+    if version == closed_version:
+        rejected_checksums = PREVIOUS_CHECKSUMS - PREVIOUS_RELEASE_CHECKSUMS
+    return all(
+        re.fullmatch(r"[0-9a-f]{64}", value)
+        and value != "0" * 64
+        and value not in rejected_checksums
+        for value in checksums.values()
+    )
 
 
 def current_version_section(document: str, label: str, version: str = VERSION) -> str:
@@ -362,17 +423,20 @@ def require_published(
 
 
 def verify(root: Path, version: str, mode: str) -> str:
+    closed_version, target_version = release_versions(root)
+    expected = expected_targets(version)
     if mode not in RELEASE_MODES:
         raise AssertionError(f"非法 CI 发布模式: {mode}")
-    if version == PREVIOUS_RELEASE_VERSION:
+    if version == closed_version:
         assert mode == "local", (
-            f"历史正式版本 {PREVIOUS_RELEASE_VERSION} 只允许 local bootstrap 校验"
+            f"历史正式版本 {closed_version} 只允许 local bootstrap 校验"
         )
-    elif version != VERSION:
+    elif version != target_version:
         raise AssertionError(
-            f"本门禁只接受当前版本 {VERSION}，或 local bootstrap 版本 "
-            f"{PREVIOUS_RELEASE_VERSION}；实际为 {version}"
+            f"本门禁只接受当前版本 {target_version}，或 local bootstrap 版本 "
+            f"{closed_version}；实际为 {version}"
         )
+    validated_release_control(root, mode)
 
     readme = read(root, "README.md")
     changelog = read(root, "CHANGELOG.md")
@@ -405,12 +469,12 @@ def verify(root: Path, version: str, mode: str) -> str:
         re.S,
     )
     assert len(blocks) == 7, f"binaryTarget 数量不是 7：{len(blocks)}"
-    assert {name for name, _, _ in blocks} == set(EXPECTED), blocks
+    assert {name for name, _, _ in blocks} == set(expected), blocks
 
     checksums: dict[str, str] = {}
     module_assets: set[str] = set()
     for name, url, checksum in blocks:
-        expected_asset, _ = EXPECTED[name]
+        expected_asset, _ = expected[name]
         asset = Path(urlparse(url).path).name
         assert asset == expected_asset, (name, asset, expected_asset)
         expected_url = (
@@ -421,15 +485,11 @@ def verify(root: Path, version: str, mode: str) -> str:
         module_assets.add(asset)
         checksums[name] = checksum
 
-    all_pending = all(checksums[name] == EXPECTED[name][1] for name in EXPECTED)
-    rejected_checksums = PREVIOUS_CHECKSUMS
-    if version == PREVIOUS_RELEASE_VERSION:
-        rejected_checksums = PREVIOUS_CHECKSUMS - PREVIOUS_RELEASE_CHECKSUMS
-    all_final = all(
-        re.fullmatch(r"[0-9a-f]{64}", checksums[name])
-        and checksums[name] != "0" * 64
-        and checksums[name] not in rejected_checksums
-        for name in EXPECTED
+    all_pending = all(checksums[name] == expected[name][1] for name in expected)
+    all_final = valid_final_checksums(
+        checksums,
+        version=version,
+        closed_version=closed_version,
     )
     assert all_pending or all_final, (
         "7 个 checksum 必须全部是精确 PENDING，或全部是本版非零、"
@@ -440,10 +500,15 @@ def verify(root: Path, version: str, mode: str) -> str:
 
     if all_pending:
         assert mode == "local"
-        assert "当前最新公开正式版仍为 `IFLYADLib 6.3.5`" in readme
-        assert re.search(r"^## \[6\.4\.0\] - 待发布\s*$", changelog, re.M)
-        assert "`main` 正在准备 `6.4.0`" in releasing
-        assert "`6.4.0` 发布准备" in security
+        assert (
+            f"当前最新公开正式版仍为 `IFLYADLib {closed_version}`"
+            in readme
+        )
+        assert re.search(
+            rf"^## \[{re.escape(version)}\] - 待发布\s*$", changelog, re.M
+        )
+        assert f"`main` 正在准备 `{version}`" in releasing
+        assert f"`{version}` 发布准备" in security
         assert "尚未生成或核对" in readme
         state = "准备"
     else:

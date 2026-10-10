@@ -16,9 +16,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from github_http_retry import call_with_retry
 
 PRIVATE_SOURCE_REPOSITORY = "LJMcarryu/IFLYADLibDemo"
-CURRENT_VERSION = "6.4.0"
-PENDING_BINARY = "__IFLYADLIB_6_4_0_BINARY_SOURCE_COMMIT_PENDING__"
-PENDING_METADATA = "__IFLYADLIB_6_4_0_RELEASE_METADATA_COMMIT_PENDING__"
+RELEASE_CONTROL = json.loads(
+    Path(__file__).resolve().with_name("release-control.json").read_text(encoding="utf-8")
+)
+CURRENT_VERSION = RELEASE_CONTROL["targetVersion"]
+VERSION_TOKEN = CURRENT_VERSION.replace(".", "_")
+PENDING_BINARY = f"__IFLYADLIB_{VERSION_TOKEN}_BINARY_SOURCE_COMMIT_PENDING__"
+PENDING_METADATA = f"__IFLYADLIB_{VERSION_TOKEN}_RELEASE_METADATA_COMMIT_PENDING__"
 ALLOWED_METADATA_FILES = {"Package.swift", "README.md", "CONTEXT.md"}
 PUBLIC_RELEASE_STATUS_RE = re.compile(
     r"<!--\s*ifly-release-status:\s*(\{[^\r\n]*\})\s*-->"
