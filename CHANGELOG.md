@@ -2,6 +2,12 @@
 
 版本的兼容变化以各节变更和目标版本公开头为准；历史补丁版本也可能包含需要修改媒体代码的 API 迁移。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
+## [6.4.1] - 候选状态
+
+<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.1","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.0"} -->
+
+`6.4.1` 当前为发布前候选，尚未发布。当前公开正式版仍为 `6.4.0`；历史 Tag、Release 和资产保持不可变。本候选文案不包含构建或 SDK 测试结论。
+
 ## [6.4.0] - 冻结与发布记录
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.0","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.0"} -->

@@ -1,4 +1,5 @@
 # 本示例固定使用公开 6.4.0 版本；通过 Podspec URL 安装，不依赖 trunk 索引。
+# 6.4.1 当前为发布前候选，尚未发布。当前公开正式版仍为 6.4.0；历史 Tag、Release 和资产保持不可变；本文件继续固定 6.4.0。
 source 'https://cdn.cocoapods.org/'
 
 platform :ios, '11.0'
