@@ -72,7 +72,7 @@ class DistributionManifestTests(unittest.TestCase):
         self.assertFalse(
             valid_final_checksums(
                 checksums,
-                version=VERSION if VERSION != PREVIOUS_RELEASE_VERSION else "6.4.1",
+                version=VERSION if VERSION != PREVIOUS_RELEASE_VERSION else "0.0.0",
                 closed_version=PREVIOUS_RELEASE_VERSION,
             )
         )

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -453,14 +454,37 @@ class CIWorkflowContractTests(unittest.TestCase):
             if relative in {
                 "Package.swift", "IFLYADLib.podspec", "IFLYADLibSimple/Podfile",
             }:
-                return value.replace(
-                    repository_contract.VERSION,
-                    repository_contract.PREVIOUS_RELEASE_VERSION,
+                value = value.replace(
+                    ROOT_STATE["version"], repository_contract.VERSION,
                 )
+                if relative == "Package.swift":
+                    value = re.sub(
+                        r'checksum: "[0-9a-f]{64}"',
+                        lambda match: 'checksum: "' + hashlib.sha256(
+                            ("target-closed-test:" + match.group(0)).encode()
+                        ).hexdigest() + '"',
+                        value,
+                    )
             return value
 
         with mock.patch.object(
             repository_contract, "read", side_effect=target_closed_read
+        ):
+            repository_contract.verify_machine(ROOT, "local")
+
+        def drifted_target_read(root: Path, relative: str) -> str:
+            value = target_closed_read(root, relative)
+            if relative == "Package.swift":
+                changed = value.replace(
+                    f"/releases/download/{repository_contract.VERSION}/",
+                    "/releases/download/0.0.0/",
+                )
+                self.assertNotEqual(value, changed)
+                return changed
+            return value
+
+        with mock.patch.object(
+            repository_contract, "read", side_effect=drifted_target_read
         ), self.assertRaisesRegex(repository_contract.ContractError, "URL 不精确"):
             repository_contract.verify_machine(ROOT, "local")
 
@@ -470,7 +494,11 @@ class CIWorkflowContractTests(unittest.TestCase):
             repository_contract.validate_state_version(state, "local")
         for release_kind in ("candidate", "tag", "formal"):
             with self.subTest(release_kind=release_kind):
-                repository_contract.validate_state_version(state, release_kind)
+                if repository_contract.RELEASE_CONTROL["state"] == "BOOTSTRAP_CLOSED":
+                    with self.assertRaises(repository_contract.ContractError):
+                        repository_contract.validate_state_version(state, release_kind)
+                else:
+                    repository_contract.validate_state_version(state, release_kind)
 
     def test_candidate_tag_and_formal_reject_current_non_frozen_state(self) -> None:
         for phase in ("PREPARING", "PUBLISHED", "VERIFIED", "CLOSED"):
