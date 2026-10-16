@@ -1,14 +1,14 @@
 # IFLYADLibSimple 接入示例
 
-> `6.4.2` 为候选版本，尚未发布。当前公开正式版和生产依赖仍为 [`6.4.1`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1)；历史 Tag、Release 和资产保持不可变。
+> `6.4.2` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
 
-本工程使用 `IFLYADLib 6.4.1`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
+本工程使用 `IFLYADLib 6.4.2`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
 
 自己的 App 如何安装 SDK、各格式的公开接口与完整配置，见[仓库接入指南](../README.md)。
 
-> 本示例的 `Podfile` 固定正式版本 `6.4.1`。版本公开状态与消费验证结论以 `release-state.json.publication` 和同版本 GitHub Release 的实际状态为准。
+> 本示例的 `Podfile` 固定正式版本 `6.4.2`。版本公开状态与消费验证结论以 `release-state.json.publication` 和同版本 GitHub Release 的实际状态为准。
 >
-> `6.4.1` 继承 `6.4.0` 的公开 API 与 UI 行为，没有新增公开 API。展示、落地页、外跳回流、曝光判断和 UI 生命周期应归属广告的实际来源 window/Scene；无来源时只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底，独立落地页始终属于来源 Scene。开屏 rootVC 仍须入窗；Scene 宿主的 `customWindow` 必须可见、尺寸有限且为正、已关联 Scene，并与 `rootVC.window` 同 Scene，可以是非 key、高 `windowLevel`、无 rootVC。非法输入展示失败，修正后可以重试。
+> `6.4.2` 继承 `6.4.0` 的公开 API 与 UI 行为，没有新增公开 API。展示、落地页、外跳回流、曝光判断和 UI 生命周期应归属广告的实际来源 window/Scene；无来源时只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底，独立落地页始终属于来源 Scene。开屏 rootVC 仍须入窗；Scene 宿主的 `customWindow` 必须可见、尺寸有限且为正、已关联 Scene，并与 `rootVC.window` 同 Scene，可以是非 key、高 `windowLevel`、无 rootVC。非法输入展示失败，修正后可以重试。
 
 ## 下载与运行
 
@@ -23,7 +23,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-已有仓库时，进入本目录从 `pod install` 开始。Podfile 固定使用公开 `6.4.1` Podspec，默认安装 `Full`；更新示例源码不会自动升级 SDK。
+已有仓库时，进入本目录从 `pod install` 开始。Podfile 固定使用公开 `6.4.2` Podspec，默认安装 `Full`；更新示例源码不会自动升级 SDK。
 
 1. 在 Xcode 选择 **IFLYADLibSimple** scheme 和一个已安装的 iPhone 模拟器或真机。
 2. 按下方说明替换广告位，真机运行时在 **Signing & Capabilities** 设置签名，再 Build & Run。

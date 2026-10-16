@@ -3,11 +3,11 @@
 > 本仓库 `IFLYADLib_iOS` 是**对外分发仓**：只放分发清单、文档、示例，二进制托管在 GitHub Releases。
 > SDK 源码与构建脚本在**内部私有源码仓**（不在本仓）。
 
-## 6.4.2 候选状态（尚未发布）
+## 6.4.2 冻结与发布记录
 
-<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.2","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.1"} -->
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.2","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2"} -->
 
-`6.4.2` 为候选版本，尚未发布。当前公开正式版和生产依赖仍为 [`6.4.1`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1)；历史 Tag、Release 和资产保持不可变。
+`6.4.2` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
 
 ## 正式发布唯一入口
 
@@ -24,7 +24,7 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 ## 6.4.1 冻结与发布记录
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.1","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1"} -->
+> 以下为 `6.4.1` 历史记录；其中“当前”“本版”均只指该历史版本。
 
 `6.4.1` 的正式签名资产、checksum 与分发资料以本版本真实冻结 manifest 为准。当前正式版本为 [6.4.1](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1)；公开时间和消费验证结论以 `release-state.json.publication` 和同版本 GitHub Release 的实际状态为准。
 
