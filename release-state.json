@@ -3,7 +3,7 @@
   "channel": "general",
   "repository": "LJMcarryu/IFLYADLib_iOS",
   "version": "6.4.2",
-  "phase": "FROZEN",
+  "phase": "CLOSED",
   "binarySourceCommit": "94a8ed10d8131e8c84d5577006e0b71ba33ca256",
   "releaseMetadataCommit": "f53551d9b2122c18add8e2f63d73995494962e3f",
   "artifactInventory": {
@@ -15,5 +15,16 @@
     "statusAtFreeze": "not-run",
     "evidenceIncluded": false
   },
-  "publication": null
+  "publication": {
+    "releaseId": 414647971,
+    "tagName": "6.4.2",
+    "tagObjectSha": "cef8e7f28e0fb4dc7c58efed71f8fcd7332b6711",
+    "tagCommitSha": "e3e862759359796f0b6b1821dab74c22aae26b33",
+    "releaseUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2",
+    "publishedAt": "2026-10-16T08:01:17Z",
+    "formalConsumerRunId": 38870917511,
+    "formalConsumerRunUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/38870917511",
+    "conclusion": "success",
+    "verifiedAt": "2026-10-16T08:03:12Z"
+  }
 }
