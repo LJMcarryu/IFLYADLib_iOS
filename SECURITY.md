@@ -1,5 +1,7 @@
 # 安全策略
 
+> `6.4.2` 为候选版本，尚未发布。当前公开正式版和生产依赖仍为 [`6.4.1`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1)；历史 Tag、Release 和资产保持不可变。
+
 ## 6.4.1 支持说明
 
 `6.4.1` 已纳入安全支持矩阵。SDK 与 UI 行为继承 `6.4.0`，没有新增公开 API；公开状态与消费验证结论以结构化状态和同版本 GitHub Release 的实际状态为准。
