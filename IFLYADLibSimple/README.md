@@ -1,14 +1,10 @@
 # IFLYADLibSimple 接入示例
 
-> `6.4.2` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
-
 本工程使用 `IFLYADLib 6.4.2`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
 
 自己的 App 如何安装 SDK、各格式的公开接口与完整配置，见[仓库接入指南](../README.md)。
 
-> 本示例的 `Podfile` 固定正式版本 `6.4.2`。版本公开状态与消费验证结论以 `release-state.json.publication` 和同版本 GitHub Release 的实际状态为准。
->
-> `6.4.2` 继承 `6.4.0` 的公开 API 与 UI 行为，没有新增公开 API。展示、落地页、外跳回流、曝光判断和 UI 生命周期应归属广告的实际来源 window/Scene；无来源时只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底，独立落地页始终属于来源 Scene。开屏 rootVC 仍须入窗；Scene 宿主的 `customWindow` 必须可见、尺寸有限且为正、已关联 Scene，并与 `rootVC.window` 同 Scene，可以是非 key、高 `windowLevel`、无 rootVC。非法输入展示失败，修正后可以重试。
+本示例的 `Podfile` 固定 `6.4.2`。宿主窗口和授权要求见[配置与隐私](../docs/接入指南/配置与隐私.md)。
 
 ## 下载与运行
 
@@ -80,7 +76,7 @@ open IFLYADLibSimple.xcworkspace
 
 一次正常内置渲染加载会先收到 `didLoad`，再收到 `didReady`；点击 Show 后检查 `didShow`，真正满足可见条件后检查 `didExpose`。NativeFeed 没有 `didReady`，使用 `didLoad`、媒体素材渲染和 `didRender` 观察进度。
 
-编译成功只证明接入和链接完成；取得填充、展示、曝光、点击返回和奖励须在有效广告位环境分别验证。不要手工调用 delegate 或伪造曝光/奖励来替代运行验证。
+编译成功只证明接入和链接完成；取得填充、展示、曝光、点击返回和奖励须在有效广告位环境分别验证。以实际运行结果确认各阶段是否完成。
 
 ## 信息流接入要点
 
@@ -91,11 +87,11 @@ open IFLYADLibSimple.xcworkspace
 - 视频的 `videoView` 使用普通 `UIView`，不创建另一套播放器；离屏后再回来，不要无条件调用 `startPlay` 覆盖用户的暂停意图。
 - 永久移除条目或退出页面时，解绑容器、清空 delegate 并释放 Ad；只想暂时离屏时不要 `destroy`。
 - `detachFromCurrentContainer` 仅适合固定、非复用且不会迁移的单容器，不能用于列表的迟到回调。
-- 常规接入将点击按钮放在广告容器内。确需外部 CTA 时，按根 [README](../README.md#自渲染信息流)显式设置 `allowsExternalClickViews`，并处理 `71503` 拒绝回调。
+- 常规接入将点击按钮放在广告容器内。确需外部 CTA 时，按[自渲染信息流指南](../docs/接入指南/自渲染信息流.md)显式设置 `allowsExternalClickViews`，并处理 `71503` 拒绝回调。
 
 ## 接入部分广告形式
 
-此示例编译全部六个页面，需要 `Full`。业务 App 可以按根[安装说明](../README.md#安装)选择所需 subspec/product。
+此示例编译全部六个页面，需要 `Full`。业务 App 可以按[安装与分包指南](../docs/接入指南/安装与分包.md)选择所需 subspec/product。
 
 如果把本示例改成仅开屏，除了把 Podfile 改为 `IFLYADLib/Splash`，还须从 App target 移除 Banner、插屏、信息流、激励页面的编译源及首页导入和入口，再重新 `pod install`。仅修改 Podfile 会因其他页面继续引用未安装类型而编译失败。
 
