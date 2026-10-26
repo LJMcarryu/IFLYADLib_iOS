@@ -1,5 +1,10 @@
 # 安全策略
 
+## 6.4.4 候选
+
+`6.4.4` 为候选，尚未发布；当前公开正式版和生产依赖保持 `6.4.3`。历史 Tag、Release 和资产保持不可变。
+
+
 > `6.4.3` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.3`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.3)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
 
 ## 6.4.3 支持说明
