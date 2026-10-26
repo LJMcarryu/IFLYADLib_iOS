@@ -1,5 +1,12 @@
 # IFLYADLib iOS SDK
 
+## 6.4.3 候选
+
+<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.3","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.2"} -->
+
+`6.4.3` 为候选，尚未发布；当前公开正式版和生产依赖保持 `6.4.2`。历史 Tag、Release 和资产保持不可变。
+
+
 面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频，支持按广告形式组合接入。本仓库提供安装清单、接入指南和 Objective-C 示例。
 
 当前正式版本：[`6.4.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2)。生产项目请固定具体版本，升级前查看[更新记录](CHANGELOG.md)。

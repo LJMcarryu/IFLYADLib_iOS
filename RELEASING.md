@@ -1,5 +1,12 @@
 # 发版手册（维护者）
 
+## 6.4.3 候选
+
+<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.3","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.2"} -->
+
+`6.4.3` 为候选，尚未发布；当前公开正式版和生产依赖保持 `6.4.2`。历史 Tag、Release 和资产保持不可变。
+
+
 > 本仓库 `IFLYADLib_iOS` 是**对外分发仓**：只放分发清单、文档、示例，二进制托管在 GitHub Releases。
 > SDK 源码与构建脚本在**内部私有源码仓**（不在本仓）。
 
