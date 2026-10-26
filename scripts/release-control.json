@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "state": "BOOTSTRAP_CLOSED",
+  "state": "CANDIDATE",
   "channel": "general",
   "repository": "LJMcarryu/IFLYADLib_iOS",
   "closedVersion": "6.4.3",
-  "targetVersion": "6.4.3"
+  "targetVersion": "6.4.4"
 }
