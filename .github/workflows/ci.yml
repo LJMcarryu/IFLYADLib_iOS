@@ -384,10 +384,10 @@ jobs:
             grep -q 'detachAdFromContainerView:' "$source"
           done
 
-          grep -q 'allowsExternalClickViews' README.md
-          grep -q 'nativeFeedAd:didRejectClickWithError:' README.md
-          grep -q 'IFLYAdErrorCodeNativeFeedClickViewsInvalid' README.md
-          grep -q 'detachFromCurrentContainer' README.md
+          grep -q 'allowsExternalClickViews' 'docs/接入指南/自渲染信息流.md'
+          grep -q 'nativeFeedAd:didRejectClickWithError:' 'docs/接入指南/自渲染信息流.md'
+          grep -q 'IFLYAdErrorCodeNativeFeedClickViewsInvalid' 'docs/接入指南/自渲染信息流.md'
+          grep -q 'detachFromCurrentContainer' 'docs/接入指南/自渲染信息流.md'
 
           if grep -En 'IFLYNativeFeedDisplaySession|IFLYNativeFeedAdBinding|beginDisplaySessionWithError:|bindAdWithViewBinder:|unbindAd|endDisplaySession' "${sources[@]}"; then
             echo 'Demo 仍使用 6.2.1 NativeFeed 历史 API' >&2
