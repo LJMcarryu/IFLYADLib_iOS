@@ -102,6 +102,45 @@ def run_native_feed_header_gate(
     )
 
 
+NATIVE_FEED_GUIDE = "docs/接入指南/自渲染信息流.md"
+NATIVE_FEED_DOC_MARKERS = (
+    "allowsExternalClickViews",
+    "nativeFeedAd:didRejectClickWithError:",
+    "IFLYAdErrorCodeNativeFeedClickViewsInvalid",
+    "detachFromCurrentContainer",
+)
+NATIVE_FEED_DEMO_SOURCES = (
+    "IFLYADLibSimple/IFLYADLibSimple/biz/native/IFLYNativeViewController.m",
+    "IFLYADLibSimple/IFLYADLibSimple/biz/native/IFLYNativeFeedListViewController.m",
+)
+
+
+def run_native_feed_demo_gate(root: Path) -> subprocess.CompletedProcess[str]:
+    step = step_block(
+        job_block("preflight"), "校验 NativeFeed Demo 只使用 SDK 托管公开 API"
+    )
+    source = textwrap.dedent(step.split("        run: |\n", 1)[1])
+    return subprocess.run(
+        ["bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", source],
+        cwd=root,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+
+def write_native_feed_demo_fixture(root: Path) -> None:
+    for relative in (
+        NATIVE_FEED_GUIDE,
+        *NATIVE_FEED_DEMO_SOURCES,
+        "IFLYADLibSimple/IFLYADLibSimple/ViewController.m",
+        "README.md",
+    ):
+        destination = root / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text((ROOT / relative).read_text(encoding="utf-8"), encoding="utf-8")
+
+
 class CIWorkflowContractTests(unittest.TestCase):
     def test_local_python_validation_cannot_dirty_candidate_worktree(self) -> None:
         ignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
@@ -376,6 +415,53 @@ class CIWorkflowContractTests(unittest.TestCase):
         self.assertIn("## 正式发布唯一入口", releasing)
         self.assertIn("scripts/release-orchestrator.py", releasing)
         self.assertIn("底层门禁或故障诊断入口", releasing)
+
+    def test_native_feed_demo_gate_runs_actual_workflow_shell(self) -> None:
+        result = run_native_feed_demo_gate(ROOT)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_native_feed_demo_gate_requires_each_authoritative_guide_marker(self) -> None:
+        for marker in NATIVE_FEED_DOC_MARKERS:
+            with self.subTest(marker=marker), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                write_native_feed_demo_fixture(root)
+                guide = root / NATIVE_FEED_GUIDE
+                original = guide.read_text(encoding="utf-8")
+                self.assertIn(marker, original)
+                guide.write_text(original.replace(marker, "REMOVED_API"), encoding="utf-8")
+                # README 即使有相同标记，也不能替代权威指南的接入规则。
+                (root / "README.md").write_text("\n".join(NATIVE_FEED_DOC_MARKERS), encoding="utf-8")
+                result = run_native_feed_demo_gate(root)
+                self.assertNotEqual(0, result.returncode, result.stdout + result.stderr)
+
+    def test_native_feed_demo_gate_rejects_each_historical_api(self) -> None:
+        for relative in NATIVE_FEED_DEMO_SOURCES:
+            for marker in (
+                "IFLYNativeFeedDisplaySession", "IFLYNativeFeedAdBinding",
+                "beginDisplaySessionWithError:", "bindAdWithViewBinder:",
+                "unbindAd", "endDisplaySession",
+            ):
+                with self.subTest(source=relative, marker=marker), tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+                    write_native_feed_demo_fixture(root)
+                    source = root / relative
+                    source.write_text(source.read_text(encoding="utf-8") + "\n" + marker, encoding="utf-8")
+                    result = run_native_feed_demo_gate(root)
+                    self.assertNotEqual(0, result.returncode, result.stdout + result.stderr)
+                    self.assertIn("Demo 仍使用 6.2.1 NativeFeed 历史 API", result.stderr)
+
+    def test_native_feed_demo_gate_requires_attach_and_detach_in_each_source(self) -> None:
+        for relative in NATIVE_FEED_DEMO_SOURCES:
+            for marker in ("attachWithViewBinder:", "detachAdFromContainerView:"):
+                with self.subTest(source=relative, marker=marker), tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+                    write_native_feed_demo_fixture(root)
+                    source = root / relative
+                    original = source.read_text(encoding="utf-8")
+                    self.assertIn(marker, original)
+                    source.write_text(original.replace(marker, "REMOVED_API"), encoding="utf-8")
+                    result = run_native_feed_demo_gate(root)
+                    self.assertNotEqual(0, result.returncode, result.stdout + result.stderr)
 
     def test_cocoapods_consumer_gates_new_native_feed_api(self) -> None:
         block = job_block("cocoapods-demo-consumer")
