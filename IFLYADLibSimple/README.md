@@ -1,15 +1,10 @@
 # IFLYADLibSimple 接入示例
 
-## 6.4.3 候选
-
-`6.4.3` 为候选，尚未发布；当前公开正式版和生产依赖保持 `6.4.2`。历史 Tag、Release 和资产保持不可变。
-
-
-本工程使用 `IFLYADLib 6.4.2`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
+本工程使用 `IFLYADLib 6.4.3`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
 
 自己的 App 如何安装 SDK、各格式的公开接口与完整配置，见[仓库接入指南](../README.md)。
 
-本示例的 `Podfile` 固定 `6.4.2`。宿主窗口和授权要求见[配置与隐私](../docs/接入指南/配置与隐私.md)。
+本示例的 `Podfile` 固定 `6.4.3`。宿主窗口和授权要求见[配置与隐私](../docs/接入指南/配置与隐私.md)。
 
 ## 下载与运行
 
@@ -24,7 +19,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-已有仓库时，进入本目录从 `pod install` 开始。Podfile 固定使用公开 `6.4.2` Podspec，默认安装 `Full`；更新示例源码不会自动升级 SDK。
+已有仓库时，进入本目录从 `pod install` 开始。Podfile 固定使用公开 `6.4.3` Podspec，默认安装 `Full`；更新示例源码不会自动升级 SDK。
 
 1. 在 Xcode 选择 **IFLYADLibSimple** scheme 和一个已安装的 iPhone 模拟器或真机。
 2. 按下方说明替换广告位，真机运行时在 **Signing & Capabilities** 设置签名，再 Build & Run。
