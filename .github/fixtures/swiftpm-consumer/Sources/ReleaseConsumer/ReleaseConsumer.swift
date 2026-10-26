@@ -1,5 +1,5 @@
 import Foundation
 
 public enum ReleaseConsumer {
-    public static let verificationMarker = "IFLYADLib-6.4.2"
+    public static let verificationMarker = "IFLYADLib-6.4.3"
 }
