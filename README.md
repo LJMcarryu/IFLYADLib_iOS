@@ -1,17 +1,11 @@
 # IFLYADLib iOS SDK
 
-## 6.4.4 候选
-
-<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.4","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.3"} -->
-
-`6.4.4` 为候选，尚未发布；当前公开正式版和生产依赖保持 `6.4.3`。历史 Tag、Release 和资产保持不可变。
-
 
 面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频，支持按广告形式组合接入。本仓库提供安装清单、接入指南和 Objective-C 示例。
 
-当前正式版本：[`6.4.3`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.3)。生产项目请固定具体版本，升级前查看[更新记录](CHANGELOG.md)。
+当前正式版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)。生产项目请固定具体版本，升级前查看[更新记录](CHANGELOG.md)。
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.3","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.3"} -->
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4"} -->
 
 [运行示例](IFLYADLibSimple/README.md) · [安装与分包](docs/接入指南/安装与分包.md) · [配置与隐私](docs/接入指南/配置与隐私.md) · [常见问题](docs/接入指南/常见问题.md)
 
@@ -50,7 +44,7 @@ platform :ios, '11.0'
 target 'YourApp' do
   use_frameworks!
   pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.3/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.4/IFLYADLib.podspec'
 end
 ```
 
@@ -62,7 +56,7 @@ open YourApp.xcworkspace
 该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前通过 GitHub 分发，请保留 Podspec URL。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
-- [Swift Package Manager](docs/接入指南/安装与分包.md#swift-package-manager)：添加本仓地址，选择 **Exact Version** `6.4.3` 和所需 product；在 App target 添加 `-ObjC`。
+- [Swift Package Manager](docs/接入指南/安装与分包.md#swift-package-manager)：添加本仓地址，选择 **Exact Version** `6.4.4` 和所需 product；在 App target 添加 `-ObjC`。
 - [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：使用同版完整包，按格式链接依赖并复制资源及隐私清单。
 
 ## 首次使用
@@ -112,7 +106,7 @@ open YourApp.xcworkspace
 
 ## 示例工程
 
-[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.4.3`，移入生产 App 时保留自己的隐私流程和业务生命周期。
+[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.4.4`，移入生产 App 时保留自己的隐私流程和业务生命周期。
 
 ## 常见问题
 
