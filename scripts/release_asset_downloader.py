@@ -19,7 +19,8 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener, urlopen
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from github_http_retry import call_with_retry, retry_delay
+from github_http_retry import (call_with_retry, retry_delay, execute_in_worker,
+                               isolated_asset_download, read_json_response)
 
 TOKEN_ENVIRONMENT_VARIABLES = (
     "GH_TOKEN",
@@ -316,11 +317,19 @@ class ApiOnlyRedirectHandler(HTTPRedirectHandler):
         return super().redirect_request(request, fp, code, msg, headers, newurl)
 
 
-def read_json(request: Request) -> dict:
+def read_json(request: Request, *, executor=None, timeout_seconds=180) -> dict:
+    runner = execute_in_worker if executor is None else executor
+    return runner(__file__, "_read_json_worker", {
+        "url": request.full_url, "headers": dict(request.header_items()),
+    }, timeout_seconds=timeout_seconds)
+
+
+def _read_json_worker(url, headers) -> dict:
+    request = Request(url, headers=headers)
     def request_once():
         opener = build_opener(ApiOnlyRedirectHandler())
         with opener.open(request, timeout=60) as response:
-            value = json.loads(response.read().decode("utf-8"))
+            value = read_json_response(response)
         require(isinstance(value, dict), "GitHub API 响应不是对象")
         return value
     return call_with_retry(request_once)
@@ -336,7 +345,11 @@ def _verify_existing_asset(asset: dict, destination: Path) -> str | None:
     if destination.stat().st_size != asset["size"]:
         destination.unlink()
         return None
-    actual = hashlib.sha256(destination.read_bytes()).hexdigest()
+    digest = hashlib.sha256()
+    with destination.open("rb") as cached:
+        while chunk := cached.read(1024 * 1024):
+            digest.update(chunk)
+    actual = digest.hexdigest()
     if not hmac.compare_digest(
         actual, asset["digest"].removeprefix("sha256:")
     ):
@@ -374,6 +387,7 @@ def download_with_retry(
     *,
     max_attempts: int = DOWNLOAD_MAX_ATTEMPTS,
     sleeper=time.sleep,
+    commit=True,
 ) -> str:
     cached = _verify_existing_asset(asset, destination)
     if cached is not None:
@@ -386,7 +400,8 @@ def download_with_retry(
         try:
             with open_response() as response:
                 actual = _write_and_verify(response, asset, temporary)
-            temporary.replace(destination)
+            if commit:
+                temporary.replace(destination)
             return actual
         except Exception as error:
             temporary.unlink(missing_ok=True)
@@ -400,35 +415,38 @@ def download_with_retry(
     raise AssertionError("unreachable")
 
 
-def download_anonymously(
-    asset: dict, destination: Path, *, max_attempts: int = DOWNLOAD_MAX_ATTEMPTS,
-    sleeper=time.sleep
-) -> str:
+def _download_asset_worker(asset, destination, token, authenticated, max_attempts):
+    destination = Path(destination)
+    cached = _verify_existing_asset(asset, destination)
+    if cached is not None:
+        return {"digest": cached, "cached": True}
     def open_response():
-        request = anonymous_request(
-            asset["browser_download_url"], "application/octet-stream"
-        )
+        if authenticated:
+            request = authenticated_api_request(asset["url"], token, "application/octet-stream")
+            return build_opener(TokenStrippingRedirectHandler()).open(request, timeout=300)
+        request = anonymous_request(asset["browser_download_url"], "application/octet-stream")
         return urlopen(request, timeout=300)
+    digest = download_with_retry(asset, destination, open_response,
+                                 max_attempts=max_attempts, commit=False)
+    return {"digest": digest, "cached": False}
 
-    return download_with_retry(
-        asset, destination, open_response, max_attempts=max_attempts, sleeper=sleeper
-    )
+
+def download_anonymously(asset: dict, destination: Path, *,
+                         max_attempts=DOWNLOAD_MAX_ATTEMPTS, executor=None,
+                         timeout_seconds=300) -> str:
+    return isolated_asset_download(__file__, "_download_asset_worker", {
+        "asset": asset, "destination": str(destination), "token": "",
+        "authenticated": False, "max_attempts": max_attempts,
+    }, destination, executor=executor, timeout_seconds=timeout_seconds)
 
 
-def download_authenticated(
-    asset: dict, destination: Path, token: str, *,
-    max_attempts: int = DOWNLOAD_MAX_ATTEMPTS, sleeper=time.sleep
-) -> str:
-    def open_response():
-        request = authenticated_api_request(
-            asset["url"], token, "application/octet-stream"
-        )
-        opener = build_opener(TokenStrippingRedirectHandler())
-        return opener.open(request, timeout=300)
-
-    return download_with_retry(
-        asset, destination, open_response, max_attempts=max_attempts, sleeper=sleeper
-    )
+def download_authenticated(asset: dict, destination: Path, token: str, *,
+                            max_attempts=DOWNLOAD_MAX_ATTEMPTS, executor=None,
+                            timeout_seconds=300) -> str:
+    return isolated_asset_download(__file__, "_download_asset_worker", {
+        "asset": asset, "destination": str(destination), "token": token,
+        "authenticated": True, "max_attempts": max_attempts,
+    }, destination, executor=executor, timeout_seconds=timeout_seconds)
 
 
 def prepare_destination(destination: Path) -> None:

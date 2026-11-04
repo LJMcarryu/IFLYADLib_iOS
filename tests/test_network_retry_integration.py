@@ -26,10 +26,14 @@ class NetworkRetryIntegrationTests(unittest.TestCase):
         try:
             with mock.patch.object(downloader, "build_opener", return_value=opener):
                 with mock.patch.object(github_http_retry.time, "sleep") as sleeper:
-                    self.assertEqual({}, downloader.read_json(request))
+                    self.assertEqual({}, downloader.read_json(request, executor=lambda path, name, args, **kw:
+                        getattr(downloader, name)(**args)))
             self.assertEqual(2, opener.open.call_count)
+            worker_request = opener.open.call_args_list[0].args[0]
+            self.assertEqual(request.full_url, worker_request.full_url)
+            self.assertEqual(request.header_items(), worker_request.header_items())
             for call in opener.open.call_args_list:
-                self.assertIs(request, call.args[0])
+                self.assertIs(worker_request, call.args[0])
                 self.assertIsNone(call.args[0].get_header("Authorization"))
             sleeper.assert_called_once_with(1)
         finally:
