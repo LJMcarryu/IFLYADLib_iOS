@@ -55,12 +55,11 @@ class NetworkRetryIntegrationTests(unittest.TestCase):
             error.close()
 
     def test_manual_formal_control_allowlist_contains_retry_module_and_tests(self):
-        workflow = (ROOT / ".github/workflows/ci.yml").read_text()
-        allowed = workflow.split("unexpected_paths=$(git diff --name-only", 1)[1].split(")\n", 1)[0]
+        from verify_manual_formal_reverification import CONTROL_PATHS
         for path in ("scripts/github_http_retry.py", "scripts/verify_private_release_provenance.py",
                      "tests/test_github_http_retry.py", "tests/test_network_retry_integration.py"):
             with self.subTest(path=path):
-                self.assertIn(f"':(exclude){path}'", allowed)
+                self.assertIn(path, CONTROL_PATHS)
 
 
 if __name__ == "__main__":

@@ -224,6 +224,39 @@ jobs:
           echo "candidate_branch=$candidate_branch" >> "$GITHUB_OUTPUT"
           echo "checkout_sha=$checkout_sha" >> "$GITHUB_OUTPUT"
 
+      - name: Tag/正式态校验不可变 annotated tag 与 checkout 绑定
+        id: tag-binding
+        if: steps.release-mode.outputs.release_mode == 'tag' || steps.release-mode.outputs.release_mode == 'formal'
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
+          FORMAL_RELEASE_ID: ${{ steps.release-mode.outputs.formal_release_id }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_REF: ${{ github.ref }}
+          EVENT_SHA: ${{ github.sha }}
+          WORKFLOW_CONTROL_SHA: ${{ github.workflow_sha }}
+        run: |
+          set -euo pipefail
+          test -z "$(git status --porcelain)"
+          test "$(git cat-file -t "refs/tags/$RELEASE_VERSION")" = 'tag'
+          if [[ "$EVENT_NAME" == 'workflow_dispatch' ]]; then
+            # 先固定控制代码来源，再运行该来源的后继拓扑与逐提交白名单校验。
+            test "$(git rev-parse HEAD)" = "$WORKFLOW_CONTROL_SHA"
+            git show "${WORKFLOW_CONTROL_SHA}:scripts/verify_manual_formal_reverification.py" |
+              python3 -B - --repository "$GITHUB_REPOSITORY" \
+                --tag "$RELEASE_VERSION" --release-id "$FORMAL_RELEASE_ID" \
+                --event-name "$EVENT_NAME" --event-ref "$EVENT_REF" \
+                --event-sha "$EVENT_SHA" --workflow-sha "$WORKFLOW_CONTROL_SHA"
+            # 数据来自不可变 Tag；检查器与导入依赖仍来自 workflow_sha 的 checkout。
+            tagged_root=$(mktemp -d "$RUNNER_TEMP/ifly-formal-tag.XXXXXX")
+            git archive "refs/tags/$RELEASE_VERSION^{commit}" | tar -x -C "$tagged_root"
+            echo "repository_root=$tagged_root" >> "$GITHUB_OUTPUT"
+          else
+            test "$(git rev-parse HEAD)" = "$(git rev-parse "refs/tags/$RELEASE_VERSION^{commit}")"
+            test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_VERSION"
+          fi
+          test "$(git show "refs/tags/$RELEASE_VERSION:IFLYADLib.podspec" | sed -nE "s/.*s\.version = '([^']+)'.*/\1/p" | head -1)" = "$RELEASE_VERSION"
+
       - name: 运行发布脚本离线单元测试
         env:
           PYTHONDONTWRITEBYTECODE: '1'
@@ -253,7 +286,8 @@ jobs:
           WORKFLOW_CONTROL_SHA: ${{ github.workflow_sha }}
         run: |
           git show "${WORKFLOW_CONTROL_SHA}:scripts/verify_repository_contract.py" |
-            python3 - --scope machine --release-kind "${RELEASE_MODE}"
+            python3 - --scope machine --release-kind "${RELEASE_MODE}" \
+              --repository-root "${{ steps.tag-binding.outputs.repository_root || github.workspace }}"
 
       - name: 阻断校验 Markdown 发布状态契约
         env:
@@ -261,7 +295,8 @@ jobs:
           WORKFLOW_CONTROL_SHA: ${{ github.workflow_sha }}
         run: |
           git show "${WORKFLOW_CONTROL_SHA}:scripts/verify_repository_contract.py" |
-            python3 - --scope docs --release-kind "${RELEASE_MODE}"
+            python3 - --scope docs --release-kind "${RELEASE_MODE}" \
+              --repository-root "${{ steps.tag-binding.outputs.repository_root || github.workspace }}"
       - name: 校验 Package.swift 可解析
         run: swift package dump-package > "$RUNNER_TEMP/ifly-package.json"
 
@@ -279,84 +314,6 @@ jobs:
         run: |
           python3 scripts/verify_private_release_provenance.py \
             --release-state release-state.json
-
-      - name: Tag/正式态校验不可变 annotated tag 与 checkout 绑定
-        if: steps.release-mode.outputs.release_mode == 'tag' || steps.release-mode.outputs.release_mode == 'formal'
-        shell: bash
-        env:
-          RELEASE_MODE: ${{ steps.release-mode.outputs.release_mode }}
-          RELEASE_VERSION: ${{ steps.release-mode.outputs.version }}
-          EVENT_NAME: ${{ github.event_name }}
-          EVENT_REF: ${{ github.ref }}
-        run: |
-          set -euo pipefail
-          test -z "$(git status --porcelain)"
-          test "$(git cat-file -t "refs/tags/$RELEASE_VERSION")" = 'tag'
-          if [[ "$EVENT_NAME" == 'workflow_dispatch' ]]; then
-            test "$EVENT_REF" = 'refs/heads/main'
-            git merge-base --is-ancestor "$RELEASE_VERSION^{commit}" HEAD
-            unexpected_paths=$(git diff --name-only "$RELEASE_VERSION^{commit}" HEAD -- . \
-              ':(exclude).github/workflows/ci.yml' \
-              ':(exclude).github/fixtures/swiftpm-consumer/Package.swift' \
-              ':(exclude).github/fixtures/swiftpm-consumer/Sources/ReleaseConsumer/ReleaseConsumer.swift' \
-              ':(exclude)Package.swift' \
-              ':(exclude)README.md' \
-              ':(exclude)CHANGELOG.md' \
-              ':(exclude)RELEASING.md' \
-              ':(exclude)SECURITY.md' \
-              ':(exclude)IFLYADLibSimple/README.md' \
-              ':(exclude)IFLYADLibSimple/Podfile' \
-              ':(exclude)scripts/download_release_anonymously.py' \
-              ':(exclude)scripts/download_draft_release.py' \
-              ':(exclude)scripts/release_asset_downloader.py' \
-              ':(exclude)scripts/github_http_retry.py' \
-              ':(exclude)scripts/verify_private_release_provenance.py' \
-              ':(exclude)scripts/prepare_release_consumers.py' \
-              ':(exclude)scripts/verify_distribution_manifest.py' \
-              ':(exclude)scripts/verify_repository_contract.py' \
-              ':(exclude)tests/test_ci_workflow_contract.py' \
-              ':(exclude)tests/test_release_asset_downloader.py' \
-              ':(exclude)tests/test_github_http_retry.py' \
-              ':(exclude)tests/test_network_retry_integration.py' \
-              ':(exclude)tests/test_prepare_release_consumers.py' \
-              ':(exclude)tests/test_verify_distribution_manifest.py')
-            if [[ -n "$unexpected_paths" ]]; then
-              echo '手动正式复验的 main 相对 tag 修改了非获准 CI/发布文档路径：' >&2
-              echo "$unexpected_paths" >&2
-              exit 1
-            fi
-            python3 - "$RELEASE_VERSION" <<'PY'
-          import subprocess
-          import sys
-          from pathlib import Path
-
-          tag = sys.argv[1]
-          for path, comment_prefix in (
-              ("Package.swift", "//"),
-              ("IFLYADLibSimple/Podfile", "#"),
-          ):
-              tagged = subprocess.check_output(
-                  ["git", "show", f"{tag}^{{commit}}:{path}"],
-                  text=True,
-              )
-              current = Path(path).read_text(encoding="utf-8")
-
-              def without_full_line_comments(value):
-                  return "\n".join(
-                      line
-                      for line in value.splitlines()
-                      if not line.lstrip().startswith(comment_prefix)
-                  )
-
-              assert without_full_line_comments(current) == without_full_line_comments(tagged), (
-                  f"{path} 相对正式 tag 存在非注释修改"
-              )
-          PY
-          else
-            test "$(git rev-parse HEAD)" = "$(git rev-parse "$RELEASE_VERSION^{commit}")"
-            test "$(git describe --tags --exact-match HEAD)" = "$RELEASE_VERSION"
-          fi
-          test "$(git show "$RELEASE_VERSION:IFLYADLib.podspec" | sed -nE "s/.*s\.version = '([^']+)'.*/\1/p" | head -1)" = "$RELEASE_VERSION"
 
       - name: 校验 NativeFeed Demo 只使用 SDK 托管公开 API
         shell: bash
