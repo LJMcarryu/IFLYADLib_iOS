@@ -21,6 +21,7 @@ CONTROL_PATHS = frozenset({
     ".github/fixtures/swiftpm-consumer/Package.swift",
     ".github/fixtures/swiftpm-consumer/Sources/ReleaseConsumer/ReleaseConsumer.swift",
     "Package.swift", "README.md", "CHANGELOG.md", "RELEASING.md", "SECURITY.md",
+    "docs/需求设计/发布验收/历史发布记录.md",
     "IFLYADLibSimple/README.md", "IFLYADLibSimple/Podfile",
     "scripts/download_release_anonymously.py", "scripts/download_draft_release.py",
     "scripts/release_asset_downloader.py", "scripts/github_http_retry.py",

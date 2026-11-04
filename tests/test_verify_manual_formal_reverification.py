@@ -119,6 +119,36 @@ class ManualFormalReverificationTests(unittest.TestCase):
         result = self.run_check()
         self.assertEqual(result.returncode, 0, result.stderr)
 
+    def test_exact_historical_archive_addition_and_update_are_allowed(self):
+        path = "docs/需求设计/发布验收/历史发布记录.md"
+        self.write(path, "# 历史发布记录\n")
+        self.commit()
+        result = self.run_check()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.write(path, "# 历史发布记录\n\n历史证据引用。\n")
+        self.commit()
+        result = self.run_check()
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_other_document_paths_are_rejected(self):
+        for path in ("docs/需求设计/发布验收/其他记录.md",
+                     "docs/其他目录/历史发布记录.md",
+                     "docs/需求设计/发布验收/历史发布记录.md.py"):
+            with self.subTest(path=path):
+                self.git("reset", "--hard", self.head)
+                self.write(path, "unapproved\n")
+                self.commit()
+                result = self.reject()
+                self.assertIn("非获准路径", result.stderr)
+
+    def test_historical_archive_symlink_is_rejected(self):
+        path = self.root / "docs/需求设计/发布验收/历史发布记录.md"
+        path.parent.mkdir(parents=True)
+        path.symlink_to("../../../payload.txt")
+        self.commit()
+        result = self.reject()
+        self.assertIn("必须为普通文件", result.stderr)
+
     def test_real_workflow_binding_and_tag_contracts_keep_main_closed(self):
         source = self.step_source("Tag/正式态校验不可变 annotated tag 与 checkout 绑定")
         environment = dict(os.environ, PYTHONDONTWRITEBYTECODE="1",

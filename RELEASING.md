@@ -12,15 +12,11 @@
 
 ## 6.4.3 冻结与发布记录
 
-> 以下为 `6.4.3` 历史记录；其中“当前”“本版”均只指该历史版本。
-
-`6.4.3` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.3`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.3)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
+历史记录见[历史发布记录](docs/需求设计/发布验收/历史发布记录.md#643-冻结与发布记录)。
 
 ## 6.4.2 冻结与发布记录
 
-> 以下为 `6.4.2` 历史记录；其中“当前”“本版”均只指该历史版本。
-
-`6.4.2` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
+历史记录见[历史发布记录](docs/需求设计/发布验收/历史发布记录.md#642-冻结与发布记录)。
 
 ## 正式发布唯一入口
 
@@ -37,59 +33,19 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 ## 6.4.1 冻结与发布记录
 
-> 以下为 `6.4.1` 历史记录；其中“当前”“本版”均只指该历史版本。
-
-`6.4.1` 的正式签名资产、checksum 与分发资料以本版本真实冻结 manifest 为准。当前正式版本为 [6.4.1](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1)；公开时间和消费验证结论以 `release-state.json.publication` 和同版本 GitHub Release 的实际状态为准。
-
-本版聚焦发布工程优化；SDK 与 UI 行为继承 `6.4.0`，没有新增公开 API。历史 Tag、Release 和资产保持不可变。
+历史记录见[历史发布记录](docs/需求设计/发布验收/历史发布记录.md#641-冻结与发布记录)。
 
 ## 6.4.0 冻结与发布记录
 
-> 以下为 `6.4.0` 历史记录；其中“当前”“本版”均只指该历史版本。
-
-`6.4.0` 的正式签名资产、checksum 与分发资料已经冻结。当前正式版本为 [6.4.0](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.0)；是否已完成公开及消费验证，以 `release-state.json.publication` 和同版本 GitHub Release 的实际状态为准。
-
-本版将展示、落地页、外跳回流、曝光判断和 UI 生命周期绑定到实际来源 window/Scene；无来源时只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底，独立落地页始终归属来源 Scene。开屏 rootVC 仍须入窗；Scene 宿主的 `customWindow` 必须可见、尺寸有限且为正、已关联 Scene，并与 `rootVC.window` 同 Scene，可以是非 key、高 `windowLevel`、无 rootVC。非法输入展示失败，修正后可重试。公开 API 方法签名不变。
+历史记录见[历史发布记录](docs/需求设计/发布验收/历史发布记录.md#640-冻结与发布记录)。
 
 ## 6.3.5 冻结与发布记录
 
-`6.3.5` 已于 2026-09-14T12:39:11Z 正式公开，发布后的 [CocoaPods / SwiftPM 消费验证](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/34844597431)为 `success`；本仓 `release-state.json` 为 `6.3.5/CLOSED`。Tag 和发布资产保持不可变。
-
-当前正式版本为 [`6.3.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5)，签名资产已冻结。冻结日期为 2026-09-14；公开日期和消费结论以 `release-state.json` 的 `publication` 字段及同版本 Release 为准，`publication=null` 表示尚未公开。`IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，匿名下载和正式消费由同一发布流水线按冻结身份验收。
-
-- `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`82d8cab58eba588104eee9bc89063952a277af65`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b1bc50e272c29dd817cfcee8bbeeb9d60dfaca89`
-- `candidateId`：`17cccada18787f54c2faca204769d245a3ee29adf40f6c85c679896c28f16ba4`
-
-`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结。`release-state.json` 只由编排器在候选和闭环阶段推进；本版正式消费成功后已推进到 `6.3.5/CLOSED`，上一版记录见下文。本文不手工修改该文件。
-
-正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
-
-`6.3.5` 不沿用历史版本的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
-
-正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
+历史记录见[历史发布记录](docs/需求设计/发布验收/历史发布记录.md#635-冻结与发布记录)。
 
 ## 6.3.1 历史发布记录
 
-> 以下内容来自不可变 `6.3.1` Tag，所有“当前”和“本版本”均指该历史版本。
-
-当前最新公开正式版是 [`6.3.1`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1)（2026-09-01）。`IFLYADLib-modelA-6.3.1.zip` 的冻结 SHA-256 为 `4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5`；7 个 SwiftPM checksum 与 10 项正式库存已冻结，无 Token 匿名下载和正式消费由同一发布流水线按冻结身份验收。
-
-- `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`b7e46a9f06897924d3d69d4d6a7e43f6237d8579`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b86f5d7dc5e1105194889bc60a5ee9eec40b611f`
-- `candidateId`：`74f506ec2562caac2d0f1f48a404c1c3b69a1a2d29463ce94067b18821d1f1d7`
-
-`releaseState=FORMAL` 表示本版正式签名资产、7 个 SwiftPM checksum 与 A/B 发布元数据已冻结。`release-state.json` 只由编排器在候选和闭环阶段受控推进，本次内容更新不手工修改该文件。
-
-正式态使用两提交模型：全部二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只能修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。正式 CI 通过 `IFLY_PRIVATE_SOURCE_TOKEN` 调用私有源码仓 compare API 验证，令牌不用于公开 Release 资产下载。
-
-`6.3.0` 的发布后证据仅作为历史记录保留，不得替代 `6.3.1` 的独立发布证据。
-
-`6.3.1` 不沿用历史版本的启发式风险授权。本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。如另行执行主动扫描，固定使用 `failOn=high`、`failOnWarning=true`、`strict=true`、`requireManual=true` 且接受名单为空；`not-run` 不得表述为通过，也不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
-
-正式 tag 必须指向同时包含最终 checksum、`spm/` 资源和正式版本文案的提交；不得只改版本号、复用上一版本 checksum 或覆盖既有 tag 与 Release。
+历史记录见[历史发布记录](docs/需求设计/发布验收/历史发布记录.md#631-历史发布记录)。
 
 ## 仓库角色
 
@@ -100,21 +56,23 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 ## 模型 A 底层门禁与诊断参考
 
+正式态采用两提交模型：二进制从提交 A 构建；提交 B 必须是 A 的后代，且 A→B 只允许修改 `Package.swift`、`README.md`、`CONTEXT.md` 和 `docs/**`。当前 A/B 以目标版本 `release-state.json` 的 `binarySourceCommit` / `releaseMetadataCommit` 为准，不能使用历史归档中的提交。
+
 本节描述编排器各阶段调用和核对的底层事实，供失败定位与维护使用，不得脱离上述唯一入口
 独立执行为正式发布。
 
-1. **核对私有源码仓正式产物生成**：编排器必须使用干净的已提交源码、项目批准的 Xcode 版本和稳定签名身份；下列命令仅用于复现单项产物问题，正式发布仍由编排器执行并留存 receipt。
+1. **核对私有源码仓正式产物生成**：编排器必须使用干净的已提交源码、项目批准的 Xcode 版本和稳定签名身份；下列命令仅在私有源码仓用于本地诊断，输出不构成正式发布资产或 receipt；正式模式的 candidate 与构建输入由编排器提供。
 
    ```bash
    export DEVELOPER_DIR='<本机获准 Xcode.app>/Contents/Developer'
    xcodebuild -version  # 必须与当前计划的 version/build 精确一致
-   export IFLY_SDK_CODESIGN_IDENTITY='<已批准的签名身份>'
+   export IFLY_SDK_CODESIGN_IDENTITY='<本机诊断签名身份>'
    VERSION='<新版本>'
    MODEL_A_BASE_URL="https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/${VERSION}"
 
-   IFLY_NEW_VERSION_RELEASE=1 scripts/release-gate.sh
+   scripts/release-gate.sh
    scripts/build-model-a.sh
-   IFLY_NEW_VERSION_RELEASE=1 scripts/package-model-a-release.sh \
+   scripts/package-model-a-release.sh \
      --version "${VERSION}" \
      --base-url "${MODEL_A_BASE_URL}"
    ```
@@ -128,13 +86,13 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
    - 确认 `IFLYADLib.podspec` 的 `Core` 显式链接 `AdSupport`、弱链接 `AppTrackingTransparency`，且最终 Core Mach-O 在 iOS 11～13 不形成 ATT 强依赖；
    - 将 `build/modelA/release/swiftpm-resources/spm/` 同步到本仓 `spm/`，不将该中间目录作为 Release 资产上传；
    - 同步 README、CHANGELOG、迁移说明和示例工程 Podfile/Xcode deployment target；
-   - NativeFeed API 变更须同步固定页和列表页，并复验数据层只持 Ad、Cell 不持 Session/Binding、进屏 Ad 级 attach、离屏按容器 detach、回屏恢复、最后引用释放自动终止和可选 `destroy`；`6.3.5` 还须验证 permissive 外部 CTA、点击时租约与可见性验收、媒体交互优先、结构化 `71503` point、Banner 四阶段结构化日志和 `detachFromCurrentContainer`；
-   - 正式资产和 checksum 均已就绪后，将 `releaseState` 切换为 `FORMAL`，但在 tag/Release 与匿名验证完成前继续明确标注“尚未公开发布”；发布闭环后才写入正式发布日期和“最新公开正式版本”；
+   - 按目标版本计划、公开头与 API 变更验证 NativeFeed 固定页和列表页；历史 `6.3.5` 专项验收见[历史发布记录](docs/需求设计/发布验收/历史发布记录.md#635-nativefeed-专项验收)。
+   - 正式冻结时由编排器按门禁同步文档 `releaseState=FORMAL` 与真实 checksum，并移除目标候选的未发布措辞；`FORMAL` 不表示发布闭环，机器阶段由 `release-state.json.phase` 记录，正式消费成功后才收口为 `CLOSED`；
    - 在私有仓执行 `python3 scripts/verify-model-a-release-metadata.py --version "${VERSION}"`，闭环校验产物、checksum 和两个分发清单。
 
 3. **核对本公开仓候选**：Release 资产公开前，编排器至少执行 `git diff --check`、`ruby -c IFLYADLib.podspec`、`swift package dump-package`、`pod ipc spec IFLYADLib.podspec`、本地 A/B 文档一致性和冻结 10 资产等价校验；完整 `pod spec lint`、示例工程 `pod install` 与真正 `xcodebuild build` 留到 Release 资产公开后执行。CI 必须对 NativeFeed 新 API 做正向头校验、对 `6.2.1` 历史 API 做反向头校验，并在 Release 事件编译固定页与列表页。Release tag 必须指向已包含最终 checksum、资源和正式版本措辞的提交。
 
-4. **核对编排器发布结果**：tag = `<版本>`（**无 `v` 前缀**），target 指向上一步冻结提交。GitHub Release 必须精确包含打包脚本产生的 10 个文件：7 个单模块 zip、1 个合并 zip、`checksums.txt` 和 `binary-targets.remote.swift`。Release body 必须各出现一次本节记录的 A/B provenance 声明，并明确“B 仅用于 checksum、扫描汇总和验收事实，不是 SDK 二进制源码提交”。通用库存不含 `delivery-manifest.json`，Release body 不得虚构额外清单声明。
+4. **核对编排器发布结果**：tag = `<版本>`（**无 `v` 前缀**），target 指向上一步冻结提交。GitHub Release 必须精确包含打包脚本产生的 10 个文件：7 个单模块 zip、1 个合并 zip、`checksums.txt` 和 `binary-targets.remote.swift`。Release body 必须各出现一次目标版本 `release-state.json` 的 `binarySourceCommit` / `releaseMetadataCommit` 对应的 A/B provenance 声明，并明确“B 仅用于 checksum、扫描汇总和验收事实，不是 SDK 二进制源码提交”。通用库存不含 `delivery-manifest.json`，Release body 不得虚构额外清单声明。
 
 5. **核对发布后校验**：
 
@@ -160,6 +118,7 @@ checkout commit、资产库存身份和全部 job 结论；summary 对上游失�
 
 ## 注意事项
 
+- Apple Review 为主动可选扫描，策略以目标版本计划为准；未运行记录 `not-run`，不得表述为扫描或 Apple 审核通过，历史版本风险授权不沿用。
 - **不要重打已上传的 zip**——内容变了 SPM checksum 就变，会让已下载者校验失败；换版本一律另起新 tag。
 - Release 的 tag 必须指向**已含新 `Package.swift` 与 `spm/` 资源**的提交，否则 SPM 消费方会解析到旧清单或旧资源。
 - 隐私清单 `PrivacyInfo.xcprivacy` 必须随 `Core` 资源进合并 zip（静态库不能内嵌到 Mach-O）。
