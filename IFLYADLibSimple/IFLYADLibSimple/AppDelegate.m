@@ -9,7 +9,7 @@
 #import "ViewController.h"
 
 #import <AppTrackingTransparency/AppTrackingTransparency.h>
-#import <IFLYADLib/IFLYADLib.h>
+#import <IFLYAdCore/IFLYAdCore.h>
 
 @interface AppDelegate ()
 

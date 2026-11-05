@@ -1,7 +1,8 @@
 #import "IFLYSplashViewController.h"
 
 #import "IFLYADUtil.h"
-#import <IFLYADLib/IFLYADLib.h>
+#import <IFLYAdCore/IFLYAdCore.h>
+#import <IFLYAdSplash/IFLYAdSplash.h>
 
 @interface IFLYSplashViewController () <IFLYSplashAdDelegate>
 

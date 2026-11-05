@@ -14,7 +14,7 @@
 #import "ViewController.h"
 
 #import "IFLYADUtil.h"
-#import <IFLYADLib/IFLYADLib.h>
+#import <IFLYAdCore/IFLYAdCore.h>
 
 @interface ViewController ()
 

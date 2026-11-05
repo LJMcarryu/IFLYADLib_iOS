@@ -1,12 +1,12 @@
 # Swift 模块接入与头路径迁移
 
-本文面向从通用模型 A 旧包升级的宿主开发者。`6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。本文描述候选的接入契约；当前生产安装仍按[安装与分包](安装与分包.md)固定 `6.4.4`。候选的正式资产与版本回填须等待发布验收。
+本文面向从通用模型 A 旧包升级到 `6.4.5` 的宿主开发者。安装入口见[安装与分包](安装与分包.md)，历史 Tag、Release 和资产保持不可变。
 
 ## 先确认升级范围
 
 本次覆盖 Core、VideoUI、Banner、Splash、Interstitial、NativeFeed、Reward 七模块，仍然静态链接。每个 XCFramework 的平台切片从 `.a + Headers` 改为带 `Headers`、`Modules/module.modulemap` 和模块专属伞头的 `.framework`；无需嵌入动态库。`Full` 继续聚合五种广告及其依赖，不是第八个二进制，也不是可替代二进制模块名的导入承诺。
 
-本候选还包含点击策略 `ids_a`、CAID 系统时间字段和加速度计能力守卫变化。升级前由服务端及宿主负责人一起审阅[候选更新记录](../../CHANGELOG.md)，不能只替换包装后沿用旧字段、监测模板或合规结论。优酷 NativeFeed 的 SDK 摇/扭 fallback 不属于通用能力。
+本版还包含点击策略 `ids_a`、CAID 系统时间字段和加速度计能力守卫变化。升级前由服务端及宿主负责人一起审阅[更新记录](../../CHANGELOG.md)，不能只替换包装后沿用旧字段、监测模板或合规结论。优酷 NativeFeed 的 SDK 摇/扭 fallback 不属于通用能力。
 
 公开类、方法和协议签名保持；旧 `<IFLYADLib/...>` 头路径在本次目标结构中不作为兼容承诺，因此 Objective-C 工程需要修改导入。全部模块和资源锁定同一版本；不要混用新旧模块，或同时链接通用模型 A 与任一导出相同 `IFLY*` 类的整包。
 
@@ -28,9 +28,9 @@
 
 ## 安装与宿主配置
 
-以下步骤用于已取得同一候选资产的验证工程；不提供候选版正式下载地址。
+以下步骤使用同一版本的正式资产，固定为 `6.4.5`。
 
-1. 选择一种安装方式。SwiftPM 在正式版本可用后固定新 Tag 和所需 product；CocoaPods 使用届时发布的同版 Podspec URL 与所需 subspec。本次不包含 CocoaPods trunk 发布，候选准备期间不要直接把现有公开安装 URL 改成不存在的版本。
+1. 选择一种安装方式。SwiftPM 固定 `6.4.5` Tag 和所需 product；CocoaPods 使用同版 Podspec URL 与所需 subspec，具体命令见[安装指南](安装与分包.md)。本次不包含 CocoaPods trunk 发布。
 2. 手动接入时，替换所选格式及全部依赖的 XCFramework；把各模块的 XCFramework 根目录交给 Xcode 选择平台切片，Embed 设为 **Do Not Embed**。不要单独拖入切片 framework，也不要复制旧切片的头目录覆盖新包。
 3. 最终 App target 的 `Other Linker Flags` 添加 `$(inherited) -ObjC`。CocoaPods 的配置传播也须在最终 App 的 build settings 中确认；SwiftPM 接入由宿主设置此参数。
 4. 链接 `AdSupport.framework`，`AppTrackingTransparency.framework` 保持 **Optional**。最低 iOS 声明为 11.0；实际兼容性仍须检查最终 Mach-O、目标设备与运行结果。
@@ -85,7 +85,7 @@ SwiftPM 的 `Full`、`Banner` 等是产品名；本文不承诺 `import Full`、
 
 按代码实际使用的类型导入。Core 和格式头分别归属自身模块，格式头引用共享类型时依赖 Core，不重复复制共享头。
 
-| 使用的头 | 旧路径（6.4.4） | 新路径（6.4.5 候选） |
+| 使用的头 | 旧路径（6.4.4） | 新路径（6.4.5） |
 | --- | --- | --- |
 | 共享类型、配置与工具 | `<IFLYADLib/IFLYAdTypes.h>` 等 | `<IFLYAdCore/IFLYAdTypes.h>` 等；也可使用 `<IFLYAdCore/IFLYAdCore.h>` |
 | Banner | `<IFLYADLib/IFLYBannerAd.h>` | `<IFLYAdBanner/IFLYBannerAd.h>` |
@@ -118,6 +118,6 @@ IFLYAdRequestConfig *request = [IFLYAdRequestConfig new];
 | 能构建但无资源或隐私清单 | 查看最终 App 包，确认对应 bundle 与独立隐私清单已复制，再验证实际加载。 |
 | 部分格式能编译、组合失败 | 在只含所选格式依赖的干净宿主中重测；缺 Core 或必需 VideoUI 应报错，不添加未选格式兜底。 |
 
-候选本地编译证明只覆盖实际执行的工具链、架构和资产。iOS 11 最低系统声明不等于已完成真机运行，模拟器成功也不等于实际媒体投放通过。正式验收结果以根目录 `release-state.json`、同版冻结记录和公开 Release 为准。
+本地编译证明只覆盖实际执行的工具链、架构和资产。iOS 11 最低系统声明不等于已完成真机运行，模拟器成功也不等于实际媒体投放通过。正式验收结果以根目录 `release-state.json`、同版冻结记录和公开 Release 为准。
 
 升级失败时，回到固定的旧正式版本及其同版资源；不要保留半套新模块或覆盖历史资产。反馈时提供 SDK 版本、Xcode/iOS、安装方式、所选产品、实际 import 和完整编译错误，并移除 token、设备标识与业务敏感值。

@@ -1,30 +1,14 @@
 # 发版手册（维护者）
 
-## 6.4.5 候选状态
+## 6.4.5 冻结与发布记录
 
-`6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5"} -->
 
-<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.5","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.4"} -->
+`6.4.5` 的签名资产、七个 SwiftPM checksum 和 10 项分发资产由同版本真实冻结库存生成；A/B 源码身份见 `release-state.json`。公开时间与消费验证结果以 `release-state.json.publication` 和 [Release 6.4.5](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5) 为准。历史 Tag、Release 和资产保持不可变。
 
-本轮只发布通用模型 A，沿用内部私有源码仓的 `scripts/release-plan-general.json` 和既有五阶段编排。候选源码包含[更新记录](CHANGELOG.md)列出的共享行为变化，不能以纯打包版本替代对应回归。模块和头路径的接入要求见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)。
+本轮仅发布通用模型 A，使用私有仓 `scripts/release-plan-general.json` 和五阶段编排。七模块改为静态 framework；Swift 导入及 Objective-C 头路径变更见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)，共享行为变化见[更新记录](CHANGELOG.md)。
 
-候选准备阶段保留 `6.4.4/CLOSED` 的 `release-state.json` 和当前正式分发清单；本节不授权提前发布 Tag、填写未知 checksum 或覆盖旧资产。仅在真实冻结库存产生后，按官方元数据同步步骤回填新版本和七个 checksum，再进入必需的 Draft `preflight`。
-
-冻结及公开前应取得与实际候选绑定的证据：
-
-- 七模块静态 framework 的头、modulemap、版本、切片与依赖库存；Swift Core 独立、逐格式、组合和 Full 的真实类型编译链接，启用 `-ObjC`，不靠 SDK bridging header 或额外头搜索路径补洞。
-- Objective-C 新头路径消费，以及 SwiftPM、CocoaPods 和手动集成的依赖、三域资源、隐私清单与最终 App 链接。
-- 点击策略新字段及宏、CAID 新请求字段和传感器能力守卫的回归；保留通用 NativeFeed 的能力边界。
-- 批准工具链、签名、最终下载件的 checksum、正式 consumer 和 `CLOSED` 收口。iOS 11 声明、二进制兼容检查与真机运行是不同证据，不以模拟器编译成功替代实际设备验证。
-
-本候选的完整结果待上述链路完成后填写；当前不宣告正式验收、真实媒体联调或 Apple Review 通过。
-
-## 6.4.4 冻结与发布记录
-
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4"} -->
-
-`6.4.4` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
-
+发布消费覆盖 SwiftPM、CocoaPods 示例及手动模块组合；具体结果以绑定当前资产的 Actions 为准。iOS 11 二进制兼容检查不等于真机运行，实际媒体投放需要有效广告位联调。CocoaPods trunk 不在发布范围；Apple Review 未执行时记录 `not-run`。
 
 > 本仓库 `IFLYADLib_iOS` 是**对外分发仓**：只放分发清单、文档、示例，二进制托管在 GitHub Releases。
 > SDK 源码与构建脚本在**内部私有源码仓**（不在本仓）。

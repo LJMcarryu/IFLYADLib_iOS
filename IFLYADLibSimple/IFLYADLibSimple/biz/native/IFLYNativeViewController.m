@@ -1,7 +1,8 @@
 #import "IFLYNativeViewController.h"
 
 #import "IFLYADUtil.h"
-#import <IFLYADLib/IFLYADLib.h>
+#import <IFLYAdCore/IFLYAdCore.h>
+#import <IFLYAdNativeFeed/IFLYAdNativeFeed.h>
 
 @interface IFLYNativeViewController () <IFLYNativeFeedAdDelegate>
 

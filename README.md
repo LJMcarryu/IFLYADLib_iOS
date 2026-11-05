@@ -1,21 +1,10 @@
 # IFLYADLib iOS SDK
 
-## 6.4.5 候选说明
-
-`6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。
-
-<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.5","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.4"} -->
-
-本次仅准备通用模型 A：七模块拟升级为带 modulemap 的静态 framework，并提供 Swift 直接导入与 Objective-C 模块头迁移。候选还包含点击策略字段、CAID 请求时间字段和传感器能力守卫变化，不是纯包装升级；范围见[候选更新记录](CHANGELOG.md)。新包需要将旧 `<IFLYADLib/...>` 导入改为模块对应路径，方法签名保持。
-
-[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)是候选接入说明；当前安装示例继续固定公开正式版 `6.4.4`。候选的正式下载、三种安装方式与运行结果须以实际发布验收为准。
-
-
 面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频，支持按广告形式组合接入。本仓库提供安装清单、接入指南和 Objective-C 示例。
 
-当前正式版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)。生产项目请固定具体版本，升级前查看[更新记录](CHANGELOG.md)。
+当前正式版本：[`6.4.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5)。生产项目请固定具体版本，升级前查看[更新记录](CHANGELOG.md)。
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4"} -->
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5"} -->
 
 [接入指南索引](docs/接入指南/README.md) · [运行示例](IFLYADLibSimple/README.md) · [安装与分包](docs/接入指南/安装与分包.md) · [配置与隐私](docs/接入指南/配置与隐私.md) · [常见问题](docs/接入指南/常见问题.md)
 
@@ -38,10 +27,15 @@
 | 系统 | iOS 11.0 及以上 |
 | CocoaPods | `IFLYADLib`，默认安装 `Full`；也可选择格式 subspec |
 | SwiftPM | `Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full` product；清单要求 Swift tools 5.9 |
-| Objective-C 导入 | `#import <IFLYADLib/IFLYADLib.h>` |
+| Objective-C 导入 | `#import <IFLYAdCore/IFLYAdCore.h>`，并导入所用格式模块头 |
+| Swift 导入 | `import IFLYAdCore`，并导入所用格式模块，如 `import IFLYAdBanner` |
 | 模块与资源 | `IFLYAdCore` 等按格式拆分模块；资源按 Core、VideoUI、Reward 投递，依赖关系见[安装指南](docs/接入指南/安装与分包.md) |
 | 链接 | 静态 XCFramework，选择 **Do Not Embed**；最终 App target 需要 `$(inherited) -ObjC` |
 | 共存 | 同一 App 选择一种安装方式；通用版与优酷定制版不能同时链接，其他渠道也不承诺共存 |
+
+## 升级到 6.4.5
+
+七模块 XCFramework 采用带 modulemap 的静态 framework。Swift 可直接导入模块，无需为本 SDK 配置 bridging header；Objective-C 需从旧 `<IFLYADLib/...>` 路径迁移。步骤见[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)。本版还包含 `ids_a`、CAID 时间字段和传感器能力守卫变化，详见[更新记录](CHANGELOG.md)。
 
 ## 安装
 
@@ -54,7 +48,7 @@ platform :ios, '11.0'
 target 'YourApp' do
   use_frameworks!
   pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.4/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.5/IFLYADLib.podspec'
 end
 ```
 
@@ -66,7 +60,7 @@ open YourApp.xcworkspace
 该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前通过 GitHub 分发，请保留 Podspec URL。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
-- [Swift Package Manager](docs/接入指南/安装与分包.md#swift-package-manager)：添加本仓地址，选择 **Exact Version** `6.4.4` 和所需 product；在 App target 添加 `-ObjC`。
+- [Swift Package Manager](docs/接入指南/安装与分包.md#swift-package-manager)：添加本仓地址，选择 **Exact Version** `6.4.5` 和所需 product；在 App target 添加 `-ObjC`。
 - [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：使用同版完整包，按格式链接依赖并复制资源及隐私清单。
 
 ## 首次使用
@@ -116,7 +110,7 @@ open YourApp.xcworkspace
 
 ## 示例工程
 
-[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.4.4`，移入生产 App 时保留自己的隐私流程和业务生命周期。
+[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.4.5`，移入生产 App 时保留自己的隐私流程和业务生命周期。
 
 ## 常见问题
 

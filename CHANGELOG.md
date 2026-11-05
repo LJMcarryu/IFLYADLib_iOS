@@ -1,14 +1,14 @@
 # 更新日志
 
-## [6.4.5] - 模块化静态框架候选
+## [6.4.5] - 模块化静态框架
 
-`6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。
+<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5"} -->
 
-<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.5","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.4"} -->
+`6.4.5` 的正式分发资料以同版本冻结 manifest 为准。公开时间和消费结论以 `release-state.json.publication` 与 [Release 6.4.5](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5) 为准。历史 Tag、Release 和资产保持不可变。
 
 ### 变更范围
 
-本候选采用当前私有源码主线作为构建输入；最终源码提交、冻结产物和验证结论以候选回执为准。范围仅为通用模型 A，不为其他渠道创建新版。除分发结构外还包含下列共享实现变化，因此不是纯包装升级：
+本版使用冻结记录绑定的私有源码提交；源码身份、冻结产物和验证结论以同版本回执为准。范围仅为通用模型 A，其他渠道保持既有正式版本。除分发结构外还包含下列共享实现变化，因此不是纯包装升级：
 
 - Core、VideoUI、Banner、Splash、Interstitial、NativeFeed、Reward 七个 XCFramework 的切片改为静态 framework，提供模块专属伞头和 modulemap。`Full` 仍为聚合 product/subspec，不新增第八个二进制。
 - Swift 使用 `import IFLYAdCore` 和所选格式模块；Objective-C 从 `<IFLYADLib/...>` 迁移到 `<IFLYAdCore/...>`、`<IFLYAdBanner/...>` 等路径。公开类、方法和协议签名保持，头导入属于源码接入迁移；不承诺新版继续支持旧头路径。依赖闭包和迁移步骤见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)。
@@ -18,11 +18,11 @@
 
 ### 验证边界
 
-上述为候选输入和接入契约说明。正式 SwiftPM、CocoaPods、手动集成、三架构消费、资源和隐私清单、iOS 11 兼容性及实际媒体投放均须按最终候选取证。本地模块编译探针不能替代这些验收；本节不宣告新版本可下载或媒体联调通过。Apple Review 未执行时保持 `not-run`。
+验证结果以同版本冻结记录、正式消费 Actions 和 `release-state.json` 为准。iOS 11 最低系统声明、二进制检查与真机运行分别记录；编译消费不能替代实际媒体投放验证。Apple Review 未执行时保持 `not-run`。
 
 ## [6.4.4] - 发布工程优化
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4"} -->
+> 本节为 6.4.4 历史记录。
 
 `6.4.4` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
 

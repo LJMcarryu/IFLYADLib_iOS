@@ -1,7 +1,8 @@
 #import "IFLYRewardVideoViewController.h"
 
 #import "IFLYADUtil.h"
-#import <IFLYADLib/IFLYADLib.h>
+#import <IFLYAdCore/IFLYAdCore.h>
+#import <IFLYAdReward/IFLYAdReward.h>
 
 @interface IFLYRewardVideoViewController () <IFLYRewardVideoAdDelegate>
 

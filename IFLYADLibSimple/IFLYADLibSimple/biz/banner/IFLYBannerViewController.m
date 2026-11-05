@@ -1,7 +1,8 @@
 #import "IFLYBannerViewController.h"
 
 #import "IFLYADUtil.h"
-#import <IFLYADLib/IFLYADLib.h>
+#import <IFLYAdCore/IFLYAdCore.h>
+#import <IFLYAdBanner/IFLYAdBanner.h>
 
 @interface IFLYBannerViewController () <IFLYBannerAdDelegate>
 

@@ -1,7 +1,8 @@
 #import "IFLYInterstitialViewController.h"
 
 #import "IFLYADUtil.h"
-#import <IFLYADLib/IFLYADLib.h>
+#import <IFLYAdCore/IFLYAdCore.h>
+#import <IFLYAdInterstitial/IFLYAdInterstitial.h>
 
 @interface IFLYInterstitialViewController () <IFLYInterstitialAdDelegate>
 

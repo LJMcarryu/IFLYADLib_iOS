@@ -1,7 +1,8 @@
 #import "IFLYNativeFeedListViewController.h"
 
 #import "IFLYADUtil.h"
-#import <IFLYADLib/IFLYADLib.h>
+#import <IFLYAdCore/IFLYAdCore.h>
+#import <IFLYAdNativeFeed/IFLYAdNativeFeed.h>
 
 static NSInteger const IFLYNativeFeedListAdRow = 4;
 static NSInteger const IFLYNativeFeedListRowCount = 13;

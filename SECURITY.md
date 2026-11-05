@@ -1,13 +1,11 @@
 # 安全策略
 
-> `6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。 候选的 CAID 请求字段变化列于[更新记录](CHANGELOG.md)，不能沿用旧版审查结论作为新版本合规证明；安全支持矩阵仍以公开正式版为准。
 
+> `6.4.5` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.5`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
 
-> `6.4.4` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
+## 6.4.5 支持说明
 
-## 6.4.4 支持说明
-
-`6.4.4` 纳入下方安全支持矩阵；公开状态与消费验证结论以结构化状态和同版本 GitHub Release 为准。
+`6.4.5` 纳入下方安全支持矩阵；公开状态与消费验证结论以结构化状态和同版本 GitHub Release 为准。
 
 ## 6.4.3 支持说明
 
@@ -27,7 +25,7 @@
 
 | 版本 | 安全更新 |
 | --- | --- |
-| 最新公开正式版本（当前为 `6.4.4`） | 支持 |
+| 最新公开正式版本（当前为 `6.4.5`） | 支持 |
 | `6.3.1` 及更早版本 | 建议升级到最新正式版本 |
 
 已发布 Tag、Release 和资产不覆盖；需要二进制安全修复时发布新版本。
