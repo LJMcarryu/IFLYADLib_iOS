@@ -2,29 +2,18 @@
   "schemaVersion": 1,
   "channel": "general",
   "repository": "LJMcarryu/IFLYADLib_iOS",
-  "version": "6.4.4",
-  "phase": "CLOSED",
-  "binarySourceCommit": "25ebc73166c9596822cfcf4e93d74fc6c98bd5e4",
-  "releaseMetadataCommit": "56aaeb4d5b76858b266981d30afd76bff6a73ad2",
+  "version": "6.4.5",
+  "phase": "FROZEN",
+  "binarySourceCommit": "cd464b724869f3c1b5f15c0245359f037abcfa1d",
+  "releaseMetadataCommit": "f63b38fc5352250e64bbd8874fc5f65c92820003",
   "artifactInventory": {
     "count": 10,
-    "sha256": "218517ee53d9802532bb4a30bf77504224634437413632b2af12c97663e3f8a1"
+    "sha256": "bb556f00bdfb7ea29cfcba648b9483330404245a764361bdf1b4210c315adae1"
   },
   "appleReview": {
     "requiredForRelease": false,
     "statusAtFreeze": "not-run",
     "evidenceIncluded": false
   },
-  "publication": {
-    "releaseId": 424092418,
-    "tagName": "6.4.4",
-    "tagObjectSha": "b10a86c1f1b5f3366d27b3d67588747a6e025031",
-    "tagCommitSha": "8360dd274618885ab97f62a9d9dd821356b203aa",
-    "releaseUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4",
-    "publishedAt": "2026-10-26T10:47:22Z",
-    "formalConsumerRunId": 40310133974,
-    "formalConsumerRunUrl": "https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/40310133974",
-    "conclusion": "success",
-    "verifiedAt": "2026-10-26T10:48:45Z"
-  }
+  "publication": null
 }
