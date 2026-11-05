@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "repository": "LJMcarryu/IFLYADLib_iOS",
+  "channel": "general",
+  "requiredRootFiles": [
+    "README.md",
+    "CHANGELOG.md",
+    "RELEASING.md",
+    "LICENSE",
+    "SECURITY.md",
+    ".gitignore",
+    "release-state.json",
+    "Package.swift",
+    "IFLYADLib.podspec"
+  ],
+  "package": {
+    "manifest": "Package.swift",
+    "podspec": "IFLYADLib.podspec"
+  },
+  "demo": {
+    "root": "IFLYADLibSimple",
+    "readme": "IFLYADLibSimple/README.md",
+    "podfile": "IFLYADLibSimple/Podfile",
+    "project": "IFLYADLibSimple/IFLYADLibSimple.xcodeproj",
+    "scheme": "IFLYADLibSimple"
+  },
+  "docs": {
+    "index": "docs/接入指南/README.md",
+    "guideRoot": "docs/接入指南",
+    "releaseHistory": "docs/需求设计/发布验收/历史发布记录.md",
+    "guides": [
+      "安装与分包.md",
+      "配置与隐私.md",
+      "开屏广告.md",
+      "Banner广告.md",
+      "插屏广告.md",
+      "激励视频广告.md",
+      "自渲染信息流.md",
+      "竞价接入.md",
+      "常见问题.md"
+    ]
+  },
+  "github": {
+    "workflow": ".github/workflows/repository-contract.yml",
+    "pullRequestTemplate": ".github/PULL_REQUEST_TEMPLATE.md",
+    "issueConfig": ".github/ISSUE_TEMPLATE/config.yml",
+    "bugTemplate": ".github/ISSUE_TEMPLATE/bug_report.yml"
+  }
+}
