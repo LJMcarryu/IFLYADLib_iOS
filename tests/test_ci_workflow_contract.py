@@ -50,7 +50,7 @@ def embedded_python(step: str) -> str:
     return textwrap.dedent(source)
 
 
-def write_native_feed_headers(pod_root: Path) -> None:
+def write_native_feed_headers(pod_root: Path, version: str = "6.4.4") -> None:
     native_feed_source = """\
 - (BOOL)attachWithViewBinder:(id)binder error:(id)error;
 + (void)detachAdFromContainerView:(id)containerView;
@@ -63,7 +63,7 @@ def write_native_feed_headers(pod_root: Path) -> None:
             pod_root
             / "IFLYAdNativeFeed.xcframework"
             / slice_name
-            / "Headers/IFLYADLib/IFLYNativeFeedAd.h"
+            / ("IFLYAdNativeFeed.framework/Headers/IFLYNativeFeedAd.h" if version == "6.4.5" else "Headers/IFLYADLib/IFLYNativeFeedAd.h")
         )
         native_feed_header.parent.mkdir(parents=True)
         native_feed_header.write_text(native_feed_source, encoding="utf-8")
@@ -71,7 +71,7 @@ def write_native_feed_headers(pod_root: Path) -> None:
             pod_root
             / "IFLYAdCore.xcframework"
             / slice_name
-            / "Headers/IFLYADLib/IFLYAdError.h"
+            / ("IFLYAdCore.framework/Headers/IFLYAdError.h" if version == "6.4.5" else "Headers/IFLYADLib/IFLYAdError.h")
         )
         error_header.parent.mkdir(parents=True)
         error_header.write_text(
@@ -84,6 +84,7 @@ def run_native_feed_header_gate(
     demo_root: Path,
     release_mode: str,
     pod_root: Path | None = None,
+    version: str = "6.4.4",
 ) -> subprocess.CompletedProcess[str]:
     step = step_block(
         job_block("cocoapods-demo-consumer"),
@@ -92,6 +93,7 @@ def run_native_feed_header_gate(
     environment = os.environ.copy()
     environment["DEMO_ROOT"] = str(demo_root)
     environment["RELEASE_MODE"] = release_mode
+    environment["RELEASE_VERSION"] = version
     environment["POD_ROOT"] = str(pod_root) if pod_root is not None else ""
     return subprocess.run(
         [sys.executable, "-c", embedded_python(step)],
@@ -142,6 +144,34 @@ def write_native_feed_demo_fixture(root: Path) -> None:
 
 
 class CIWorkflowContractTests(unittest.TestCase):
+    def test_modular_swift_consumer_is_mandatory_by_release_version(self) -> None:
+        block = step_block(job_block("swiftpm-consumer"), "使用隔离且干净的 SwiftPM 缓存构建 Full 产品")
+        self.assertIn('uses_modular_frameworks(sys.argv[1])', block)
+        self.assertIn('"$RELEASE_VERSION"', block)
+        self.assertIn("-DIFLY_MODULAR_FRAMEWORKS", block)
+        self.assertIn('OTHER_SWIFT_FLAGS="$modular_swift_flags"', block)
+        self.assertIn("OTHER_LDFLAGS='$(inherited) -ObjC'", block)
+        source = (ROOT / ".github/fixtures/swiftpm-consumer/Sources/ReleaseConsumer/ReleaseConsumer.swift").read_text()
+        self.assertIn("#if IFLY_MODULAR_FRAMEWORKS", source)
+        self.assertNotIn("canImport", source)
+        self.assertNotIn("HEADER_SEARCH_PATHS", block)
+        for module in ("Core", "Banner", "Splash", "Interstitial", "NativeFeed", "Reward"):
+            self.assertIn(f"import IFLYAd{module}", source)
+        for symbol in ("IFLYAdRequestConfig()", "IFLYBannerAdDelegate", "IFLYNativeFeedAdData?", 'IFLYRewardVideoAd(adUnitId:'):
+            self.assertIn(symbol, source)
+
+    def test_header_gate_requires_version_specific_framework_layout(self) -> None:
+        for version in ("6.4.4", "6.4.5"):
+            with self.subTest(version=version), tempfile.TemporaryDirectory() as temporary:
+                demo_root = Path(temporary) / "IFLYADLibSimple"
+                pod_root = demo_root / "Pods/IFLYADLib"
+                write_native_feed_headers(pod_root, version)
+                result = run_native_feed_header_gate(demo_root, "formal", version=version)
+                self.assertEqual(0, result.returncode, result.stderr)
+                other_version = "6.4.4" if version == "6.4.5" else "6.4.5"
+                result = run_native_feed_header_gate(demo_root, "formal", version=other_version)
+                self.assertNotEqual(0, result.returncode, result.stderr)
+
     def test_local_python_validation_cannot_dirty_candidate_worktree(self) -> None:
         ignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
         self.assertRegex(ignore, r"(?m)^__pycache__/$")

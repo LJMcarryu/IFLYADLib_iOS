@@ -646,6 +646,11 @@ jobs:
             consumer="$GITHUB_WORKSPACE/.github/fixtures/swiftpm-consumer"
           fi
 
+          modular_swift_flags='$(inherited)'
+          if python3 -c 'import sys; sys.path.insert(0, "scripts"); from model_a_layout import uses_modular_frameworks; sys.exit(0 if uses_modular_frameworks(sys.argv[1]) else 1)' "$RELEASE_VERSION"; then
+            modular_swift_flags='$(inherited) -DIFLY_MODULAR_FRAMEWORKS'
+          fi
+
           (
             cd "$consumer"
             env -u GH_TOKEN -u GITHUB_TOKEN -u GITHUB_AUTH_TOKEN \
@@ -659,6 +664,8 @@ jobs:
                 -clonedSourcePackagesDirPath "$cloned_packages" \
                 -packageCachePath "$package_cache" \
                 -disablePackageRepositoryCache \
+                OTHER_SWIFT_FLAGS="$modular_swift_flags" \
+                OTHER_LDFLAGS='$(inherited) -ObjC' \
                 CODE_SIGNING_ALLOWED=NO
           )
 
@@ -772,6 +779,7 @@ jobs:
 
       - name: 校验 NativeFeed 新 API 正向与旧 API 反向
         env:
+          RELEASE_VERSION: ${{ needs.preflight.outputs.version }}
           RELEASE_MODE: ${{ needs.preflight.outputs.release_mode }}
           DEMO_ROOT: ${{ steps.consumer-paths.outputs.demo_root }}
           POD_ROOT: ${{ steps.consumer-paths.outputs.pod_root }}
@@ -784,7 +792,10 @@ jobs:
 
           sys.path.insert(0, str(Path("scripts").resolve()))
           from release_control_plane_checks import validate_public_header_selectors
+          from model_a_layout import public_header_glob
 
+          release_version = os.environ["RELEASE_VERSION"]
+          native_header_glob = public_header_glob("IFLYAdNativeFeed", "IFLYNativeFeedAd.h", release_version)
           demo_root = Path(os.environ["DEMO_ROOT"])
           release_mode = os.environ["RELEASE_MODE"]
           if release_mode == "candidate":
@@ -801,7 +812,7 @@ jobs:
               raise AssertionError(f"非法 Release mode: {release_mode}")
           validate_public_header_selectors(
               pod_root,
-              ["IFLYAdNativeFeed.xcframework/*/Headers/IFLYADLib/IFLYNativeFeedAd.h"],
+              [native_header_glob],
               ["nativeFeedAd:didRejectClickWithError:"],
           )
           native_feed_framework = pod_root / "IFLYAdNativeFeed.xcframework"
@@ -809,7 +820,7 @@ jobs:
               f"缺少 NativeFeed XCFramework: {native_feed_framework}"
           )
           native_feed_headers = sorted(
-              native_feed_framework.glob("*/Headers/IFLYADLib/IFLYNativeFeedAd.h")
+              pod_root.glob(native_header_glob)
           )
           assert len(native_feed_headers) >= 2, native_feed_headers
           positive = {
@@ -845,7 +856,7 @@ jobs:
           core_framework = pod_root / "IFLYAdCore.xcframework"
           assert core_framework.is_dir(), f"缺少 Core XCFramework: {core_framework}"
           error_headers = sorted(
-              core_framework.glob("*/Headers/IFLYADLib/IFLYAdError.h")
+              pod_root.glob(public_header_glob("IFLYAdCore", "IFLYAdError.h", release_version))
           )
           assert len(error_headers) >= 2, error_headers
           error_pattern = r"IFLYAdErrorCodeNativeFeedClickViewsInvalid\s*=\s*71503"

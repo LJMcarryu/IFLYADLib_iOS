@@ -14,6 +14,8 @@ import zipfile
 from pathlib import Path, PurePosixPath
 from urllib.parse import urlparse
 
+from model_a_layout import uses_modular_frameworks
+
 
 class AssetValidationError(RuntimeError):
     """分发资产不满足冻结契约。"""
@@ -51,6 +53,16 @@ RESOURCE_SOURCES = {
 EXPECTED_LIBRARY_IDENTIFIERS = {
     "ios-arm64",
     "ios-arm64_x86_64-simulator",
+}
+
+MODULE_HEADERS = {
+    "IFLYAdCore": {"IFLYAdTypes.h", "IFLYAdBase.h", "IFLYAdConfig.h", "IFLYAdSDK.h", "IFLYAdKeys.h", "IFLYAdTool.h", "IFLYAdError.h"},
+    "IFLYAdVideoUI": set(),
+    "IFLYAdBanner": {"IFLYBannerAd.h"},
+    "IFLYAdSplash": {"IFLYSplashAd.h"},
+    "IFLYAdInterstitial": {"IFLYInterstitialAd.h"},
+    "IFLYAdNativeFeed": {"IFLYNativeFeedAd.h", "IFLYNativeFeedAdData.h"},
+    "IFLYAdReward": {"IFLYRewardVideoAd.h"},
 }
 
 
@@ -163,7 +175,7 @@ def find_xcframework(root: Path, module: str) -> Path:
     return matches[0]
 
 
-def validate_xcframework(root: Path, module: str) -> dict[str, int]:
+def validate_xcframework(root: Path, module: str, version: str) -> dict[str, int]:
     info_path = root / "Info.plist"
     if not info_path.is_file():
         fail(f"{module} 缺少 XCFramework Info.plist")
@@ -180,7 +192,7 @@ def validate_xcframework(root: Path, module: str) -> dict[str, int]:
         for item in libraries
         if isinstance(item, dict)
     }
-    if identifiers != EXPECTED_LIBRARY_IDENTIFIERS:
+    if identifiers != EXPECTED_LIBRARY_IDENTIFIERS or len(libraries) != 2:
         fail(f"{module} 切片不精确：{sorted(identifiers)}")
 
     binary_count = 0
@@ -191,13 +203,49 @@ def validate_xcframework(root: Path, module: str) -> dict[str, int]:
         library_path = item.get("LibraryPath") or item.get("BinaryPath")
         if not isinstance(identifier, str) or not isinstance(library_path, str):
             fail(f"{module} AvailableLibraries 字段非法：{item}")
-        binary = root / identifier / library_path
+        expected_archs = ["arm64"] if identifier == "ios-arm64" else ["arm64", "x86_64"]
+        if item.get("SupportedPlatform") != "ios" or sorted(item.get("SupportedArchitectures", [])) != expected_archs:
+            fail(f"{module} 切片平台或架构不精确：{item}")
+        expected_variant = None if identifier == "ios-arm64" else "simulator"
+        if item.get("SupportedPlatformVariant") != expected_variant:
+            fail(f"{module} 切片平台变体错误：{item}")
+
+        modular = uses_modular_frameworks(version)
+        expected_library = f"{module}.framework" if modular else f"lib{module}.a"
+        if library_path != expected_library:
+            fail(f"{module} {version} LibraryPath 必须为 {expected_library}：{library_path}")
+        framework = root / identifier / library_path
+        binary = framework / module if modular else framework
         if not binary.is_file():
             fail(f"{module} 缺少切片二进制：{binary.relative_to(root)}")
         binary_count += 1
 
         headers_path = item.get("HeadersPath")
-        if headers_path is not None:
+        if modular:
+            if headers_path is not None:
+                fail(f"{module} framework 切片禁止旧 HeadersPath")
+            headers = framework / "Headers"
+            actual_headers = {p.relative_to(headers).as_posix() for p in headers.rglob("*") if p.is_file()}
+            expected_headers = MODULE_HEADERS[module] | {f"{module}.h"}
+            if actual_headers != expected_headers:
+                fail(f"{module} framework 公开头库存不精确：{sorted(actual_headers)}")
+            header_count += len(actual_headers)
+            modules = framework / "Modules"
+            modulemap = modules / "module.modulemap"
+            expected_map = f'framework module {module} {{ umbrella header "{module}.h" export * module * {{ export * }} }}'
+            if not modulemap.is_file() or " ".join(modulemap.read_text().split()) != expected_map:
+                fail(f"{module} modulemap 与模块/伞头契约不一致")
+            if {p.relative_to(modules).as_posix() for p in modules.rglob("*") if p.is_file()} != {"module.modulemap"}:
+                fail(f"{module} Modules 库存不精确")
+            module_file_count += 1
+            framework_info = plistlib.loads((framework / "Info.plist").read_bytes())
+            for key, expected in {"CFBundleExecutable": module, "CFBundleName": module, "CFBundlePackageType": "FMWK", "CFBundleShortVersionString": version}.items():
+                if framework_info.get(key) != expected:
+                    fail(f"{module} framework {key} 错误：{framework_info.get(key)}")
+            for header in headers.glob("*.h"):
+                if re.search(r"[<\"]IFLYADLib/", header.read_text()):
+                    fail(f"{module} framework 头残留旧 IFLYADLib 引用：{header.name}")
+        elif headers_path is not None:
             if not isinstance(headers_path, str):
                 fail(f"{module} HeadersPath 非字符串：{item}")
             headers = root / identifier / headers_path
@@ -212,8 +260,13 @@ def validate_xcframework(root: Path, module: str) -> dict[str, int]:
                 fail(f"{module} Headers 为空：{headers.relative_to(root)}")
             header_count += len(current_headers)
 
+        elif module != "IFLYAdVideoUI":
+            # 6.4.4 及更早的 VideoUI 是内部静态库，builder 未传 -headers。
+            # 只有该历史模块允许无 HeadersPath；其余六模块继续失败关闭。
+            fail(f"{module} 旧静态库切片缺少 HeadersPath")
+
         modules = root / identifier / "Modules"
-        if modules.exists():
+        if not modular and modules.exists():
             if not modules.is_dir() or modules.is_symlink():
                 fail(f"{module} Modules 节点非法：{modules.relative_to(root)}")
             module_file_count += sum(
@@ -242,9 +295,9 @@ def validate_xcframework(root: Path, module: str) -> dict[str, int]:
     }
 
 
-def compare_framework_trees(single: Path, combined: Path, module: str) -> dict[str, int]:
-    single_summary = validate_xcframework(single, module)
-    combined_summary = validate_xcframework(combined, module)
+def compare_framework_trees(single: Path, combined: Path, module: str, version: str) -> dict[str, int]:
+    single_summary = validate_xcframework(single, module, version)
+    combined_summary = validate_xcframework(combined, module, version)
     if single_summary != combined_summary:
         fail(
             f"{module} 单模块与合并包结构摘要不同："
@@ -440,7 +493,7 @@ def verify_release_assets(asset_dir: Path, repository_root: Path, version: str) 
             single_framework = find_xcframework(single_extract, module)
             combined_framework = find_xcframework(combined_extract, module)
             summary = compare_framework_trees(
-                single_framework, combined_framework, module
+                single_framework, combined_framework, module, version
             )
             print(
                 f"OK {module}：单模块/合并包逐文件一致，"
