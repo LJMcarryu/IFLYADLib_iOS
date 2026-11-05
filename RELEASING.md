@@ -1,5 +1,24 @@
 # 发版手册（维护者）
 
+## 6.4.5 候选状态
+
+`6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。
+
+<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.5","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.4"} -->
+
+本轮只发布通用模型 A，沿用内部私有源码仓的 `scripts/release-plan-general.json` 和既有五阶段编排。候选源码包含[更新记录](CHANGELOG.md)列出的共享行为变化，不能以纯打包版本替代对应回归。模块和头路径的接入要求见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)。
+
+候选准备阶段保留 `6.4.4/CLOSED` 的 `release-state.json` 和当前正式分发清单；本节不授权提前发布 Tag、填写未知 checksum 或覆盖旧资产。仅在真实冻结库存产生后，按官方元数据同步步骤回填新版本和七个 checksum，再进入必需的 Draft `preflight`。
+
+冻结及公开前应取得与实际候选绑定的证据：
+
+- 七模块静态 framework 的头、modulemap、版本、切片与依赖库存；Swift Core 独立、逐格式、组合和 Full 的真实类型编译链接，启用 `-ObjC`，不靠 SDK bridging header 或额外头搜索路径补洞。
+- Objective-C 新头路径消费，以及 SwiftPM、CocoaPods 和手动集成的依赖、三域资源、隐私清单与最终 App 链接。
+- 点击策略新字段及宏、CAID 新请求字段和传感器能力守卫的回归；保留通用 NativeFeed 的能力边界。
+- 批准工具链、签名、最终下载件的 checksum、正式 consumer 和 `CLOSED` 收口。iOS 11 声明、二进制兼容检查与真机运行是不同证据，不以模拟器编译成功替代实际设备验证。
+
+本候选的完整结果待上述链路完成后填写；当前不宣告正式验收、真实媒体联调或 Apple Review 通过。
+
 ## 6.4.4 冻结与发布记录
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4"} -->

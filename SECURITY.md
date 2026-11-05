@@ -1,5 +1,7 @@
 # 安全策略
 
+> `6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。 候选的 CAID 请求字段变化列于[更新记录](CHANGELOG.md)，不能沿用旧版审查结论作为新版本合规证明；安全支持矩阵仍以公开正式版为准。
+
 
 > `6.4.4` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
 

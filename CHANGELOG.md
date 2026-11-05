@@ -1,5 +1,25 @@
 # 更新日志
 
+## [6.4.5] - 模块化静态框架候选
+
+`6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。
+
+<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.5","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.4"} -->
+
+### 变更范围
+
+本候选采用当前私有源码主线作为构建输入；最终源码提交、冻结产物和验证结论以候选回执为准。范围仅为通用模型 A，不为其他渠道创建新版。除分发结构外还包含下列共享实现变化，因此不是纯包装升级：
+
+- Core、VideoUI、Banner、Splash、Interstitial、NativeFeed、Reward 七个 XCFramework 的切片改为静态 framework，提供模块专属伞头和 modulemap。`Full` 仍为聚合 product/subspec，不新增第八个二进制。
+- Swift 使用 `import IFLYAdCore` 和所选格式模块；Objective-C 从 `<IFLYADLib/...>` 迁移到 `<IFLYAdCore/...>`、`<IFLYAdBanner/...>` 等路径。公开类、方法和协议签名保持，头导入属于源码接入迁移；不承诺新版继续支持旧头路径。依赖闭包和迁移步骤见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)。
+- 共享点击策略响应字段从 `isdclick` 改为 `ads[].ext.ids_a`，监测宏从 `__ISDCLICK__` 改为 `__IDS_A__`。字段和监测模板须配套迁移；不承诺新旧字段双读，旧正式包不能据此当作支持新字段。通用 NativeFeed 不启用优酷专有的 SDK 摇/扭 fallback，也不因此增加媒体摇一摇上报能力。
+- CAID 请求增加 `sysFileTime`、`deviceInitTime`：读取系统路径时间并处理不可取得的值；读取失败分别使用空字符串和 `__DEVICE_INIT_TIME_UNAVAILABLE__`。这改变请求内容，须核对服务端兼容性、宿主隐私告知与平台合规要求；旧审核记录不覆盖本变化。
+- 共享互动传感器在加速度计不可用时不启动采样。该守卫不等同于已完成点击替代、传感器降级或真实设备体验验收。
+
+### 验证边界
+
+上述为候选输入和接入契约说明。正式 SwiftPM、CocoaPods、手动集成、三架构消费、资源和隐私清单、iOS 11 兼容性及实际媒体投放均须按最终候选取证。本地模块编译探针不能替代这些验收；本节不宣告新版本可下载或媒体联调通过。Apple Review 未执行时保持 `not-run`。
+
 ## [6.4.4] - 发布工程优化
 
 <!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.4","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4"} -->

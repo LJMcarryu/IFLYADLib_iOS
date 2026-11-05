@@ -1,3 +1,6 @@
+# 6.4.5 候选尚未发布，当前公开正式版仍为 6.4.4。历史 Tag、Release 和资产保持不可变。
+# 候选迁移说明见 ../docs/接入指南/Swift模块接入与头路径迁移.md；以下活跃依赖仍固定 6.4.4。
+
 # 本示例固定使用 6.4.4；公开时间与消费验证结论以 release-state.json.publication 和同版本 GitHub Release 的实际状态为准。
 # 历史 Tag、Release 和资产保持不可变。
 

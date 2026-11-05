@@ -1,5 +1,15 @@
 # IFLYADLib iOS SDK
 
+## 6.4.5 候选说明
+
+`6.4.5` 候选尚未发布，当前公开正式版仍为 `6.4.4`。历史 Tag、Release 和资产保持不可变。
+
+<!-- ifly-release-candidate: {"schemaVersion":1,"version":"6.4.5","releaseState":"CANDIDATE","publicationState":"UNPUBLISHED","repository":"LJMcarryu/IFLYADLib_iOS","currentFormalVersion":"6.4.4"} -->
+
+本次仅准备通用模型 A：七模块拟升级为带 modulemap 的静态 framework，并提供 Swift 直接导入与 Objective-C 模块头迁移。候选还包含点击策略字段、CAID 请求时间字段和传感器能力守卫变化，不是纯包装升级；范围见[候选更新记录](CHANGELOG.md)。新包需要将旧 `<IFLYADLib/...>` 导入改为模块对应路径，方法签名保持。
+
+[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)是候选接入说明；当前安装示例继续固定公开正式版 `6.4.4`。候选的正式下载、三种安装方式与运行结果须以实际发布验收为准。
+
 
 面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频，支持按广告形式组合接入。本仓库提供安装清单、接入指南和 Objective-C 示例。
 
