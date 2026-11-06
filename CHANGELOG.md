@@ -1,8 +1,17 @@
 # 更新日志
 
+## [6.4.6] - TOS 分发
+
+<!-- ifly-release-status: {"version":"6.4.6","status":"FORMAL","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json"} -->
+
+本版 SDK 二进制改由火山云 TOS 分发，下载基础地址为 `https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general`。SwiftPM 与 CocoaPods 的公开版本入口保持，生产项目固定 `6.4.6`。通用版沿用七模块静态 framework 与既有模块导入路径。
+
+产物清单、大小、SHA-256、源码与元数据提交见 [TOS 发布记录](https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json)。只有该记录存在且 `release-state.json` 为 `CLOSED` 才表示本版发布完成。正式证据包含匿名下载以及 SwiftPM/CocoaPods 的 simulator/device 编译链接与资源检查；普通 CI 只检查元数据。CocoaPods trunk、Apple 人工审核与真实媒体验收不在本次分发完成范围。
+
+> 以下为历史版本记录，其中当前版本和验收结论仅适用于各自历史版本。
+
 ## [6.4.5] - 模块化静态框架
 
-<!-- ifly-release-status: {"schemaVersion":1,"version":"6.4.5","releaseState":"FORMAL","distribution":"github-release","releaseUrl":"https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5"} -->
 
 `6.4.5` 的正式分发资料以同版本冻结 manifest 为准。公开时间和消费结论以 `release-state.json.publication` 与 [Release 6.4.5](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5) 为准。历史 Tag、Release 和资产保持不可变。
 
