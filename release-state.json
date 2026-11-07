@@ -1,7 +1,7 @@
 {
   "schemaVersion": 4,
   "distributionBackend": "tos",
-  "phase": "FROZEN",
+  "phase": "CLOSED",
   "version": "6.4.6",
   "channel": "general",
   "repository": "LJMcarryu/IFLYADLib_iOS",
@@ -71,5 +71,8 @@
       "sha256": "8167b366750e8f4647de82686246de4112ad256b0286ddd62388cdfde56021e7",
       "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/binary-targets.remote.swift"
     }
-  ]
+  ],
+  "distributionRevisionId": "60a16af6ee75200c41e849dc59f9f68cdae1deb47a5ef1373aea1c994b93ed70",
+  "verifyReceiptSha256": "ae526acd48a516bd3981db4938a2420fa71ab0ee4b72a51f3ea090cb7fab74c6",
+  "tagCommit": "9a346e8a9d5e1de266d4a1b36265983e7f0bbf43"
 }
