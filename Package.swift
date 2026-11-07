@@ -4,7 +4,7 @@
 // SwiftPM 的 binaryTarget 不能直接声明 target 间依赖，因此这里使用轻量伞 target 表达依赖图。
 // 静态库中的 Objective-C category 需要 -ObjC：本清单【不再】用 .unsafeFlags 注入 -ObjC（unsafeFlags 会让本包
 // 无法作为带版本号的依赖被标准 SwiftPM 消费）。改由【消费方】在自己 App target 的 OTHER_LDFLAGS 加 -ObjC。
-// 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：binaryTarget url 指向其 GitHub Releases tag 6.4.5 的
+// 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：binaryTarget url 指向自有域名上的 6.4.6 TOS 冻结资产：
 //   各 IFLYAd<模块>.xcframework.zip（checksum 为 sha256）；本仓同时承载伞 target 与受版本控制资源。
 // 产物由私有源码仓的 package-model-a-release.sh 打包并计算 checksum（device(ios-arm64)+simulator 双切片）；
 //   换版本/主机时在私有源码仓重跑该脚本后，据 release/checksums.txt 同步更新此处的 url/checksum。
@@ -16,7 +16,7 @@ import PackageDescription
 
 let package = Package(
     name: "IFLYADLib",
-    // 下列 checksum 来自 6.4.5 冻结签名 zip。
+    // 下列 checksum 来自 6.4.6 冻结签名 zip。
     platforms: [
         .iOS("11.0"),
     ],
@@ -32,38 +32,38 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "IFLYAdCore",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.4.5/IFLYAdCore.xcframework.zip",
-            checksum: "bb95cd39016096854e17fed8be03c5940c120696fd9ca6f166c66fca174ebc24"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdCore.xcframework.zip",
+            checksum: "d3add7a07428c40b9c64242832ad9bcbab05628759bb316acc7b129f3ea7a83e"
         ),
         .binaryTarget(
             name: "IFLYAdVideoUI",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.4.5/IFLYAdVideoUI.xcframework.zip",
-            checksum: "3a7c6531275da8fb010885d5831f65850a1eeb160191acccfde8e11244a67f1e"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdVideoUI.xcframework.zip",
+            checksum: "0b00fbc03160dfc57c431249a0b0e01a7ca2fc4c70c413875809eba52ece79a4"
         ),
         .binaryTarget(
             name: "IFLYAdBanner",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.4.5/IFLYAdBanner.xcframework.zip",
-            checksum: "28fa5958c481c9068927c2cfaac51f7c7adec7520bd0082d74e0d69140b47052"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdBanner.xcframework.zip",
+            checksum: "06583f2fba8ac3bd09b67243bf2166be828bf7e48cfb1cbd9965b3e756a7914f"
         ),
         .binaryTarget(
             name: "IFLYAdSplash",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.4.5/IFLYAdSplash.xcframework.zip",
-            checksum: "e72f6da77b78c421cb1eaad9212a74c3f5ec6b4345edda421217bcf3580ab51d"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdSplash.xcframework.zip",
+            checksum: "ccd3031b36ad23badc3945a4063f893308908aecd72466dfe8239389e7ea0d54"
         ),
         .binaryTarget(
             name: "IFLYAdInterstitial",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.4.5/IFLYAdInterstitial.xcframework.zip",
-            checksum: "e208671472682dd6f44b58aa9e5504bdec121b48489f42758b40c404f6bda800"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdInterstitial.xcframework.zip",
+            checksum: "f551cad68947a13c320908a4195e92a3720eff457291046fe8874c921ff267bc"
         ),
         .binaryTarget(
             name: "IFLYAdNativeFeed",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.4.5/IFLYAdNativeFeed.xcframework.zip",
-            checksum: "5114502ef1413c1568662f0cb306da0fb16ded05c46abc8481d97372a6bbaf54"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdNativeFeed.xcframework.zip",
+            checksum: "459df9b97b912c303b0d5093e63b7a9feb5ed4acad9c4f633c61f4a7e1b3b6d0"
         ),
         .binaryTarget(
             name: "IFLYAdReward",
-            url: "https://github.com/LJMcarryu/IFLYADLib_iOS/releases/download/6.4.5/IFLYAdReward.xcframework.zip",
-            checksum: "242720eeb3ca2dfff90a7477b55029d780d6823e30ea78e2110fa38c94381ec9"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdReward.xcframework.zip",
+            checksum: "c7a5f73347bed7fd1ed8506edc3584af060334656cd7e755ce7e9b0e86188a19"
         ),
         .target(
             name: "Core",
