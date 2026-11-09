@@ -1,6 +1,6 @@
 # IFLYADLib iOS SDK
 
-> **6.5.0 极速发布未验证**：`verification=not-run`。本次仅编译、打包、上传 TOS，并同步公开清单和 Tag；不运行测试、匿名下载复验、SwiftPM/CocoaPods 消费验收或 CI。风险由发布者承担。
+> **6.5.0 发布回执状态为 `FAST_UNVERIFIED`**。本次已补充完成 CocoaPods trunk 安装、锁定版本和 iOS Simulator 构建验证；匿名下载复验、SwiftPM 消费验收、真机广告填充和 Apple 审核仍未执行。
 
 <!-- ifly-release-status: {"version":"6.5.0","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json"} -->
 
@@ -38,13 +38,13 @@
 | 链接 | 静态 XCFramework，选择 **Do Not Embed**；最终 App target 需要 `$(inherited) -ObjC` |
 | 共存 | 同一 App 选择一种安装方式；通用版与优酷定制版不能同时链接，其他渠道也不承诺共存 |
 
-## 升级到 6.4.6
+## 升级到 6.5.0
 
 七模块 XCFramework 采用带 modulemap 的静态 framework。Swift 可直接导入模块，无需为本 SDK 配置 bridging header；Objective-C 需从旧 `<IFLYADLib/...>` 路径迁移。步骤见[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)。本版还包含 `ids_a`、CAID 时间字段和传感器能力守卫变化，详见[更新记录](CHANGELOG.md)。
 
 ## 安装
 
-首次接入可使用 CocoaPods，按完整 Podspec URL 安装固定版本：
+首次接入可使用 CocoaPods，按 CocoaPods 官方 trunk 安装固定版本：
 
 ```ruby
 source 'https://cdn.cocoapods.org/'
@@ -52,8 +52,7 @@ platform :ios, '11.0'
 
 target 'YourApp' do
   use_frameworks!
-  pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.5.0/IFLYADLib.podspec'
+  pod 'IFLYADLib', '6.5.0'
 end
 ```
 
@@ -62,7 +61,7 @@ pod install
 open YourApp.xcworkspace
 ```
 
-该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前使用 GitHub 版本清单和 TOS 二进制分发，请保留 Podspec URL。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
+该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前通过 CocoaPods trunk 获取版本清单，二进制仍由 TOS 分发。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
 - [Swift Package Manager](docs/接入指南/安装与分包.md#swift-package-manager)：添加本仓地址，选择 **Exact Version** `6.5.0` 和所需 product；在 App target 添加 `-ObjC`。

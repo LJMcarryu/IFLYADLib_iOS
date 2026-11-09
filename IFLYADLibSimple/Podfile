@@ -1,4 +1,4 @@
-# 本示例固定 6.5.0，通过同版 Podspec URL 安装；不依赖 trunk 索引。
+# 本示例固定 6.5.0，通过 CocoaPods trunk 安装。
 source 'https://cdn.cocoapods.org/'
 
 platform :ios, '11.0'
@@ -12,11 +12,10 @@ target 'IFLYADLibSimple' do
   use_frameworks!
 
   # 示例包含全部五种广告，使用 Full；安装后打开生成的 .xcworkspace。
-  pod 'IFLYADLib', :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.5.0/IFLYADLib.podspec'
+  pod 'IFLYADLib', '6.5.0'
 
   # 业务 App 可按需选择广告形式，例如：
-  #   pod 'IFLYADLib/Splash',
-  #       :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.5.0/IFLYADLib.podspec'
+  #   pod 'IFLYADLib/Splash', '6.5.0'
   # 导入 <IFLYAdCore/IFLYAdCore.h> 和所用格式模块头。
   # 若裁剪此示例，须同时移除未安装格式的页面编译源和首页入口，详见 README。
 end

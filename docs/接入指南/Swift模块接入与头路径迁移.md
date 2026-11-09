@@ -1,6 +1,6 @@
 # Swift 模块接入与头路径迁移
 
-本文面向从通用模型 A 旧包升级到 `6.4.5` 的宿主开发者。安装入口见[安装与分包](安装与分包.md)，历史 Tag、Release 和资产保持不可变。
+本文面向从通用模型 A 旧包升级到 `6.5.0` 的宿主开发者。安装入口见[安装与分包](安装与分包.md)，历史 Tag、Release 和资产保持不可变。
 
 ## 先确认升级范围
 
@@ -28,9 +28,9 @@
 
 ## 安装与宿主配置
 
-以下步骤使用同一版本的正式资产，固定为 `6.4.5`。
+以下步骤使用同一版本的正式资产，固定为 `6.5.0`。
 
-1. 选择一种安装方式。SwiftPM 固定 `6.4.5` Tag 和所需 product；CocoaPods 使用同版 Podspec URL 与所需 subspec，具体命令见[安装指南](安装与分包.md)。本次不包含 CocoaPods trunk 发布。
+1. 选择一种安装方式。SwiftPM 固定 `6.5.0` Tag 和所需 product；CocoaPods 使用官方 trunk 与所需 subspec，具体命令见[安装指南](安装与分包.md)。
 2. 手动接入时，替换所选格式及全部依赖的 XCFramework；把各模块的 XCFramework 根目录交给 Xcode 选择平台切片，Embed 设为 **Do Not Embed**。不要单独拖入切片 framework，也不要复制旧切片的头目录覆盖新包。
 3. 最终 App target 的 `Other Linker Flags` 添加 `$(inherited) -ObjC`。CocoaPods 的配置传播也须在最终 App 的 build settings 中确认；SwiftPM 接入由宿主设置此参数。
 4. 链接 `AdSupport.framework`，`AppTrackingTransparency.framework` 保持 **Optional**。最低 iOS 声明为 11.0；实际兼容性仍须检查最终 Mach-O、目标设备与运行结果。
@@ -85,7 +85,7 @@ SwiftPM 的 `Full`、`Banner` 等是产品名；本文不承诺 `import Full`、
 
 按代码实际使用的类型导入。Core 和格式头分别归属自身模块，格式头引用共享类型时依赖 Core，不重复复制共享头。
 
-| 使用的头 | 旧路径（6.4.4） | 新路径（6.4.5） |
+| 使用的头 | 旧路径（6.4.4） | 新路径（6.5.0） |
 | --- | --- | --- |
 | 共享类型、配置与工具 | `<IFLYADLib/IFLYAdTypes.h>` 等 | `<IFLYAdCore/IFLYAdTypes.h>` 等；也可使用 `<IFLYAdCore/IFLYAdCore.h>` |
 | Banner | `<IFLYADLib/IFLYBannerAd.h>` | `<IFLYAdBanner/IFLYBannerAd.h>` |
