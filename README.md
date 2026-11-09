@@ -1,17 +1,25 @@
 # IFLYADLib iOS SDK
 
-> **6.5.0 发布回执状态为 `FAST_UNVERIFIED`**。本次已补充完成 CocoaPods trunk 安装、锁定版本和 iOS Simulator 构建验证，以及 SwiftPM 固定 `6.5.0` 的独立 Demo 模拟器 arm64 编译、链接、Tag 和资源核对；匿名下载复验、真机广告填充和 Apple 审核仍未执行。
+<!-- ifly-fast-release-notice:start -->
+
+> **6.5.0 已完成 CocoaPods 和 SwiftPM 的安装、版本锁定及模拟器构建验证。** 匿名下载复验、真机广告填充、真实媒体验收和 Apple 审核尚未执行。
 
 <!-- ifly-release-status: {"version":"6.5.0","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json"} -->
 
+<details>
+<summary>版本验证与发布记录</summary>
+
+发布回执状态为 `FAST_UNVERIFIED`。已补充完成 CocoaPods trunk 安装、锁定版本和 iOS Simulator 构建验证，以及 SwiftPM 固定 `6.5.0` 的独立 Demo 模拟器 arm64 编译、链接、Tag 和资源核对。
+
 资产上传摘要见[极速发布记录](https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json)，元数据提交以同版本 Tag 为准；公开状态为 `FAST_PUBLISHED`，不表示全量验收通过。CocoaPods trunk 已由极速入口自动发布；Apple 人工审核和真实媒体验收未执行。
+
+</details>
+
+<!-- ifly-fast-release-notice:end -->
 
 面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频，支持按广告形式组合接入。本仓库提供安装清单、接入指南和 Objective-C 示例。
 
-
-
-
-[接入指南索引](docs/接入指南/README.md) · [运行示例](IFLYADLibSimple/README.md) · [安装与分包](docs/接入指南/安装与分包.md) · [配置与隐私](docs/接入指南/配置与隐私.md) · [常见问题](docs/接入指南/常见问题.md)
+[指南目录](docs/接入指南/README.md) · [运行示例](IFLYADLibSimple/README.md) · [安装与分包](docs/接入指南/安装与分包.md) · [配置与隐私](docs/接入指南/配置与隐私.md) · [常见问题](docs/接入指南/常见问题.md)
 
 ## 能力矩阵
 
