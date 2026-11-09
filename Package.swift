@@ -4,7 +4,7 @@
 // SwiftPM 的 binaryTarget 不能直接声明 target 间依赖，因此这里使用轻量伞 target 表达依赖图。
 // 静态库中的 Objective-C category 需要 -ObjC：本清单【不再】用 .unsafeFlags 注入 -ObjC（unsafeFlags 会让本包
 // 无法作为带版本号的依赖被标准 SwiftPM 消费）。改由【消费方】在自己 App target 的 OTHER_LDFLAGS 加 -ObjC。
-// 对外分发在【公开仓 LJMcarryu/IFLYADLib_iOS】：binaryTarget url 指向自有域名上的 6.4.6 TOS 冻结资产：
+// 6.5.0 极速发布资产；verification=not-run。
 //   各 IFLYAd<模块>.xcframework.zip（checksum 为 sha256）；本仓同时承载伞 target 与受版本控制资源。
 // 产物由私有源码仓的 package-model-a-release.sh 打包并计算 checksum（device(ios-arm64)+simulator 双切片）；
 //   换版本/主机时在私有源码仓重跑该脚本后，据 release/checksums.txt 同步更新此处的 url/checksum。
@@ -16,7 +16,7 @@ import PackageDescription
 
 let package = Package(
     name: "IFLYADLib",
-    // 下列 checksum 来自 6.4.6 冻结签名 zip。
+    // 6.5.0 极速发布资产摘要；verification=not-run。
     platforms: [
         .iOS("11.0"),
     ],
@@ -32,38 +32,38 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "IFLYAdCore",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdCore.xcframework.zip",
-            checksum: "05f4ca5038c4c4c3e55ba4ed999bbfaa17028fbdba869ed5b04cda45c7ce09b4"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdCore.xcframework.zip",
+            checksum: "1b29d1003906b4d65d0250758ad28199c4d52f5996615dfc99de92ca060508ea"
         ),
         .binaryTarget(
             name: "IFLYAdVideoUI",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdVideoUI.xcframework.zip",
-            checksum: "26ff648c5ff3028bdf1f090a7192c990d6d01563fbaad5af165590bdb3cf37fd"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdVideoUI.xcframework.zip",
+            checksum: "38a513bb089e4942041502d0ca19e9a41b0ca812065785255c9bdf6d13da2d2d"
         ),
         .binaryTarget(
             name: "IFLYAdBanner",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdBanner.xcframework.zip",
-            checksum: "536d3a146459f1c0a5c957455177da85ea320e88165bc48bfbaa209d6bbcb8fd"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdBanner.xcframework.zip",
+            checksum: "b057278734d429cede2cc45b5ddec2f487c06a88ca3c163757f78bc83ead0e95"
         ),
         .binaryTarget(
             name: "IFLYAdSplash",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdSplash.xcframework.zip",
-            checksum: "7e6ca0e14b464c5c2e918cec7d042de193b38dffda48e3f32da9bfd46bbd7a1a"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdSplash.xcframework.zip",
+            checksum: "fced6e67ee924395086eb660ea97962ac0ec4f6bc8ad53e8486b30ca867c25d0"
         ),
         .binaryTarget(
             name: "IFLYAdInterstitial",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdInterstitial.xcframework.zip",
-            checksum: "369a00ea236c2f0e3f935cb5df3a092d75c8e9b3a7e1712950356243b27c81ea"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdInterstitial.xcframework.zip",
+            checksum: "e76b299cb6544751c77a58f61f28a7b20d31e7384c7957c0381b1b721cb71740"
         ),
         .binaryTarget(
             name: "IFLYAdNativeFeed",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdNativeFeed.xcframework.zip",
-            checksum: "0c6d8f1cfa6c2c4341842b64420f1758b63aa4ff13f728ffe103c6e4d11330ee"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdNativeFeed.xcframework.zip",
+            checksum: "24df054a5eea916a560e86b03d54c9e6eda5e7adf8b533d126de5d4041895bca"
         ),
         .binaryTarget(
             name: "IFLYAdReward",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/IFLYAdReward.xcframework.zip",
-            checksum: "f2c0804743e0d1460d9653aa720d18045c7794cc36d2c1949d576242bb2680de"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdReward.xcframework.zip",
+            checksum: "81dc156b3d601dec9dcdc1ffcb968d95536ce17cbc388041d9cdd2d2cb04d649"
         ),
         .target(
             name: "Core",

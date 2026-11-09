@@ -1,10 +1,15 @@
 # IFLYADLib iOS SDK
 
+> **6.5.0 极速发布未验证**：`verification=not-run`。本次仅编译、打包、上传 TOS，并同步公开清单和 Tag；不运行测试、匿名下载复验、SwiftPM/CocoaPods 消费验收或 CI。风险由发布者承担。
+
+<!-- ifly-release-status: {"version":"6.5.0","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json"} -->
+
+资产上传摘要见[极速发布记录](https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json)，元数据提交以同版本 Tag 为准；公开状态为 `FAST_PUBLISHED`，不表示全量验收通过。CocoaPods trunk、Apple 人工审核和真实媒体验收未执行。
+
 面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频，支持按广告形式组合接入。本仓库提供安装清单、接入指南和 Objective-C 示例。
 
-当前正式版本：[`6.4.6`](https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json)。生产项目请固定具体版本，升级前查看[更新记录](CHANGELOG.md)。
 
-<!-- ifly-release-status: {"version":"6.4.6","status":"FORMAL","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json"} -->
+
 
 [接入指南索引](docs/接入指南/README.md) · [运行示例](IFLYADLibSimple/README.md) · [安装与分包](docs/接入指南/安装与分包.md) · [配置与隐私](docs/接入指南/配置与隐私.md) · [常见问题](docs/接入指南/常见问题.md)
 
@@ -48,7 +53,7 @@ platform :ios, '11.0'
 target 'YourApp' do
   use_frameworks!
   pod 'IFLYADLib',
-      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.4.6/IFLYADLib.podspec'
+      :podspec => 'https://raw.githubusercontent.com/LJMcarryu/IFLYADLib_iOS/6.5.0/IFLYADLib.podspec'
 end
 ```
 
@@ -60,7 +65,7 @@ open YourApp.xcworkspace
 该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前使用 GitHub 版本清单和 TOS 二进制分发，请保留 Podspec URL。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
-- [Swift Package Manager](docs/接入指南/安装与分包.md#swift-package-manager)：添加本仓地址，选择 **Exact Version** `6.4.6` 和所需 product；在 App target 添加 `-ObjC`。
+- [Swift Package Manager](docs/接入指南/安装与分包.md#swift-package-manager)：添加本仓地址，选择 **Exact Version** `6.5.0` 和所需 product；在 App target 添加 `-ObjC`。
 - [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：使用同版完整包，按格式链接依赖并复制资源及隐私清单。
 
 ## 首次使用
@@ -110,7 +115,7 @@ open YourApp.xcworkspace
 
 ## 示例工程
 
-[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.4.6`，移入生产 App 时保留自己的隐私流程和业务生命周期。
+[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.5.0`，移入生产 App 时保留自己的隐私流程和业务生命周期。
 
 ## 常见问题
 
@@ -122,8 +127,3 @@ open YourApp.xcworkspace
 
 [更新记录](CHANGELOG.md) · [使用许可](LICENSE) · [安全问题报告](SECURITY.md#报告安全漏洞)
 
-## 6.4.6 分发与验收
-
-本版 SDK 二进制改由火山云 TOS 分发，下载基础地址为 `https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general`。SwiftPM 与 CocoaPods 的公开版本入口保持，生产项目固定 `6.4.6`。通用版沿用七模块静态 framework 与既有模块导入路径。
-
-产物清单、大小、SHA-256、源码与元数据提交见 [TOS 发布记录](https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json)。只有该记录存在且 `release-state.json` 为 `CLOSED` 才表示本版发布完成。正式证据包含匿名下载以及 SwiftPM/CocoaPods 的 simulator/device 编译链接与资源检查；普通 CI 只检查元数据。CocoaPods trunk、Apple 人工审核与真实媒体验收不在本次分发完成范围。
