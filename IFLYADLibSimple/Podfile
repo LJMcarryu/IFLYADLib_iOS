@@ -1,9 +1,9 @@
-# 本示例固定 6.4.6，通过同版 Podspec URL 安装；不依赖 trunk 索引。
+# 本示例固定 6.5.0，通过同版 Podspec URL 安装；不依赖 trunk 索引。
 source 'https://cdn.cocoapods.org/'
 
 platform :ios, '11.0'
 
-# 6.4.6 沿用 6.4.0 的公开 API 方法签名与 UIScene 语义。展示、落地页、外跳回流、曝光和 UI 生命周期绑定实际来源 window/Scene；
+# 6.5.0 沿用 6.4.0 的公开 API 方法签名与 UIScene 语义。展示、落地页、外跳回流、曝光和 UI 生命周期绑定实际来源 window/Scene；
 # 无来源时只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底，独立落地页始终属于来源 Scene。
 # 开屏 rootVC 仍须入窗；Scene 宿主的 customWindow 须可见、尺寸有限且为正、已关联且与 rootVC.window 同 Scene，
 # 可为非 key、高 windowLevel、无 rootVC；非法输入展示失败，修正后可重试。历史 Tag、Release 和资产保持不变。

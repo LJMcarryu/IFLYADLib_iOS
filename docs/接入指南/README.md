@@ -12,7 +12,7 @@
 ## 指南目录
 
 - [安装与分包](安装与分包.md)：当前正式版 CocoaPods、Swift Package Manager 和手动集成
-- [Swift模块接入与头路径迁移](Swift模块接入与头路径迁移.md)：6.4.6 的模块导入、Objective-C 头迁移及验证边界
+- [Swift模块接入与头路径迁移](Swift模块接入与头路径迁移.md)：6.5.0 的模块导入、Objective-C 头迁移及验证边界
 - [配置与隐私](配置与隐私.md)：初始化、隐私状态、请求配置和网络要求
 - [开屏广告](开屏广告.md)：图片/视频开屏加载、展示和收尾
 - [Banner广告](Banner广告.md)：Banner 容器和生命周期
@@ -24,6 +24,6 @@
 
 ## 发布与版本
 
-- 当前版本和正式 Release 以根目录 `release-state.json`、README 发布标记和同版本 GitHub Release 为准。
+- 当前版本和正式 Release 以根目录 `release-state.json`、README 发布标记和同版本 TOS 发布记录 为准。
 - 发布历史见[历史发布记录](../需求设计/发布验收/历史发布记录.md)。
 - 安装示例固定到明确版本；升级前先阅读根目录 `CHANGELOG.md`。
