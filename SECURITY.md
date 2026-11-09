@@ -1,11 +1,11 @@
 # 安全策略
 
 
-> `6.5.0` 为极速发布版本，状态为 `FAST_UNVERIFIED`；资产记录见 [TOS 极速发布记录](https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json)，不代表完成消费验证。历史 Tag、Release 和资产保持不可变。
+> `6.5.0` 为极速发布版本，状态为 `FAST_UNVERIFIED`；资产记录见 [TOS 极速发布记录](https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json)，该回执保留发布时的验证状态。后续已补充 CocoaPods 与 SwiftPM 的模拟器消费验证，未完成真机广告填充和 Apple 审核。历史 Tag、Release 和资产保持不可变。
 
 ## 6.5.0 支持说明
 
-`6.5.0` 已纳入安全支持矩阵；公开状态为 `FAST_UNVERIFIED`，消费验证仍待完成。
+`6.5.0` 已纳入安全支持矩阵；公开状态为 `FAST_UNVERIFIED`，已补充 CocoaPods 与 SwiftPM 模拟器消费验证；真机运行、广告填充和 Apple 审核仍未完成。
 
 ## 6.4.3 支持说明
 

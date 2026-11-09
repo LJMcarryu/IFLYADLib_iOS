@@ -134,4 +134,4 @@ xcodebuild build \
 
 ## 反馈问题
 
-到[公开 Issues](https://github.com/LJMcarryu/IFLYADLib_iOS/issues)提供 SDK 版本、Xcode/iOS 版本、模拟器或机型、页面入口、操作顺序和错误码。截图与日志先脱敏，不提交完整 token、设备标识或业务敏感数据。
+先查[错误处理与生命周期](../docs/接入指南/常见问题.md)，仍需帮助时通过双方约定的支持渠道提供 SDK 版本、Xcode/iOS 版本、模拟器或机型、页面入口、操作顺序和错误码。截图与日志先脱敏，不提交完整 token、设备标识或业务敏感数据。
