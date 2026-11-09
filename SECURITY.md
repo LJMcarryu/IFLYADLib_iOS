@@ -34,7 +34,7 @@
 
 **请勿在公开 Issue / PR / 讨论区中披露安全漏洞**，以免在修复前扩大暴露面。
 
-请通过[讯飞安全应急响应中心](https://security.iflysec.com/front/bugForm)的「提交漏洞/情报」入口私密上报。本仓库当前未开启 GitHub Private Vulnerability Reporting，不要使用公开 Issue 代替私密上报。
+请通过[讯飞安全应急响应中心](https://security.iflysec.com/front/bugForm)的「提交漏洞/情报」入口私密上报。请勿使用公开渠道代替私密上报。
 
 上报时请尽量包含：
 

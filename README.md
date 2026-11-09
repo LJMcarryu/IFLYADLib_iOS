@@ -122,7 +122,7 @@ open YourApp.xcworkspace
 
 ## 反馈与支持
 
-接入问题请在 [Issues](https://github.com/LJMcarryu/IFLYADLib_iOS/issues) 提供 SDK/iOS/Xcode 版本、安装方式、广告形式、操作步骤和错误码。日志与截图先去除 Token、设备标识和业务敏感信息。
+接入问题请通过双方约定的支持渠道提供 SDK/iOS/Xcode 版本、安装方式、广告形式、操作步骤和错误码。日志与截图先去除 Token、设备标识和业务敏感信息。
 
 [更新记录](CHANGELOG.md) · [使用许可](LICENSE) · [安全问题报告](SECURITY.md#报告安全漏洞)
 
