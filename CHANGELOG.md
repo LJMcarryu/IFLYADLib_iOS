@@ -10,332 +10,228 @@
 
 ## [6.4.6] - TOS 分发
 
-本版 SDK 二进制改由火山云 TOS 分发，下载基础地址为 `https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general`。SwiftPM 与 CocoaPods 的公开版本入口保持，生产项目固定 `6.4.6`。通用版沿用七模块静态 framework 与既有模块导入路径。
-
-下载文件与校验值见[版本下载记录](https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json)。
-
-> 以下为历史版本记录，其中当前版本和验收结论仅适用于各自历史版本。
+- 调整 SDK 下载分发，安装入口保持不变。
+- 下载文件与校验值见[版本下载记录](https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json)。
 
 ## [6.4.5] - 模块化静态框架
 
-历史版本：[Release 6.4.5](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5)
+<a id="变更范围"></a>
+<a id="验证边界"></a>
 
-### 变更范围
-
-本版适用于通用版，包含以下变化：
-
-- Core、VideoUI、Banner、Splash、Interstitial、NativeFeed、Reward 七个 XCFramework 的切片改为静态 framework，提供模块专属伞头和 modulemap。`Full` 仍为聚合 product/subspec，不新增第八个二进制。
-- Swift 使用 `import IFLYAdCore` 和所选格式模块；Objective-C 从 `<IFLYADLib/...>` 迁移到 `<IFLYAdCore/...>`、`<IFLYAdBanner/...>` 等路径。公开类、方法和协议签名保持，头导入属于源码接入迁移；不承诺新版继续支持旧头路径。依赖闭包和迁移步骤见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)。
-
-### 验证边界
-
-该历史版本的编译验证不替代宿主 App 的真机广告展示与审核。
+- 完善七模块静态 framework 的 Swift 接入。
+- Swift 使用 `import IFLYAdCore` 和所选格式模块；Objective-C 须将 `<IFLYADLib/...>` 改为对应模块头路径，见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)。
 
 ## [6.4.4] - 发布工程优化
 
-> 本节为 6.4.4 历史记录。
+<a id="变更"></a>
 
-历史版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)
-
-### 变更
-
-- 全渠道统一为 `6.4.4`，从同一共享源码重新构建，公开 API 方法签名、广告能力和最低 iOS 11.0 要求保持。
-
-版本的兼容变化以各节变更和目标版本公开头为准；历史补丁版本也可能包含需要修改媒体代码的 API 迁移。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
+- 优化 SDK 分发。公开 API、广告形式和最低系统要求保持不变。
 
 ## [6.4.3] - 冻结与发布记录
 
-> 以下为 `6.4.3` 历史记录；其中“当前”“本版”均只指该历史版本。
+<a id="变更-1"></a>
+<a id="变更-2"></a>
 
-历史版本：[`6.4.3`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.3)
-
-### 变更
-
-- 清理未使用的设备标识日志脱敏规则与未引用宏，保留当前使用的日志脱敏安全网。
-- 公开 API 方法签名、广告能力和最低 iOS 11.0 要求沿用 `6.4.2`。
+- 优化日志处理。公开 API 和广告形式保持不变。
 
 ## [6.4.2] - 冻结与发布记录
 
-> 以下为 `6.4.2` 历史记录；其中“当前”“本版”均只指该历史版本。
-
-历史版本：[`6.4.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2)
+- 更新 SDK 分发。
 
 ## [6.4.1] - 发布工程优化
 
-> 以下为 `6.4.1` 历史记录；其中“当前”“本版”均只指该历史版本。
+<a id="变更-3"></a>
 
-历史版本：[Release 6.4.1](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1)
-
-### 变更
-
-- 增加匿名逐资产恢复、正式 consumer 受控恢复、摘要日志和运行耗时证据。
-- SDK 与 UI 行为继承 `6.4.0`，没有新增公开 API。
+- 优化 SDK 分发。
 
 ## [6.4.0] - 冻结与发布记录
 
-历史版本：[Release 6.4.0](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.0)
+<a id="变更-4"></a>
 
-### 变更
-
-- 共享 UIScene 适配：展示、落地页、外跳回流、曝光判断和 UI 生命周期使用广告的实际来源 window/Scene；完全没有来源时，只允许唯一且明确的前台应用 Scene，不跨 Scene 随机兜底。独立落地页始终归属来源 Scene。
-- 收紧开屏 `customWindow` 的 Scene 宿主验收：rootVC 仍须入窗；`customWindow` 必须可见、尺寸有限且为正、已关联 Scene，并与 `rootVC.window` 同 Scene。合法窗口可以不是 key window，可以使用较高 `windowLevel`，也可以没有 rootVC。
-- 无 Scene、跨 Scene、隐藏或尺寸无效的 `customWindow` 会导致展示失败；失败不锁死本次机会，媒体修正后可以重试。
-- 公开 API 方法签名不变。
+- 优化多窗口场景下的广告展示与页面返回。
+- 开屏 `customWindow` 须与宿主页面处于同一 Scene，并保持可见、尺寸有效。
 
 ## [6.3.5] - 冻结与发布记录
 
-正式发布于 2026-09-14；本版本的消费结果见 [RELEASING](RELEASING.md)。历史章节只描述各自版本，不替代当前接入契约。
+<a id="变更-5"></a>
 
-- `releaseState`：`FORMAL`
-- `IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`。
-
-### 变更
-
-- 统一版本至 `6.3.5`，保留五种广告形式及模块化 SDK 的七模块组合能力；公开 API 和错误码保持。
-- 加强五种广告的加载代次、回调重入、曝光检测停止与终态资源清理；共享图片下载支持各订阅独立取消。
-- 修复开屏全交互回流、视频暂停恢复及完播关闭边界，插屏视频素材验真在后台完成并复核文件身份。
-- 增加公共请求阶段和广告生命周期诊断，硬化 Release 日志脱敏与裁剪；NativeFeed 点击使用独立落地页宿主，激励动画丢弃迟到 completion。
+- 优化广告加载、展示及视频播放。
 
 ## [6.3.1] - 2026-09-01
 
-- `releaseState`：`FORMAL`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.1.zip` 的冻结 SHA-256 为 `4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5`。
+<a id="变更-6"></a>
 
-### 变更
-
-- NativeFeed 的 `71503` 诊断统一为 `[71503/<point>]` 中文原因与处理提示，移除渠道命名空间差异；绑定预检、点击验收与 owner/lease 取证统一使用诊断级日志。
-- Banner 请求、解析、素材和展示链路增加结构化阶段、原因、错误码、请求代次与渠道字段；关键失败使用 Error，可恢复展示状态和可选角标失败使用 Diagnostic。
-- 加强迟到请求、换代取消、主素材失败幂等和日志脱敏安全网，不改变现有公开 API 与错误码。
+- 优化广告加载与诊断信息。
 
 ## [6.3.0] - 2026-08-25
 
-- `releaseState`：`FORMAL`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.0.zip` 的冻结 SHA-256 为 `fdf7c98bf1332b78cc6e2c7a840dd8cc804fb607e754cc457f969ce6e448a6f2`。
+<a id="变更-7"></a>
 
-### 变更
-
-- NativeFeed 外部 CTA 统一采用 permissive attach：开启 `allowsExternalClickViews` 后允许 CTA 后挂载、后布局、跨层级和大面积范围，不再要求同 Cell、共同 wrapper、几何相邻、固定祖先路径或面积比例。
-- 点击时继续校验当前 Ad/container/generation 的独占租约、双方同 window/scene、CTA 有效尺寸与可见交互、容器前台且至少 `2/3` 可见；`UIWindow`、页面根和 container 本身继续失败关闭。
-- 父级广告点击为媒体 `UIControl` 和非 SDK 手势退让；显式注册的 CTA 自身仍归 SDK，`closeView` 子树继续隔离。
-- 所有 71503 统一返回稳定 `[71503/<point>]` 与中文处理提示，覆盖 attach 和运行时 acceptance；失败不补曝光、监测或跳转。
-- 收口点击跳转、落地页回调和转场生命周期，保证完成、失败、取消和页面关闭路径只终结一次。
+- 优化 NativeFeed 视图绑定、点击交互与页面跳转。
 
 ## [6.2.4] - 2026-08-17
 
-- `releaseState`：`FORMAL`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结并公开；`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`。[GitHub Release 6.2.4](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4) 的 10 个资产已通过无 Token 匿名下载与正式消费 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 验证。
+<a id="修复"></a>
 
-### 修复
-
-- NativeFeed 外部 CTA 的非 Cell 场景新增 window-local 归属，不再强制共同紧包 wrapper；同 window/scene、几何紧凑相邻且非页面级范围时允许绑定。
-- 绑定时固化归属类型、结构锚点和双方祖先路径；运行中 reparent、共享、固定悬浮、离屏仍可点击、跨 window、远距离分散或页面级范围继续以 `IFLYAdErrorCodeNativeFeedClickViewsInvalid`（71503）失败关闭。
+- 优化 NativeFeed 视图绑定与点击处理。
 
 ## [6.2.3] - 2026-08-16
 
-- `releaseState`：`FORMAL`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结并公开；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `f6331ecf01aa902b5831a62ea8e205799c4301aa689f87bc216c0d1798e6f469`。[GitHub Release 6.2.3](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.3) 的 10 个资产已通过无 Token 匿名下载与正式消费 [Run 31939141466](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31939141466) 验证。
+<a id="新增"></a>
 
-### 新增
-
-- NativeFeed Binder 新增 `allowsExternalClickViews`（默认 `NO`）。显式开启后仅接受同 window/scene 且归属可判定的同 Cell 或窄范围兄弟视图；共享、固定悬浮、离屏仍可点击或归属不明时失败关闭，并通过 `nativeFeedAd:didRejectClickWithError:` 返回 `IFLYAdErrorCodeNativeFeedClickViewsInvalid`（71503）。
-- NativeFeed 新增 `detachFromCurrentContainer` 固定单容器便利入口；6.2.2 的 Ad 级 attach 与容器级 detach 仍是通用主路径。
+- NativeFeed 新增 `allowsExternalClickViews`，默认 `NO`；需要外部点击视图时显式开启。
+- 新增 `detachFromCurrentContainer` 便利方法。
 
 ## [6.2.2] - 2026-08-10
 
-- `releaseState`：`FORMAL`
-- 合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
+<a id="新增-1"></a>
+<a id="新增-2"></a>
+<a id="变更-8"></a>
+<a id="移除"></a>
 
-### 新增
-
-- NativeFeed 新增 Ad 级 `attachWithViewBinder:error:` 和容器级 `detachAdFromContainerView:`；SDK 内部管理会话、绑定代次、跨 Cell 串行迁移与同容器原子接管。
-- 公开固定卡片与 `UITableView` 列表示例统一为 SDK 托管模式，CI 新增新 API 正向、旧 API 反向及 Demo 真实 `xcodebuild build` 门禁。
-
-### 变更
-
-- 数据层只持 `IFLYNativeFeedAd`，Cell 不再持 Session、Binding、Binding 集合或首次/复用状态。暂时离屏只 detach 容器，回屏使用原 Ad 重新 attach。
-- 永久淘汰时 detach 已知容器并释放最后一个 Ad 强引用即可自动收口；`destroy` 只保留为仍持有 Ad 时的可选主动提前终止。
-- 曝光、点击和视频节点继续按逻辑内容去重；曝光前迁移在新容器重新累计 `500ms`，视频进度与播放意图跨 detach/attach 保留。
-- 同步带出 Base/S2S 在途 token gate 析构收口修复，并扩展点击回调丢弃灰度联调、S2S 测试环境保护、HTTP transport 测试、Server Bidding Demo 与正式二进制测试标记防污染门禁。
-
-### 移除
-
-- NativeFeed 公开头移除 `IFLYNativeFeedDisplaySession`、`IFLYNativeFeedAdBinding`、`beginDisplaySessionWithError:`、`bindAdWithViewBinder:error:`、`unbindAd` 和 `endDisplaySession`。该版必须迁移媒体代码并重新编译。
+- NativeFeed 改用 Ad 级 `attachWithViewBinder:error:` 挂载、容器级 `detachAdFromContainerView:` 解绑；数据层持有 Ad，Cell 离屏或复用时解绑。
+- 移除 `IFLYNativeFeedDisplaySession`、`IFLYNativeFeedAdBinding`、`beginDisplaySessionWithError:`、`bindAdWithViewBinder:error:`、`unbindAd` 和 `endDisplaySession`。从旧版升级须替换相关调用并重新编译。
 
 ## [6.2.1] - 2026-08-07
 
-### 新增
+<a id="新增-3"></a>
+<a id="变更-9"></a>
 
-- NativeFeed 新增 `IFLYNativeFeedDisplaySession` 与 `IFLYNativeFeedAdBinding`：数据层可按稳定 item ID 持有 `IFLYNativeFeedAd + DisplaySession`，Cell 只持当前 Binding，从而支持同一逻辑广告条目滚出后再回来继续展示原广告。
-- 新增 `beginDisplaySessionWithError:`、`attachWithViewBinder:error:`、`detach` 和 `endDisplaySession` 完整列表生命周期；旧 `bindAdWithViewBinder:error:` / `unbindAd` 继续保留一次性固定卡片语义，两种模式不能在同一广告实例混用。
-- 公开示例新增真实 `UITableView` 列表复用页面，覆盖稳定 item identity、`willDisplay` / `didEndDisplaying` 乱序、离屏 detach 与条目淘汰时 `endDisplaySession → destroy`。
-
-### 变更
-
-- 同一 DisplaySession 同时只允许一个活动 Binding；旧 Cell 的迟到 detach 由绑定 generation 隔离，不会误伤后来挂载的新 Cell。
-- TTL 或视频投放截止时间在当前 Binding 活动期间到达时，`session.valid` 会变为 `NO`，但不会中途强拆当前展示；正常 detach 后不得再挂载，媒体应结束旧会话并请求新广告。
-- 曝光前重新挂载会重新累计连续可见 `500ms`；已经曝光的逻辑广告不会因 Cell 复用重复曝光。视频进度与播放意图按逻辑条目保留，只有结束会话、关闭、销毁或过期后的 detach 才终止恢复能力。
+- NativeFeed 新增 `IFLYNativeFeedDisplaySession`、`IFLYNativeFeedAdBinding` 及列表展示接口，支持 Cell 复用。
+- 旧的 `bindAdWithViewBinder:error:` / `unbindAd` 用于固定卡片，两种接入方式不能在同一广告实例混用。
 
 ## [6.2.0] - 2026-08-06
 
-### 新增
+<a id="新增-4"></a>
+<a id="变更-10"></a>
 
-- NativeFeed 统一公开 `reportMediaShakeTriggeredWithError:`。通用版 仅保留统一 API 契约，不启用媒体摇一摇采样能力；调用会返回 `NO`，并通过 `IFLYAdErrorCodeNativeFeedMediaShakeUnavailable` 返回错误码 `71512`。
-
-### 变更
-
-- 收紧 ATT / IDFA 门控：iOS 14 及以上仅在 ATT 状态为 `authorized` 时读取、缓存或随普通请求及 S2S 请求发送 IDFA；用户撤销授权或 App 回到前台发现未授权时清除缓存。
-- 未授权阶段通过 `IFLYAdRequestConfig.idfa` 或 `setParamValue:forKey:` 显式设置的 IDFA 会被丢弃，不跨授权状态保留；授权成功后如需显式 IDFA，媒体必须重新读取并设置。
-- DeepLink 与自定义 scheme 跳转删除 `canOpenURL:` 预检，统一直接调用 `openURL:options:completionHandler:`，按系统 completion 判定成功并保留落地页 fallback。`jumpDirectly` 继续保留用于源码与二进制兼容，但设置值不再改变跳转行为，也不进入请求体。
-- CocoaPods 的 `Core` 显式链接 `AdSupport`，并弱链接 `AppTrackingTransparency`；新二进制继续以 iOS 11.0 为最低系统，避免 iOS 11～13 因 ATT 框架强依赖而无法启动。
+- 优化请求与跳转处理。
+- `jumpDirectly` 保留兼容，设置该属性不再影响跳转行为。
+- iOS 14 及以上传入 IDFA 前须取得 ATT 授权；授权后需要显式传入 IDFA 时，请重新读取并设置。
 
 ## [6.1.0] - 2026-07-31
 
-### 新增
+<a id="新增-5"></a>
+<a id="变更-11"></a>
+<a id="移除-1"></a>
+<a id="移除-2"></a>
 
-- NativeFeed `IFLYNativeFeedAdData` 新增 `appName`，对应服务端 `app_name`；仅 NativeFeed 暴露，空字符串和纯空白归一为 `nil`。
-- NativeFeed Binder 支持 `Exposure` / `Unknown` 显式传空 `clickViews` 完成仅曝光绑定；补齐视频 start / pause / resume / finish / fail 回调驱动的封面状态示例。
-- 公开示例新增单图、视频、多图三条直达路径；多图支持两至三张。
-
-### 变更
-
-- 五种广告格式通用响应字段严格收敛为 `bidInfo.price` 和 `bidInfo.dealId`；创意 ID 仅通过 NativeFeed 的 `adData.creativeId` 暴露。
-- NativeFeed CTA 改为服务端原始 `ctaText`；`templateId/materialType` 统一为 `0=Unknown`、`1=SingleImage`、`2=Video`、`3=MultipleImages`，按 `video → img1+img2 → img/icon → Unknown` 推导。
-- 多图最低要求由固定三张改为 `img1+img2`，`img3` 可选。绑定成功即消费广告实例；视图复用、替换广告或页面退出前须执行 `unbindAd → delegate=nil → destroy`。
-- NativeFeed 视频由 SDK 在媒体提供的普通 `UIView` 内托管播放器、观察者和监测；媒体不自行创建 `AVPlayer`。SDK 不再向自渲染容器添加摇一摇提示 UI。
-- SwiftPM 的 `Core` / `VideoUI` / `Reward` 伞 target 改为自动投递三域资源；所有 product 经 `Core` 自动携带 `PrivacyInfo.xcprivacy`，媒体不再手工复制资源。
-
-### 移除
-
-- 移除旧的 `ecpm`、`actionText`、`rawAdData`、`sponsored`、`ThreeImages` 和 `winNoticeAvailable` 公开 API。该版本需要业务代码迁移并重新编译，迁移说明见 [6.1.0 Tag 的 README](https://github.com/LJMcarryu/IFLYADLib_iOS/blob/6.1.0/README.md)。
+- NativeFeed 新增 `appName`，完善单图、视频、多图示例及 SwiftPM 资源集成。
+- 竞价信息改用 `bidInfo.price` / `bidInfo.dealId`；NativeFeed 按新版 `materialType`、`interactionType` 和 `ctaText` 接入。
+- 移除 `ecpm`、`actionText`、`rawAdData`、`sponsored`、`ThreeImages` 和 `winNoticeAvailable` 等旧公开 API。升级须修改相关调用并重新编译，见 [6.1.0 接入说明](https://github.com/LJMcarryu/IFLYADLib_iOS/blob/6.1.0/README.md)。
 
 ## [6.0.14] - 2026-07-20
 
-### 新增
-- 插屏和激励视频素材同时包含图片时，视频播放结束后展示图片完播页；开屏仍按原语义在视频结束后关闭，不增加完播页。
-- 请求链路补齐客户端竞价时间戳、曝光宏和设备调试状态字段。
+<a id="新增-6"></a>
+<a id="变更-12"></a>
 
-### 变更
-- SDK、公开 Podspec、Swift Package、示例工程与全部重新构建的 device / simulator 二进制最低系统统一为 iOS 11.0；历史 `6.0.13` 及更早产物不追溯扩大支持范围。
-- 请求字段 `lts` 从顶层移入 `device` 对象；公开 API 签名不变。
-- 7 个模块二进制按 iOS 11 重新构建；`Package.swift` 的 7 个 URL/checksum 与 `IFLYADLib.podspec` 合并 zip 源同步到 `6.0.14`。
+- 最低支持系统调整为 iOS 11.0。
+- 完善视频完播页，优化广告请求。
 
 ## [6.0.13] - 2026-07-09
 
-### 新增
-- 自渲染信息流的「点击+摇一摇」广告绑定成功后，由 SDK 在容器右下角自动添加「摇一摇查看详情」提示，并避让关闭按钮。
-- 自渲染素材校验失败时增加脱敏诊断日志；公开 API 签名不变。
+<a id="新增-7"></a>
+
+- 优化 NativeFeed 展示与素材处理。
 
 ## [6.0.12] - 2026-07-08
 
-### 说明
-- **版本对齐发版，标准版无行为变化**：公开 API、`Full` 行为、各格式能力、交付形态（模块化 SDK 静态 xcframework + 三域资源 bundle）均与 `6.0.11` 一致。本版本随 YS 定制仓 `YSIFLYADLib 6.0.12`（交付形态动态 framework → 静态 framework）三仓对齐版本号发布。
-- 7 个模块二进制随版本号重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.12`。
+<a id="说明"></a>
+
+- 更新版本分发，公开 API 与广告能力保持不变。
 
 ## [6.0.11] - 2026-07-08
 
-### 修复
-- **移除跳转黑名单中的 `itms-services` / `itms-apps` 字面量，改为 `itms` 前缀拦截**：自定义 scheme 跳转的危险 scheme 黑名单原以完整字面量列举 `itms` / `itms-apps` / `itms-services`（用于**拦截**这类 App Store / 企业分发（OTA）链接，SDK 自身从不构造、不调起），现改为按 `itms` 前缀统一拦截。效果：编译产物中不再出现 `itms-services` 完整字符串（避免被应用市场 / 审核的二进制静态扫描误判为企业分发 / 侧载），拦截行为完全不变且更严（覆盖整个 `itms` 家族）。公开 API、`Full` 行为、各格式能力均与 `6.0.10` 一致。
+<a id="修复-1"></a>
+<a id="修复-2"></a>
+<a id="说明-1"></a>
+<a id="说明-2"></a>
 
-### 说明
-- 7 个模块二进制相对 `6.0.10` 因该改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.11`。
+- 优化广告跳转。
 
 ## [6.0.10] - 2026-07-01
 
-### 新增
-- **自渲染信息流（NativeFeed）新增落地页关闭前回调 `nativeFeedAdWillDismissLandingPage:`**：在内嵌落地页关闭动画开始前**同步**回调，作为「落地页露出前的最后确认点」，供媒体在落地页收起、广告重新露出前做最后一次确认；随后仍会照常回调 `nativeFeedAdDidDismissLandingPage:`。该方法桥接 SDK 内部已有的落地页 dismiss-will-start 时机，是 `IFLYNativeFeedAdDelegate` 新增的**可选**方法。公开 API 其余部分、`Full` 行为、各格式能力均与 `6.0.9` 一致。
+<a id="新增-8"></a>
+<a id="说明-3"></a>
 
-### 说明
-- 仅 NativeFeed 暴露该回调；基类桥接对其它 4 格式为 no-op，公开头集合不变。7 个模块二进制相对 `6.0.9` 因新增回调重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.10`。
+- NativeFeed 新增可选回调 `nativeFeedAdWillDismissLandingPage:`，用于在落地页开始关闭前处理宿主页面；原有关闭完成回调保留。
 
 ## [6.0.9] - 2026-06-30
 
-### 变更
-- **自渲染信息流（NativeFeed）放宽素材完整性判定**：广告标题、视频封面图均改为**非必填**；`isMaterialComplete` 仅按素材类型校验核心素材（单图 ≥1 张图 / 视频含可播放 `videoURL` / 三图 ≥3 张图），与开屏 / 插屏 / Banner / 激励的原生视频素材口径对齐。缺标题或缺视频封面的素材不再被判为不完整而加载失败。公开 API、`Full` 行为、各格式能力均与 `6.0.8` 一致。
-- **服务端竞价（S2S）测试环境域名对齐**：测试环境（`IFLYAd_TEST_ENVIRONMENT`）`/ad/sdk-s2s/bid`、`/ad/sdk-s2s/load` 由 `sdk-grey.voiceads.cn` 对齐为 `sdk-adx.voiceads.cn`；生产环境本就为 `sdk-adx.voiceads.cn`，故发布二进制无变化。
+<a id="变更-13"></a>
+<a id="说明-4"></a>
 
-### 说明
-- 7 个模块二进制相对 `6.0.8` 因素材判定改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.9`。
+- 优化 NativeFeed 素材兼容性与竞价处理。
 
 ## [6.0.8] - 2026-06-22
 
-### 变更
-- **SDK 内部日志整体清除，仅保留关键节点 `error`**：`info` / `warn` / 调试 / JSON 日志宏整体置为无操作（不再产生任何输出），仅保留各失败关键节点的 `error` 日志（请求 / 渲染 / 播放 / 监测失败等）；`error` 日志内容仅含错误码与脱敏文案，不打印内部类名（`NSStringFromClass`）或裸 `NSError`。彻底杜绝运行期日志外泄内部符号。公开 API、`Full` 行为、各格式能力均与 `6.0.7` 一致。
+<a id="变更-14"></a>
+<a id="说明-5"></a>
 
-### 说明
-- 7 个模块二进制相对 `6.0.7` 因日志改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.8`。
+- 优化日志处理。
 
 ## [6.0.7] - 2026-06-18
 
-### 变更
-- **服务端竞价（S2S）正式环境域名切换**：生产环境 `/ad/sdk-s2s/bid`、`/ad/sdk-s2s/load` 地址由 `msdk.voiceads.cn` 切换为 `sdk-adx.voiceads.cn`；灰度调试地址 `sdk-grey.voiceads.cn` 不变。`PrivacyInfo.xcprivacy` 的 `NSPrivacyTrackingDomains` 新增 `sdk-adx.voiceads.cn`。公开 API、`Full` 行为、各格式能力均与 `6.0.6` 一致。
+<a id="变更-15"></a>
+<a id="说明-6"></a>
 
-### 说明
-- 7 个模块二进制相对 `6.0.6` 因 S2S 生产地址改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.7`。
+- 优化服务端竞价接入。
 
 ## [6.0.6] - 2026-06-17
 
-### 变更
-- **SDK 内部日志精简**：删除调试级与冗余追踪日志（约 322 → 181 条），保留全部 `error` / `warn` 与关键业务里程碑（请求 / 展示 / 点击 / 关闭 / 发奖 / 竞价）。
-- **日志输出彻底去 IFLY 字眼**：移除日志中打印内部类名（`NSStringFromClass`）与裸 `NSError`（域名合成串）的路径；运行期日志前缀 `[AdSDK]`、模块名与文案均无品牌名。公开 API、`Full` 行为、各格式能力均与 `6.0.5` 一致。
+<a id="变更-16"></a>
+<a id="说明-7"></a>
 
-### 说明
-- 7 个模块二进制相对 `6.0.5` 因日志改动重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.6`。
+- 优化日志处理。
 
 ## [6.0.5] - 2026-06-17
 
-### 修复
-- **资源加载器跨域兜底**：请求域未命中时回退其余域 bundle，修复边界资产（`IFLYFPlayer_slider` 归 VideoUI 域却经 Core 交互域请求）在按广告形式分包（模块化 SDK）下的"域内缺图"。
-- 开屏交互图标改用统一资源加载器（按域定位 + 密度选择），替换裸文件路径加载。
+<a id="修复-3"></a>
+<a id="变更-17"></a>
 
-### 变更
-- SDK 版本号常量（随广告请求上报的 `sdk_ver`）由 `6.0.1` 对齐到发版号 `6.0.5`（此前 6.0.2–6.0.4 为打包型发版，未同步该常量）。
-- 7 个模块二进制相对 `6.0.4` 重新构建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.5`。
+- 优化资源加载。
 
 ## [6.0.4] - 2026-06-16
 
-### 变更
-- 运行期日志行前缀去品牌：`[IFLYAd <时间戳>]` → `[AdSDK <时间戳>]`（合规去名）。仅日志输出文本变化，公开 API、`Full` 行为、各格式能力均与 `6.0.3` 一致。
+<a id="变更-18"></a>
+<a id="说明-8"></a>
 
-### 说明
-- 7 个模块二进制相对 `6.0.3` 均因日志字符串改动而重建，`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 的合并 zip 源已同步更新到 `6.0.4`。
+- 调整日志输出。
 
 ## [6.0.3] - 2026-06-15
 
-### 修复
-- 伞头 `IFLYADLib.h` 的各格式头 import 改用 `#if __has_include(...)` 守卫：按广告形式部分安装（模块化 SDK）时也可直接 `#import <IFLYADLib/IFLYADLib.h>`（此前部分安装用伞头会因缺少未安装格式的头而编译失败，只能 import 具体格式头）。全量 `Full` 行为不变。
+<a id="修复-4"></a>
+<a id="说明-9"></a>
 
-### 说明
-- 仅头文件变更：各模块二进制与 `6.0.2` 一致（`Core` 的 xcframework checksum 因伞头改动而变化，其余 6 个模块不变）。
+- 优化按广告形式安装时的头文件兼容性。
 
 ## [6.0.2] - 2026-06-15
 
-### 修复
-- 模块化 SDK 产物补齐 `PrivacyInfo.xcprivacy`（修复相对 6.0.0 单包的隐私清单回归）。静态库无法内嵌隐私清单，故随 `Core` 资源经 `IFLYADLibCoreResources` 资源 bundle 交付；SPM 接入方需手动包含（见 README「隐私清单」）。
+<a id="修复-5"></a>
+<a id="说明-10"></a>
 
-### 说明
-- 公开 API 与 `Full` 行为与 `6.0.1` / `6.0.0` 一致；SPM 各模块二进制与 `6.0.1` 字节一致（仅 CocoaPods 合并包新增隐私清单与资源）。
+- 完善隐私清单与资源交付。SwiftPM 接入须按该版本指南添加隐私清单。
 
 ## [6.0.1] - 2026-06-15
 
-### 新增
-- 「按广告形式可组合接入」（模块化 SDK）：CocoaPods subspec（`Core` 必选 + `Banner`/`Splash`/`Interstitial`/`NativeFeed`/`Reward` 按需，`VideoUI` 与资源自动带入）与 Swift Package Manager。
-- 各模块独立 `xcframework`（含 device + simulator 切片，可在模拟器调试），托管于 GitHub Releases `6.0.1`。
+<a id="新增-9"></a>
+<a id="说明-11"></a>
 
-### 说明
-- 公开 API 与 `Full` 行为与 `6.0.0` 一致，业务代码无需改动。
-- SPM 接入需在 App target 的 `OTHER_LDFLAGS` 添加 `-ObjC`；SPM 不携带资源 bundle（详见 README）。
+- 新增 CocoaPods 按广告形式安装与 SwiftPM 接入，提供真机和模拟器切片。
+- SwiftPM 接入须在 App target 添加 `-ObjC`，并按该版本指南加入资源。
 
 ## [6.0.0] - 2026-06-12
 
-### 变更
-- SDK API 大版本升级；公开 `IFLYSplashAd`、`IFLYBannerAd`、`IFLYInterstitialAd`、`IFLYNativeFeedAd`、`IFLYRewardVideoAd`。
-- 统一请求配置 `IFLYAdRequestConfig` 与展示配置；重写媒体侧示例工程。
-- 交付形态：单一 `IFLYADLib.framework`（仅真机 arm64，不含模拟器切片）。
+<a id="变更-19"></a>
+
+- 升级广告 API，提供开屏、Banner、插屏、信息流与激励视频接口。
+- 统一请求与展示配置，更新接入示例；该版本为真机 arm64 framework。
 
 ## [5.5.1] - 2026-04-14
 
-### 修复
-- CAID 字段为空未过滤、CAID 缓存过期未生效。
+<a id="修复-6"></a>
+
+- 优化请求处理。
 
 ## 更早版本
 
@@ -364,11 +260,7 @@
 [6.0.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.1
 [6.0.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.0.0
 [5.5.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/5.5.1
-
 [6.3.5]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.5
-
 [6.3.1]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.1
-
 [6.3.0]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.3.0
-
 [6.2.4]: https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4
