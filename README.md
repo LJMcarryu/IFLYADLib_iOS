@@ -39,7 +39,7 @@
 
 ## 升级到 6.5.0
 
-七模块 XCFramework 采用带 modulemap 的静态 framework。Swift 可直接导入模块，无需为本 SDK 配置 bridging header；Objective-C 需从旧 `<IFLYADLib/...>` 路径迁移。步骤见[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)。本版还包含 `ids_a`、CAID 时间字段和传感器能力守卫变化，详见[更新记录](CHANGELOG.md)。
+七模块 XCFramework 采用带 modulemap 的静态 framework。Swift 可直接导入模块，无需为本 SDK 配置 bridging header；Objective-C 需从旧 `<IFLYADLib/...>` 路径迁移。步骤见[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)。
 
 ## 安装
 

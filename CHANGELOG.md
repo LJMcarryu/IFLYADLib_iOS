@@ -26,9 +26,6 @@
 
 - Core、VideoUI、Banner、Splash、Interstitial、NativeFeed、Reward 七个 XCFramework 的切片改为静态 framework，提供模块专属伞头和 modulemap。`Full` 仍为聚合 product/subspec，不新增第八个二进制。
 - Swift 使用 `import IFLYAdCore` 和所选格式模块；Objective-C 从 `<IFLYADLib/...>` 迁移到 `<IFLYAdCore/...>`、`<IFLYAdBanner/...>` 等路径。公开类、方法和协议签名保持，头导入属于源码接入迁移；不承诺新版继续支持旧头路径。依赖闭包和迁移步骤见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)。
-- 共享点击策略响应字段从 `isdclick` 改为 `ads[].ext.ids_a`，监测宏从 `__ISDCLICK__` 改为 `__IDS_A__`。字段和监测模板须配套迁移；不承诺新旧字段双读，旧正式包不能据此当作支持新字段。通用 NativeFeed 不启用优酷专有的 SDK 摇/扭 fallback，也不因此增加媒体摇一摇上报能力。
-- CAID 请求增加 `sysFileTime`、`deviceInitTime`：读取系统路径时间并处理不可取得的值；读取失败分别使用空字符串和 `__DEVICE_INIT_TIME_UNAVAILABLE__`。这改变请求内容，须核对服务端兼容性、宿主隐私告知与平台合规要求；旧审核记录不覆盖本变化。
-- 共享互动传感器在加速度计不可用时不启动采样。该守卫不等同于已完成点击替代、传感器降级或真实设备体验验收。
 
 ### 验证边界
 

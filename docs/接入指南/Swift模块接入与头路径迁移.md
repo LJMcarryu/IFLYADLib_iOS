@@ -6,7 +6,6 @@
 
 本次覆盖 Core、VideoUI、Banner、Splash、Interstitial、NativeFeed、Reward 七模块，仍然静态链接。每个 XCFramework 的平台切片从 `.a + Headers` 改为带 `Headers`、`Modules/module.modulemap` 和模块专属伞头的 `.framework`；无需嵌入动态库。`Full` 继续聚合五种广告及其依赖，不是第八个二进制，也不是可替代二进制模块名的导入承诺。
 
-本版还包含点击策略 `ids_a`、CAID 系统时间字段和加速度计能力守卫变化。升级前由服务端及宿主负责人一起审阅[更新记录](../../CHANGELOG.md)，不能只替换包装后沿用旧字段、监测模板或合规结论。优酷 NativeFeed 的 SDK 摇/扭 fallback 不属于通用能力。
 
 公开类、方法和协议签名保持；旧 `<IFLYADLib/...>` 头路径在本次目标结构中不作为兼容承诺，因此 Objective-C 工程需要修改导入。全部模块和资源锁定同一版本；不要混用新旧模块，或同时链接通用版 与任一导出相同 `IFLY*` 类的整包。
 
