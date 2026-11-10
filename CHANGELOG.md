@@ -1,33 +1,28 @@
 # 更新日志
 
-## [6.5.0] - 极速发布（未验证）
+## [6.5.0] - 更新说明
 
-> **6.5.0 发布回执状态为 `FAST_UNVERIFIED`**。本次已补充完成 CocoaPods trunk 安装、锁定版本和 iOS Simulator 构建验证；匿名下载复验、SwiftPM 消费验收、真机广告填充和 Apple 审核仍未执行。
+> `6.5.0` 已验证 CocoaPods、SwiftPM 的安装、版本锁定与模拟器构建；真机广告展示需在宿主 App 中联调。
 
 <!-- ifly-release-status: {"version":"6.5.0","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json"} -->
-
-资产上传摘要见[极速发布记录](https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json)，元数据提交以同版本 Tag 为准；公开状态为 `FAST_PUBLISHED`，不表示全量验收通过。CocoaPods trunk 已由极速入口自动发布；Apple 人工审核和真实媒体验收未执行。
 
 > 以下为历史版本记录，验收结论仅适用于各节明确列出的历史版本。
 
 ## [6.4.6] - TOS 分发
 
-
-
 本版 SDK 二进制改由火山云 TOS 分发，下载基础地址为 `https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general`。SwiftPM 与 CocoaPods 的公开版本入口保持，生产项目固定 `6.4.6`。通用版沿用七模块静态 framework 与既有模块导入路径。
 
-产物清单、大小、SHA-256、源码与元数据提交见 [TOS 发布记录](https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json)。只有该记录存在且 `release-state.json` 为 `CLOSED` 才表示本版发布完成。正式证据包含匿名下载以及 SwiftPM/CocoaPods 的 simulator/device 编译链接与资源检查；普通 CI 只检查元数据。CocoaPods trunk 已由极速入口自动发布；Apple 人工审核与真实媒体验收不在本次分发完成范围。
+下载文件与校验值见[版本下载记录](https://download-adsdk.voiceads.cn/ios_sdk/6.4.6/general/release-record.json)。
 
 > 以下为历史版本记录，其中当前版本和验收结论仅适用于各自历史版本。
 
 ## [6.4.5] - 模块化静态框架
 
-
-`6.4.5` 的正式分发资料以同版本冻结 manifest 为准。公开时间和消费结论以 `release-state.json.publication` 与 [Release 6.4.5](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5) 为准。历史 Tag、Release 和资产保持不可变。
+历史版本：[Release 6.4.5](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.5)
 
 ### 变更范围
 
-本版使用冻结记录绑定的私有源码提交；源码身份、冻结产物和验证结论以同版本回执为准。范围仅为通用模型 A，其他渠道保持既有正式版本。除分发结构外还包含下列共享实现变化，因此不是纯包装升级：
+本版适用于通用版，包含以下变化：
 
 - Core、VideoUI、Banner、Splash、Interstitial、NativeFeed、Reward 七个 XCFramework 的切片改为静态 framework，提供模块专属伞头和 modulemap。`Full` 仍为聚合 product/subspec，不新增第八个二进制。
 - Swift 使用 `import IFLYAdCore` 和所选格式模块；Objective-C 从 `<IFLYADLib/...>` 迁移到 `<IFLYAdCore/...>`、`<IFLYAdBanner/...>` 等路径。公开类、方法和协议签名保持，头导入属于源码接入迁移；不承诺新版继续支持旧头路径。依赖闭包和迁移步骤见[迁移指南](docs/接入指南/Swift模块接入与头路径迁移.md)。
@@ -37,19 +32,17 @@
 
 ### 验证边界
 
-验证结果以同版本冻结记录、正式消费 Actions 和 `release-state.json` 为准。iOS 11 最低系统声明、二进制检查与真机运行分别记录；编译消费不能替代实际媒体投放验证。Apple Review 未执行时保持 `not-run`。
+该历史版本的编译验证不替代宿主 App 的真机广告展示与审核。
 
 ## [6.4.4] - 发布工程优化
 
 > 本节为 6.4.4 历史记录。
 
-`6.4.4` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
+历史版本：[`6.4.4`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.4)
 
 ### 变更
 
 - 全渠道统一为 `6.4.4`，从同一共享源码重新构建，公开 API 方法签名、广告能力和最低 iOS 11.0 要求保持。
-- 发布工程稳定脚本回归的执行环境与复用证明，保留完整构建、测试和消费验证范围。
-
 
 版本的兼容变化以各节变更和目标版本公开头为准；历史补丁版本也可能包含需要修改媒体代码的 API 迁移。格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)。
 
@@ -57,7 +50,7 @@
 
 > 以下为 `6.4.3` 历史记录；其中“当前”“本版”均只指该历史版本。
 
-`6.4.3` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.3`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.3)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
+历史版本：[`6.4.3`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.3)
 
 ### 变更
 
@@ -68,24 +61,22 @@
 
 > 以下为 `6.4.2` 历史记录；其中“当前”“本版”均只指该历史版本。
 
-`6.4.2` 的正式分发资料以同版本真实冻结 manifest 为准。当前正式版本：[`6.4.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2)；公开时间和消费验证结论以 `release-state.json.publication` 与同版本 GitHub Release 的实际状态为准。历史 Tag、Release 和资产保持不可变。
+历史版本：[`6.4.2`](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.2)
 
 ## [6.4.1] - 发布工程优化
 
 > 以下为 `6.4.1` 历史记录；其中“当前”“本版”均只指该历史版本。
 
-`6.4.1` 的正式分发资料由同版本冻结库存生成；公开时间和消费验证结论以 `release-state.json.publication` 与 [Release 6.4.1](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1) 的实际状态为准。
+历史版本：[Release 6.4.1](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.1)
 
 ### 变更
 
-- 优化正式发布编排：统一入口与 profile 路由不减少正式五阶段门禁。
-- 发布脚本回归支持绑定完整身份的不可变回执与确定性分片；SDK、Demo、Scene 和变体测试仍按候选独立执行。
 - 增加匿名逐资产恢复、正式 consumer 受控恢复、摘要日志和运行耗时证据。
 - SDK 与 UI 行为继承 `6.4.0`，没有新增公开 API。
 
 ## [6.4.0] - 冻结与发布记录
 
-`6.4.0` 的正式分发资料与签名资产已经冻结；公开时间和消费结论以 `release-state.json.publication` 与 [Release 6.4.0](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.0) 的实际状态为准。
+历史版本：[Release 6.4.0](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.4.0)
 
 ### 变更
 
@@ -98,18 +89,12 @@
 
 正式发布于 2026-09-14；本版本的消费结果见 [RELEASING](RELEASING.md)。历史章节只描述各自版本，不替代当前接入契约。
 
-签名资产已冻结，冻结日期为 2026-09-14。公开日期和消费结论以 `release-state.json` 的 `publication` 字段及同版本 Release 为准；`publication=null` 表示尚未公开。
-
 - `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`82d8cab58eba588104eee9bc89063952a277af65`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b1bc50e272c29dd817cfcee8bbeeb9d60dfaca89`
-- `candidateId`：`17cccada18787f54c2faca204769d245a3ee29adf40f6c85c679896c28f16ba4`
-- `IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`。7 个 SwiftPM checksum 与 10 项资产已冻结；匿名下载、逐项 SHA-256 和正式消费验证由发布流水线执行。
-- Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
+- `IFLYADLib-modelA-6.3.5.zip` 的冻结 SHA-256 为 `e98a475110012cbe7399238bee61956ae6fd7ac37108c79a63bd80919a326884`。
 
 ### 变更
 
-- 统一版本至 `6.3.5`，保留五种广告形式及模型 A 的七模块组合能力；公开 API 和错误码保持。
+- 统一版本至 `6.3.5`，保留五种广告形式及模块化 SDK 的七模块组合能力；公开 API 和错误码保持。
 - 加强五种广告的加载代次、回调重入、曝光检测停止与终态资源清理；共享图片下载支持各订阅独立取消。
 - 修复开屏全交互回流、视频暂停恢复及完播关闭边界，插屏视频素材验真在后台完成并复核文件身份。
 - 增加公共请求阶段和广告生命周期诊断，硬化 Release 日志脱敏与裁剪；NativeFeed 点击使用独立落地页宿主，激励动画丢弃迟到 completion。
@@ -117,11 +102,7 @@
 ## [6.3.1] - 2026-09-01
 
 - `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`b7e46a9f06897924d3d69d4d6a7e43f6237d8579`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`b86f5d7dc5e1105194889bc60a5ee9eec40b611f`
-- `candidateId`：`74f506ec2562caac2d0f1f48a404c1c3b69a1a2d29463ce94067b18821d1f1d7`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.1.zip` 的冻结 SHA-256 为 `4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5`。公开库存固定为 10 项，由发布流水线执行无 Token 匿名下载、逐项 SHA-256 与正式消费验证。
-- Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
+- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.1.zip` 的冻结 SHA-256 为 `4739b9945be7d179d32261649220703160badb5632d4b9acf47f86c8350629c5`。
 
 ### 变更
 
@@ -132,11 +113,7 @@
 ## [6.3.0] - 2026-08-25
 
 - `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`38eb0715f889fe2d585641891923511c9cc3e43e`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`0e667f9f1a2d615d3f7e15a552f093c903ff1a57`
-- `candidateId`：`1b69dab08ac31e756b707d824b2548c2c2cfd66b343007d00e43efdbee795c44`
-- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.0.zip` 的冻结 SHA-256 为 `fdf7c98bf1332b78cc6e2c7a840dd8cc804fb607e754cc457f969ce6e448a6f2`。公开库存固定为 10 项，由发布流水线执行无 Token 匿名下载、逐项 SHA-256 与正式消费验证。
-- Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
+- 正式签名资产和 7 个 SwiftPM checksum 已冻结；`IFLYADLib-modelA-6.3.0.zip` 的冻结 SHA-256 为 `fdf7c98bf1332b78cc6e2c7a840dd8cc804fb607e754cc457f969ce6e448a6f2`。
 
 ### 变更
 
@@ -149,11 +126,7 @@
 ## [6.2.4] - 2026-08-17
 
 - `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`b0f745d582ce2bed5110702cff972be4153e5038`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`7b08118b43a0c4441de4c76a64f34fa54b3fe889`
-- `candidateId`：`61f427469346615982e0225fad8187611794cc0a54c452da83073e89fd5ea1bd`
 - 正式签名资产和 7 个 SwiftPM checksum 已冻结并公开；`IFLYADLib-modelA-6.2.4.zip` 的冻结 SHA-256 为 `1ad521c06ad4c14909c9e1e816861f5898226e261c87d7e8ee4d4981c178791d`。[GitHub Release 6.2.4](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.4) 的 10 个资产已通过无 Token 匿名下载与正式消费 [Run 32027224523](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/32027224523) 验证。
-- Apple Review 扫描未执行且不是发布门禁：`requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`。
 
 ### 修复
 
@@ -163,10 +136,7 @@
 ## [6.2.3] - 2026-08-16
 
 - `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`ea0240e620b57d7275e486199099c648f51de257`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`0f26b7647e6c1aadb32eca68b24f6845639a59c2`
 - 正式签名资产和 7 个 SwiftPM checksum 已冻结并公开；`IFLYADLib-modelA-6.2.3.zip` 的冻结 SHA-256 为 `f6331ecf01aa902b5831a62ea8e205799c4301aa689f87bc216c0d1798e6f469`。[GitHub Release 6.2.3](https://github.com/LJMcarryu/IFLYADLib_iOS/releases/tag/6.2.3) 的 10 个资产已通过无 Token 匿名下载与正式消费 [Run 31939141466](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31939141466) 验证。
-- 本版本未执行主动 Apple Review 扫描，该扫描不属于发布门禁；冻结状态为 `requiredForRelease=false`、`statusAtFreeze=not-run`、`evidenceIncluded=false`，不得表述为通过。
 
 ### 新增
 
@@ -176,11 +146,7 @@
 ## [6.2.2] - 2026-08-10
 
 - `releaseState`：`FORMAL`
-- `binarySourceCommit`（SDK 二进制源码提交）：`a8ec925d3731d7d11734647aa02ca7d91d674965`
-- `releaseMetadataCommit`（仅回填 checksum、扫描汇总和发布验收事实，不是 SDK 二进制源码提交）：`eff78263c2d3f65b029f4114de1a9ed00f3827f3`
-- 正式签名资产已从提交 A 构建、扫描并冻结；7 个 SwiftPM checksum 已回填，合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
-- 不可变 annotated tag 指向 `d5caeb26794d8000e13e40d4356d2ff79706a3a9`；通用版 10 个资产已在 GitHub Release 正式公开，并通过无 Token 匿名下载、逐字节同源、SwiftPM、CocoaPods、`-ObjC`、Demo 编译链接和 `pod spec lint` 终验（[Run 31347794760](https://github.com/LJMcarryu/IFLYADLib_iOS/actions/runs/31347794760)）。
-- 本版按确认范围保留并原样归档既有启发式残余风险，以 `failOn=high`、`failOnWarning=false`、`strict=false`、`requireManual=false` 发布；该发布不代表最终宿主合规、`Validate App` 或 Apple 审核通过。
+- 合并包 `IFLYADLib-modelA-6.2.2.zip` 的冻结 SHA-256 为 `f24cf6ea1d4e4319fbcef0fdb79a29aee5906f9bc35d81453052a6341379a673`。
 
 ### 新增
 
@@ -216,7 +182,7 @@
 
 ### 新增
 
-- NativeFeed 统一公开 `reportMediaShakeTriggeredWithError:`。通用模型 A 仅保留统一 API 契约，不启用媒体摇一摇采样能力；调用会返回 `NO`，并通过 `IFLYAdErrorCodeNativeFeedMediaShakeUnavailable` 返回错误码 `71512`。
+- NativeFeed 统一公开 `reportMediaShakeTriggeredWithError:`。通用版 仅保留统一 API 契约，不启用媒体摇一摇采样能力；调用会返回 `NO`，并通过 `IFLYAdErrorCodeNativeFeedMediaShakeUnavailable` 返回错误码 `71512`。
 
 ### 变更
 
@@ -265,7 +231,7 @@
 ## [6.0.12] - 2026-07-08
 
 ### 说明
-- **版本对齐发版，标准版无行为变化**：公开 API、`Full` 行为、各格式能力、交付形态（模型 A 静态 xcframework + 三域资源 bundle）均与 `6.0.11` 一致。本版本随 YS 定制仓 `YSIFLYADLib 6.0.12`（交付形态动态 framework → 静态 framework）三仓对齐版本号发布。
+- **版本对齐发版，标准版无行为变化**：公开 API、`Full` 行为、各格式能力、交付形态（模块化 SDK 静态 xcframework + 三域资源 bundle）均与 `6.0.11` 一致。本版本随 YS 定制仓 `YSIFLYADLib 6.0.12`（交付形态动态 framework → 静态 framework）三仓对齐版本号发布。
 - 7 个模块二进制随版本号重建；`Package.swift` 各 `binaryTarget` checksum 与 `IFLYADLib.podspec` 合并 zip 源已同步到 `6.0.12`。
 
 ## [6.0.11] - 2026-07-08
@@ -321,7 +287,7 @@
 ## [6.0.5] - 2026-06-17
 
 ### 修复
-- **资源加载器跨域兜底**：请求域未命中时回退其余域 bundle，修复边界资产（`IFLYFPlayer_slider` 归 VideoUI 域却经 Core 交互域请求）在按广告形式分包（模型 A）下的"域内缺图"。
+- **资源加载器跨域兜底**：请求域未命中时回退其余域 bundle，修复边界资产（`IFLYFPlayer_slider` 归 VideoUI 域却经 Core 交互域请求）在按广告形式分包（模块化 SDK）下的"域内缺图"。
 - 开屏交互图标改用统一资源加载器（按域定位 + 密度选择），替换裸文件路径加载。
 
 ### 变更
@@ -339,7 +305,7 @@
 ## [6.0.3] - 2026-06-15
 
 ### 修复
-- 伞头 `IFLYADLib.h` 的各格式头 import 改用 `#if __has_include(...)` 守卫：按广告形式部分安装（模型 A）时也可直接 `#import <IFLYADLib/IFLYADLib.h>`（此前部分安装用伞头会因缺少未安装格式的头而编译失败，只能 import 具体格式头）。全量 `Full` 行为不变。
+- 伞头 `IFLYADLib.h` 的各格式头 import 改用 `#if __has_include(...)` 守卫：按广告形式部分安装（模块化 SDK）时也可直接 `#import <IFLYADLib/IFLYADLib.h>`（此前部分安装用伞头会因缺少未安装格式的头而编译失败，只能 import 具体格式头）。全量 `Full` 行为不变。
 
 ### 说明
 - 仅头文件变更：各模块二进制与 `6.0.2` 一致（`Core` 的 xcframework checksum 因伞头改动而变化，其余 6 个模块不变）。
@@ -347,7 +313,7 @@
 ## [6.0.2] - 2026-06-15
 
 ### 修复
-- 模型 A 产物补齐 `PrivacyInfo.xcprivacy`（修复相对 6.0.0 单包的隐私清单回归）。静态库无法内嵌隐私清单，故随 `Core` 资源经 `IFLYADLibCoreResources` 资源 bundle 交付；SPM 接入方需手动包含（见 README「隐私清单」）。
+- 模块化 SDK 产物补齐 `PrivacyInfo.xcprivacy`（修复相对 6.0.0 单包的隐私清单回归）。静态库无法内嵌隐私清单，故随 `Core` 资源经 `IFLYADLibCoreResources` 资源 bundle 交付；SPM 接入方需手动包含（见 README「隐私清单」）。
 
 ### 说明
 - 公开 API 与 `Full` 行为与 `6.0.1` / `6.0.0` 一致；SPM 各模块二进制与 `6.0.1` 字节一致（仅 CocoaPods 合并包新增隐私清单与资源）。
@@ -355,7 +321,7 @@
 ## [6.0.1] - 2026-06-15
 
 ### 新增
-- 「按广告形式可组合接入」（模型 A）：CocoaPods subspec（`Core` 必选 + `Banner`/`Splash`/`Interstitial`/`NativeFeed`/`Reward` 按需，`VideoUI` 与资源自动带入）与 Swift Package Manager。
+- 「按广告形式可组合接入」（模块化 SDK）：CocoaPods subspec（`Core` 必选 + `Banner`/`Splash`/`Interstitial`/`NativeFeed`/`Reward` 按需，`VideoUI` 与资源自动带入）与 Swift Package Manager。
 - 各模块独立 `xcframework`（含 device + simulator 切片，可在模拟器调试），托管于 GitHub Releases `6.0.1`。
 
 ### 说明

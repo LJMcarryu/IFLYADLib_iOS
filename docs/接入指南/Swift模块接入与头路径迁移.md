@@ -1,6 +1,6 @@
 # Swift 模块接入与头路径迁移
 
-本文面向从通用模型 A 旧包升级到 `6.5.0` 的宿主开发者。安装入口见[安装与分包](安装与分包.md)，历史 Tag、Release 和资产保持不可变。
+本文面向从通用版 旧包升级到 `6.5.0` 的宿主开发者。安装入口见[安装与分包](安装与分包.md)，历史 Tag、Release 和资产保持不可变。
 
 ## 先确认升级范围
 
@@ -8,7 +8,7 @@
 
 本版还包含点击策略 `ids_a`、CAID 系统时间字段和加速度计能力守卫变化。升级前由服务端及宿主负责人一起审阅[更新记录](../../CHANGELOG.md)，不能只替换包装后沿用旧字段、监测模板或合规结论。优酷 NativeFeed 的 SDK 摇/扭 fallback 不属于通用能力。
 
-公开类、方法和协议签名保持；旧 `<IFLYADLib/...>` 头路径在本次目标结构中不作为兼容承诺，因此 Objective-C 工程需要修改导入。全部模块和资源锁定同一版本；不要混用新旧模块，或同时链接通用模型 A 与任一导出相同 `IFLY*` 类的整包。
+公开类、方法和协议签名保持；旧 `<IFLYADLib/...>` 头路径在本次目标结构中不作为兼容承诺，因此 Objective-C 工程需要修改导入。全部模块和资源锁定同一版本；不要混用新旧模块，或同时链接通用版 与任一导出相同 `IFLY*` 类的整包。
 
 ## 选择产品与模块
 
@@ -77,7 +77,7 @@ import IFLYAdNativeFeed
 import IFLYAdReward
 ```
 
-SwiftPM 的 `Full`、`Banner` 等是产品名；本文不承诺 `import Full`、`import Banner` 或 `import IFLYADLib` 重导出模型 A 的公开 API。模块使用全名和正确大小写。
+SwiftPM 的 `Full`、`Banner` 等是产品名；本文不承诺 `import Full`、`import Banner` 或 `import IFLYADLib` 重导出通用版的公开 API。模块使用全名和正确大小写。
 
 升级并验证新模块后，可删除仅为本 SDK 配置的 bridging header 引用；如果同一 bridging header 仍服务于其他 Objective-C 代码，只移除 SDK 的旧头导入，保留其他配置。不要保留旧 SDK 头与新模块同时声明同一组类型。
 
@@ -113,7 +113,7 @@ IFLYAdRequestConfig *request = [IFLYAdRequestConfig new];
 | --- | --- |
 | `no such module 'IFLYAdCore'` | 确认使用新 framework 结构、Core 已加入目标，且没有继续解析旧版缓存。先检查依赖版本和实际切片，不加旧头搜索路径。 |
 | `IFLYADLib/... file not found` | 宿主仍使用旧导入，或混入旧公开头；按上表迁移并整组核对版本。 |
-| 类型重复或链接重复符号 | 检查是否同时链接整包和模型 A、重复 Core，或旧头与模块同时暴露同一类型。 |
+| 类型重复或链接重复符号 | 检查是否同时链接整包和模块化 SDK、重复 Core，或旧头与模块同时暴露同一类型。 |
 | Swift 能导入但 App 链接失败 | 检查完整依赖、最终 `-ObjC` 和系统 framework，不能把语法解析成功当作最终链接。 |
 | 能构建但无资源或隐私清单 | 查看最终 App 包，确认对应 bundle 与独立隐私清单已复制，再验证实际加载。 |
 | 部分格式能编译、组合失败 | 在只含所选格式依赖的干净宿主中重测；缺 Core 或必需 VideoUI 应报错，不添加未选格式兜底。 |
