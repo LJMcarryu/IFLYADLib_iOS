@@ -1,6 +1,6 @@
 # Swift 模块接入与头路径迁移
 
-本文面向从通用版 旧包升级到 `6.5.0` 的宿主开发者。安装入口见[安装与分包](安装与分包.md)，历史 Tag、Release 和资产保持不可变。
+本文面向从通用版旧包升级到 `6.5.0` 的宿主开发者。6.5.0 暂不提供 SwiftPM 对外接入，请使用 CocoaPods 或手动集成；安装入口见[安装与分包](安装与分包.md)。历史 Tag、Release 和资产保持不可变。
 
 ## 先确认升级范围
 
@@ -13,7 +13,7 @@
 
 产品名用于选择安装内容，二进制模块名用于代码导入。仅导入所安装格式；VideoUI 为视频格式的内部依赖，不提供宿主广告入口。
 
-| 需要的能力 | SwiftPM product / CocoaPods subspec | 必需二进制模块 | Swift 导入 |
+| 需要的能力 | CocoaPods subspec / 手动模块 | 必需二进制模块 | Swift 导入 |
 | --- | --- | --- | --- |
 | 基础配置和公共类型 | `Core` | `IFLYAdCore` | `import IFLYAdCore` |
 | Banner | `Banner` | Core、`IFLYAdBanner` | Core、`IFLYAdBanner` |
@@ -23,17 +23,17 @@
 | 激励视频 | `Reward` | Core、VideoUI、`IFLYAdReward` | Core、`IFLYAdReward` |
 | 五种格式 | `Full` | 全部七模块 | Core 与实际调用的五种格式模块 |
 
-表中 Core、VideoUI 分别指 `IFLYAdCore`、`IFLYAdVideoUI`。多个格式共用一份 Core 和 VideoUI；包管理器通过 product/subspec 的依赖关系带入，手动集成须自行补齐。
+表中 Core、VideoUI 分别指 `IFLYAdCore`、`IFLYAdVideoUI`。多个格式共用一份 Core 和 VideoUI；CocoaPods 通过 subspec 依赖关系带入，手动集成须自行补齐。
 
 ## 安装与宿主配置
 
 以下步骤使用同一版本的正式资产，固定为 `6.5.0`。
 
-1. 选择一种安装方式。SwiftPM 固定 `6.5.0` Tag 和所需 product；CocoaPods 使用官方 trunk 与所需 subspec，具体命令见[安装指南](安装与分包.md)。
+1. 选择一种安装方式。CocoaPods 使用官方 trunk 与所需 subspec；手动集成按同版完整包补齐模块和资源，具体命令见[安装指南](安装与分包.md)。
 2. 手动接入时，替换所选格式及全部依赖的 XCFramework；把各模块的 XCFramework 根目录交给 Xcode 选择平台切片，Embed 设为 **Do Not Embed**。不要单独拖入切片 framework，也不要复制旧切片的头目录覆盖新包。
-3. 最终 App target 的 `Other Linker Flags` 添加 `$(inherited) -ObjC`。CocoaPods 的配置传播也须在最终 App 的 build settings 中确认；SwiftPM 接入由宿主设置此参数。
+3. 最终 App target 的 `Other Linker Flags` 添加 `$(inherited) -ObjC`。CocoaPods 的配置传播也须在最终 App 的 build settings 中确认。
 4. 链接 `AdSupport.framework`，`AppTrackingTransparency.framework` 保持 **Optional**。最低 iOS 声明为 11.0；实际兼容性仍须检查最终 Mach-O、目标设备与运行结果。
-5. 保留资源闭包。Core 总是需要，视频格式另需 VideoUI，Reward 另需 Reward 资源。SwiftPM/CocoaPods 按依赖投递；手动集成从同版 Tag 的 `spm` 取得 `IFLYADLibCoreResources.bundle`、所需 `IFLYADLibVideoUIResources.bundle`、`IFLYADLibRewardResources.bundle`，加入 **Copy Bundle Resources**。把 `spm/Core/Resources/PrivacyInfo.xcprivacy` 单独加入，不能仅确认 zip 内有文件。
+5. 保留资源闭包。Core 总是需要，视频格式另需 VideoUI，Reward 另需 Reward 资源。CocoaPods 按依赖投递；手动集成从同版完整包的 `resources` 目录取得 `Core`、`VideoUI` 和 `Reward` 资源，加入 **Copy Bundle Resources**。把 `resources/Core/PrivacyInfo.xcprivacy` 单独加入，不能仅确认 zip 内有文件。
 6. 通过 `.xcworkspace` 构建消费工程。先确认导入和链接，再在目标系统验证资源加载、授权、广告回调和业务收尾。
 
 新 framework 公开头平铺在自己的 `Headers` 下，由 framework 搜索与 modulemap 解析；不需要把旧 `Headers/IFLYADLib` 添加到自定义 `HEADER_SEARCH_PATHS`。包管理器配置后若 Swift 找不到模块，先检查所安装版本和完整依赖，不用额外头搜索路径掩盖缺失。
@@ -76,7 +76,7 @@ import IFLYAdNativeFeed
 import IFLYAdReward
 ```
 
-SwiftPM 的 `Full`、`Banner` 等是产品名；本文不承诺 `import Full`、`import Banner` 或 `import IFLYADLib` 重导出通用版的公开 API。模块使用全名和正确大小写。
+CocoaPods 的 `Full`、`Banner` 等是 subspec 名；本文不承诺 `import Full`、`import Banner` 或 `import IFLYADLib` 重导出通用版的公开 API。模块使用全名和正确大小写。
 
 升级并验证新模块后，可删除仅为本 SDK 配置的 bridging header 引用；如果同一 bridging header 仍服务于其他 Objective-C 代码，只移除 SDK 的旧头导入，保留其他配置。不要保留旧 SDK 头与新模块同时声明同一组类型。
 

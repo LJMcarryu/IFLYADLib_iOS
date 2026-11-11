@@ -2,7 +2,7 @@
 
 <!-- ifly-fast-release-notice:start -->
 
-当前版本：`6.5.0`。已验证 CocoaPods、SwiftPM 的安装、版本锁定与模拟器构建；真机广告展示需在宿主 App 中联调。
+当前版本：`6.5.0`。当前对外支持 CocoaPods 和手动集成；SwiftPM 暂停支持，预计 6.5.1 修复后恢复。真机广告展示需在宿主 App 中联调。
 
 <!-- ifly-release-status: {"version":"6.5.0","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/fast-release-record.json"} -->
 
@@ -30,7 +30,6 @@
 | --- | --- |
 | 系统 | iOS 11.0 及以上 |
 | CocoaPods | `IFLYADLib`，默认安装 `Full`；也可选择格式 subspec |
-| SwiftPM | `Core`、`Banner`、`Splash`、`Interstitial`、`NativeFeed`、`Reward`、`Full` product；清单要求 Swift tools 5.9 |
 | Objective-C 导入 | `#import <IFLYAdCore/IFLYAdCore.h>`，并导入所用格式模块头 |
 | Swift 导入 | `import IFLYAdCore`，并导入所用格式模块，如 `import IFLYAdBanner` |
 | 模块与资源 | `IFLYAdCore` 等按格式拆分模块；资源按 Core、VideoUI、Reward 投递，依赖关系见[安装指南](docs/接入指南/安装与分包.md) |
@@ -63,7 +62,6 @@ open YourApp.xcworkspace
 该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前通过 CocoaPods trunk 获取版本清单，二进制仍由 TOS 分发。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
-- [Swift Package Manager](docs/接入指南/安装与分包.md#swift-package-manager)：添加本仓地址，选择 **Exact Version** `6.5.0` 和所需 product；在 App target 添加 `-ObjC`。
 - [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：使用同版完整包，按格式链接依赖并复制资源及隐私清单。
 
 ## 首次使用
