@@ -11,7 +11,7 @@
 
 ## 指南目录
 
-- [安装与分包](安装与分包.md)：当前发布版 CocoaPods 和手动集成、SwiftPM
+- [安装与分包](安装与分包.md)：当前发布版 CocoaPods、SwiftPM、手动下载与安装检查
 - [Swift 模块迁移说明](Swift模块接入与头路径迁移.md)
 - [配置与隐私](配置与隐私.md)：初始化、隐私状态、请求配置和网络要求
 - [开屏广告](开屏广告.md)：图片/视频开屏加载、展示和收尾
@@ -21,6 +21,12 @@
 - [自渲染信息流](自渲染信息流.md)：NativeFeed 素材、挂载和列表复用
 - [竞价接入](竞价接入.md)：S2S 与 Header Bidding
 - [常见问题](常见问题.md)：生命周期、错误处理和反馈
+
+## 三种可运行示例
+
+- [CocoaPods 示例](../../IFLYADLibSimple/README.md)
+- [SwiftPM 示例](../../IFLYADLibSwiftPMSimple/README.md)
+- [手动示例](../../IFLYADLibManualSimple/README.md)
 
 ## 配套资料
 

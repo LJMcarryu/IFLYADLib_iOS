@@ -33,7 +33,7 @@
 2. 手动接入时，替换所选格式及全部依赖的 XCFramework；把各模块的 XCFramework 根目录交给 Xcode 选择平台切片，Embed 设为 **Do Not Embed**。不要单独拖入切片 framework，也不要复制旧切片的头目录覆盖新包。
 3. 最终 App target 的 `Other Linker Flags` 添加 `$(inherited) -ObjC`。CocoaPods 的配置传播也须在最终 App 的 build settings 中确认。
 4. 链接 `AdSupport.framework`，`AppTrackingTransparency.framework` 保持 **Optional**。最低 iOS 声明为 11.0；实际兼容性仍须检查最终 Mach-O、目标设备与运行结果。
-5. 保留资源闭包。Core 总是需要，视频格式另需 VideoUI，Reward 另需 Reward 资源。CocoaPods 按依赖投递；手动集成从同版完整包的 `resources` 目录取得 `Core`、`VideoUI` 和 `Reward` 资源，加入 **Copy Bundle Resources**。把 `resources/Core/PrivacyInfo.xcprivacy` 单独加入，不能仅确认 zip 内有文件。
+5. 保留同版资源。CocoaPods 和 SwiftPM 自动投递；6.5.1 手动集成从 TOS 下载独立资源补充包，按格式复制完整 bundle，并把独立 `PrivacyInfo.xcprivacy` 加入 App target。原完整包的 `resources` 是散资源目录，不能直接当作 bundle 拖入。下载入口、GitHub Tag 备用来源和实际路径见[手动安装步骤](安装与分包.md#下载与手动集成)。
 6. 通过 `.xcworkspace` 构建消费工程。先确认导入和链接，再在目标系统验证资源加载、授权、广告回调和业务收尾。
 
 新 framework 公开头平铺在自己的 `Headers` 下，由 framework 搜索与 modulemap 解析；不需要把旧 `Headers/IFLYADLib` 添加到自定义 `HEADER_SEARCH_PATHS`。包管理器配置后若 Swift 找不到模块，先检查所安装版本和完整依赖，不用额外头搜索路径掩盖缺失。
@@ -84,7 +84,7 @@ CocoaPods 的 `Full`、`Banner` 等是 subspec 名；本文不承诺 `import Ful
 
 按代码实际使用的类型导入。Core 和格式头分别归属自身模块，格式头引用共享类型时依赖 Core，不重复复制共享头。
 
-| 使用的头 | 旧路径（6.4.4） | 新路径（6.5.0） |
+| 使用的头 | 旧路径（6.4.4） | 新路径（6.5.0 起，适用于 6.5.1） |
 | --- | --- | --- |
 | 共享类型、配置与工具 | `<IFLYADLib/IFLYAdTypes.h>` 等 | `<IFLYAdCore/IFLYAdTypes.h>` 等；也可使用 `<IFLYAdCore/IFLYAdCore.h>` |
 | Banner | `<IFLYADLib/IFLYBannerAd.h>` | `<IFLYAdBanner/IFLYBannerAd.h>` |

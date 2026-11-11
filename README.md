@@ -61,7 +61,7 @@ open YourApp.xcworkspace
 该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前通过 CocoaPods trunk 获取版本清单，二进制仍由 TOS 分发。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
-- [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：使用同版完整包，按格式链接依赖并复制资源及隐私清单。
+- [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：6.5.1 同时下载 TOS 二进制包和资源补充包，按格式链接依赖并复制资源及隐私清单。
 
 ## 首次使用
 
@@ -108,7 +108,9 @@ open YourApp.xcworkspace
 
 见[生命周期与清理](docs/接入指南/常见问题.md#生命周期)。将加载、素材、展示和交互失败分开处理，避免无间隔重试。
 
-## 两种接入示例
+## 三种接入示例
+
+最新示例请从 [main 分支源码 ZIP](https://github.com/LJMcarryu/IFLYADLib_iOS/archive/refs/heads/main.zip) 下载并解压，或克隆 main；下面各 README 说明进入哪个目录及如何运行。接入自己的 App 请从[安装指南](docs/接入指南/安装与分包.md)开始，包含完整下载、资源来源、Xcode 配置和安装检查。
 
 | 接入方式 | 独立示例 | 首次准备 |
 | --- | --- | --- |

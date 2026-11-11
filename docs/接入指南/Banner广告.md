@@ -7,6 +7,9 @@
 容器必须已经完成布局，宽度大于 0；高度为 0 时 SDK 可按素材比例自适应。
 
 ```objc
+#import <IFLYAdCore/IFLYAdCore.h>
+#import <IFLYAdBanner/IFLYBannerAd.h>
+
 @interface BannerViewController () <IFLYBannerAdDelegate>
 @property (nonatomic, strong) IFLYBannerAd *bannerAd;
 @property (nonatomic, strong) UIView *bannerContainer;

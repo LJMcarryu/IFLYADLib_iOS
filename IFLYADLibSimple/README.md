@@ -7,6 +7,12 @@
 
 本示例的 `Podfile` 固定 `6.5.1`。宿主窗口和授权要求见[配置与隐私](../docs/接入指南/配置与隐私.md)。
 
+## 下载入口与版本
+
+无需 Git 时，可下载 [GitHub main 分支源码 ZIP](https://github.com/LJMcarryu/IFLYADLib_iOS/archive/refs/heads/main.zip)，解压后进入 `IFLYADLib_iOS-main/IFLYADLibSimple/`，再执行下方安装命令。不要只下载 `.xcodeproj`。使用 Git 的命令见下文；已有副本先确认本页与 Podfile 都固定 SDK `6.5.1`。
+
+依赖安装后核对 `Podfile.lock` 中 `IFLYADLib` 为 `6.5.1`。版本找不到或锁文件冲突的处理见[安装指南](../docs/接入指南/安装与分包.md#cocoapods)。
+
 ## 下载与运行
 
 准备 macOS、Xcode、CocoaPods 和一个可用的 iOS Simulator runtime。工程最低部署版本为 iOS 11.0；真机调试需要选择自己的开发者 Team 和 Bundle Identifier。安装依赖需要访问 CocoaPods trunk 源和 TOS 下载地址。
