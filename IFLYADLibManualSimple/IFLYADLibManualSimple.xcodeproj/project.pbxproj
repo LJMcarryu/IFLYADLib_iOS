@@ -1,0 +1,454 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0D621C03E19AFFF9B0895A27 /* IFLYAdCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BBD9F18C7C4F8DF4D879154 /* IFLYAdCore.xcframework */; };
+		17F048F3C9702467228E51B8 /* IFLYADLibRewardResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7C2863C01B46E4FAEA76EF32 /* IFLYADLibRewardResources.bundle */; };
+		1CC46F6BF7357D8F092F514D /* IFLYAdNativeFeed.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3BFF84C63940D1BBDC45EBD5 /* IFLYAdNativeFeed.xcframework */; };
+		1D456C9C9D3972B8830EFE04 /* IFLYADLibCoreResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 15E766D52D849FA4368195AC /* IFLYADLibCoreResources.bundle */; };
+		2DFBF12544B6F4F4708EC623 /* IFLYAdVideoUI.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 922BFA0148F5DFFD5FD0B1BB /* IFLYAdVideoUI.xcframework */; };
+		2ED0A98ED184D896F1EDDFDD /* IFLYAdSplash.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7722E74C1BBB95BC651E028D /* IFLYAdSplash.xcframework */; };
+		362BA587843F8B0DD6D74D86 /* IFLYAdInterstitial.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47AA095081FA70B6D08CB4C7 /* IFLYAdInterstitial.xcframework */; };
+		68BA6BAE6FF4C668D6530DDD /* IFLYADLibVideoUIResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D40036B74E7C4E4807C25C32 /* IFLYADLibVideoUIResources.bundle */; };
+		9D8C3D67467D14239239D602 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 204CE5F1778B90ED6FE493A7 /* AdSupport.framework */; };
+		A52536FB7E23475B4CE8742D /* IFLYAdReward.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A5B0F8AF677FFF4A193696C5 /* IFLYAdReward.xcframework */; };
+		D9536B4308AD330ACB430CF4 /* AppTrackingTransparency.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7EA43A4B8CDC6D855394F845 /* AppTrackingTransparency.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		E38BFFFDD3A9C0719F5AC188 /* IFLYAdBanner.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = C6C783D7BE47FB7C7991C632 /* IFLYAdBanner.xcframework */; };
+		FD745487583D79344A4CFD44 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8AD64EA5DC7BFCECC1D6FD39 /* PrivacyInfo.xcprivacy */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		15E766D52D849FA4368195AC /* IFLYADLibCoreResources.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.cfbundle; path = IFLYADLibCoreResources.bundle; sourceTree = "<group>"; };
+		204CE5F1778B90ED6FE493A7 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
+		3BFF84C63940D1BBDC45EBD5 /* IFLYAdNativeFeed.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; path = IFLYAdNativeFeed.xcframework; sourceTree = "<group>"; };
+		47AA095081FA70B6D08CB4C7 /* IFLYAdInterstitial.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; path = IFLYAdInterstitial.xcframework; sourceTree = "<group>"; };
+		4BBD9F18C7C4F8DF4D879154 /* IFLYAdCore.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; path = IFLYAdCore.xcframework; sourceTree = "<group>"; };
+		7722E74C1BBB95BC651E028D /* IFLYAdSplash.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; path = IFLYAdSplash.xcframework; sourceTree = "<group>"; };
+		7C2863C01B46E4FAEA76EF32 /* IFLYADLibRewardResources.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.cfbundle; path = IFLYADLibRewardResources.bundle; sourceTree = "<group>"; };
+		7EA43A4B8CDC6D855394F845 /* AppTrackingTransparency.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppTrackingTransparency.framework; path = System/Library/Frameworks/AppTrackingTransparency.framework; sourceTree = SDKROOT; };
+		84320C3D2D75455C0051F812 /* IFLYADLibManualSimple.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IFLYADLibManualSimple.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		8AD64EA5DC7BFCECC1D6FD39 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		922BFA0148F5DFFD5FD0B1BB /* IFLYAdVideoUI.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; path = IFLYAdVideoUI.xcframework; sourceTree = "<group>"; };
+		A5B0F8AF677FFF4A193696C5 /* IFLYAdReward.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; path = IFLYAdReward.xcframework; sourceTree = "<group>"; };
+		C6C783D7BE47FB7C7991C632 /* IFLYAdBanner.xcframework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.xcframework; path = IFLYAdBanner.xcframework; sourceTree = "<group>"; };
+		D40036B74E7C4E4807C25C32 /* IFLYADLibVideoUIResources.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.cfbundle; path = IFLYADLibVideoUIResources.bundle; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		84320C542D75455F0051F812 /* Exceptions for "IFLYADLibSimple" folder in "IFLYADLibManualSimple" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 84320C3C2D75455C0051F812 /* IFLYADLibManualSimple */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		84320C3F2D75455C0051F812 /* IFLYADLibSimple */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				84320C542D75455F0051F812 /* Exceptions for "IFLYADLibSimple" folder in "IFLYADLibManualSimple" target */,
+			);
+			path = IFLYADLibSimple;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		84320C3A2D75455C0051F812 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9D8C3D67467D14239239D602 /* AdSupport.framework in Frameworks */,
+				D9536B4308AD330ACB430CF4 /* AppTrackingTransparency.framework in Frameworks */,
+				0D621C03E19AFFF9B0895A27 /* IFLYAdCore.xcframework in Frameworks */,
+				2DFBF12544B6F4F4708EC623 /* IFLYAdVideoUI.xcframework in Frameworks */,
+				E38BFFFDD3A9C0719F5AC188 /* IFLYAdBanner.xcframework in Frameworks */,
+				2ED0A98ED184D896F1EDDFDD /* IFLYAdSplash.xcframework in Frameworks */,
+				362BA587843F8B0DD6D74D86 /* IFLYAdInterstitial.xcframework in Frameworks */,
+				1CC46F6BF7357D8F092F514D /* IFLYAdNativeFeed.xcframework in Frameworks */,
+				A52536FB7E23475B4CE8742D /* IFLYAdReward.xcframework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		65AD222075E1CA4738466B3C /* SDK 库 */ = {
+			isa = PBXGroup;
+			children = (
+				4BBD9F18C7C4F8DF4D879154 /* IFLYAdCore.xcframework */,
+				922BFA0148F5DFFD5FD0B1BB /* IFLYAdVideoUI.xcframework */,
+				C6C783D7BE47FB7C7991C632 /* IFLYAdBanner.xcframework */,
+				7722E74C1BBB95BC651E028D /* IFLYAdSplash.xcframework */,
+				47AA095081FA70B6D08CB4C7 /* IFLYAdInterstitial.xcframework */,
+				3BFF84C63940D1BBDC45EBD5 /* IFLYAdNativeFeed.xcframework */,
+				A5B0F8AF677FFF4A193696C5 /* IFLYAdReward.xcframework */,
+			);
+			name = "SDK 库";
+			path = Vendor;
+			sourceTree = "<group>";
+		};
+		84320C342D75455C0051F812 = {
+			isa = PBXGroup;
+			children = (
+				84320C3F2D75455C0051F812 /* IFLYADLibSimple */,
+				84320C3E2D75455C0051F812 /* Products */,
+				EDFC175E6D7532D3DFC63685 /* Frameworks */,
+				65AD222075E1CA4738466B3C /* SDK 库 */,
+				86A9706D3B69A31DC9B7F16E /* SDK 资源 */,
+			);
+			sourceTree = "<group>";
+		};
+		84320C3E2D75455C0051F812 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				84320C3D2D75455C0051F812 /* IFLYADLibManualSimple.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		86A9706D3B69A31DC9B7F16E /* SDK 资源 */ = {
+			isa = PBXGroup;
+			children = (
+				15E766D52D849FA4368195AC /* IFLYADLibCoreResources.bundle */,
+				7C2863C01B46E4FAEA76EF32 /* IFLYADLibRewardResources.bundle */,
+				D40036B74E7C4E4807C25C32 /* IFLYADLibVideoUIResources.bundle */,
+				8AD64EA5DC7BFCECC1D6FD39 /* PrivacyInfo.xcprivacy */,
+			);
+			name = "SDK 资源";
+			path = SDKResources;
+			sourceTree = "<group>";
+		};
+		EDFC175E6D7532D3DFC63685 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				204CE5F1778B90ED6FE493A7 /* AdSupport.framework */,
+				7EA43A4B8CDC6D855394F845 /* AppTrackingTransparency.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		84320C3C2D75455C0051F812 /* IFLYADLibManualSimple */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 84320C552D75455F0051F812 /* Build configuration list for PBXNativeTarget "IFLYADLibManualSimple" */;
+			buildPhases = (
+				9748EDA23510EAA966ABF2AE /* 检查本地 SDK */,
+				84320C392D75455C0051F812 /* Sources */,
+				84320C3A2D75455C0051F812 /* Frameworks */,
+				84320C3B2D75455C0051F812 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				84320C3F2D75455C0051F812 /* IFLYADLibSimple */,
+			);
+			name = IFLYADLibManualSimple;
+			productName = IFLYADLibManualSimple;
+			productReference = 84320C3D2D75455C0051F812 /* IFLYADLibManualSimple.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		84320C352D75455C0051F812 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					84320C3C2D75455C0051F812 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+				};
+			};
+			buildConfigurationList = 84320C382D75455C0051F812 /* Build configuration list for PBXProject "IFLYADLibManualSimple" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 84320C342D75455C0051F812;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 84320C3E2D75455C0051F812 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				84320C3C2D75455C0051F812 /* IFLYADLibManualSimple */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		84320C3B2D75455C0051F812 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1D456C9C9D3972B8830EFE04 /* IFLYADLibCoreResources.bundle in Resources */,
+				17F048F3C9702467228E51B8 /* IFLYADLibRewardResources.bundle in Resources */,
+				68BA6BAE6FF4C668D6530DDD /* IFLYADLibVideoUIResources.bundle in Resources */,
+				FD745487583D79344A4CFD44 /* PrivacyInfo.xcprivacy in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		9748EDA23510EAA966ABF2AE /* 检查本地 SDK */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "检查本地 SDK";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ ! -f \"${SRCROOT}/Vendor/.prepared.json\" ]; then echo \"error: 请先在此 Demo 目录运行 python3 准备SDK.py\"; exit 1; fi";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		84320C392D75455C0051F812 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		84320C562D75455F0051F812 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "$(PROJECT_DIR)/IFLYADLibSimple/Supporting Files/IFLYAdPrefixHeader.pch";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IFLYADLibSimple/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACH_O_TYPE = mh_execute;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cn.voiceads.demo.general.manual;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		84320C572D75455F0051F812 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_PREFIX_HEADER = "$(PROJECT_DIR)/IFLYADLibSimple/Supporting Files/IFLYAdPrefixHeader.pch";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IFLYADLibSimple/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACH_O_TYPE = mh_execute;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = cn.voiceads.demo.general.manual;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		84320C582D75455F0051F812 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		84320C592D75455F0051F812 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		84320C382D75455C0051F812 /* Build configuration list for PBXProject "IFLYADLibManualSimple" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84320C582D75455F0051F812 /* Debug */,
+				84320C592D75455F0051F812 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		84320C552D75455F0051F812 /* Build configuration list for PBXNativeTarget "IFLYADLibManualSimple" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84320C562D75455F0051F812 /* Debug */,
+				84320C572D75455F0051F812 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 84320C352D75455C0051F812 /* Project object */;
+}

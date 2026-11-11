@@ -1,0 +1,15 @@
+{
+  "originHash" : "b0cb52b3c424a6879cb8affc7247faa135c93357522cf9b8e68faf4109378485",
+  "pins" : [
+    {
+      "identity" : "iflyadlib_ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/LJMcarryu/IFLYADLib_iOS.git",
+      "state" : {
+        "revision" : "8dd4d6ea368fb6f189c70e9746e73e8d645ef206",
+        "version" : "6.5.0"
+      }
+    }
+  ],
+  "version" : 3
+}

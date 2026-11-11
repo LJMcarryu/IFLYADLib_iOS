@@ -111,6 +111,16 @@ open YourApp.xcworkspace
 
 见[生命周期与清理](docs/接入指南/常见问题.md#生命周期)。将加载、素材、展示和交互失败分开处理，避免无间隔重试。
 
+## 三种接入示例
+
+| 接入方式 | 独立示例 | 首次准备 |
+| --- | --- | --- |
+| CocoaPods | [IFLYADLibSimple](IFLYADLibSimple/README.md) | 在示例目录运行 `pod install` |
+| SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 直接打开示例 workspace，Xcode 解析远程包 |
+| 手动集成 | [IFLYADLibManualSimple](IFLYADLibManualSimple/README.md) | 运行示例内 `准备SDK.py`，再打开 workspace |
+
+各示例固定的 SDK 版本与运行步骤以其 README 为准。一次只选择一种集成方式。
+
 ## 示例工程
 
 [`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.5.0`，移入生产 App 时保留自己的隐私流程和业务生命周期。

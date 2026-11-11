@@ -1,0 +1,102 @@
+//
+//  ViewController.m
+//  IFLYADLibSimple
+//
+//  Created by admin on 3.3.25.
+//
+
+#import "IFLYBannerViewController.h"
+#import "IFLYInterstitialViewController.h"
+#import "IFLYNativeFeedListViewController.h"
+#import "IFLYNativeViewController.h"
+#import "IFLYRewardVideoViewController.h"
+#import "IFLYSplashViewController.h"
+#import "ViewController.h"
+
+#import "IFLYADUtil.h"
+#import <IFLYAdCore/IFLYAdCore.h>
+
+@interface ViewController ()
+
+@end
+
+@implementation ViewController
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    self.title = @"讯飞广告 SDK 示例";
+    self.view.backgroundColor = UIColor.whiteColor;
+    [self initADTypeListView];
+}
+
+- (void)initADTypeListView {
+    UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self.view addSubview:scrollView];
+
+    CGFloat width = self.view.bounds.size.width;
+    CGFloat margin = 24;
+    CGFloat contentWidth = width - margin * 2;
+    CGFloat y = 24;
+
+    UILabel *versionLabel =
+        [IFLYADUtil createSectionTitleWithText:[NSString stringWithFormat:@"SDK 版本：%@", [IFLYAdTool sdkVersion]]
+                                         frame:CGRectMake(margin, y, contentWidth, 20)];
+    versionLabel.textAlignment = NSTextAlignmentCenter;
+    [scrollView addSubview:versionLabel];
+    y += 36;
+
+    UILabel *descLabel = [IFLYADUtil
+        createSectionTitleWithText:@"先配置自己的广告位，再选择示例。内置广告按 Load → Ready → Show 操作；信息流由媒体渲染后挂载。详细步骤见示例 README。"
+                             frame:CGRectMake(margin, y, contentWidth, 52)];
+    descLabel.textAlignment = NSTextAlignmentCenter;
+    [scrollView addSubview:descLabel];
+    y += 72;
+
+    NSArray<NSDictionary<NSString *, NSString *> *> *items = @[
+        @{@"title" : @"开屏广告", @"selector" : @"splashADTypeClick:"},
+        @{@"title" : @"Banner 广告", @"selector" : @"bannerADTypeClick:"},
+        @{@"title" : @"插屏广告", @"selector" : @"interstitialADTypeClick:"},
+        @{@"title" : @"自渲染信息流", @"selector" : @"nativeADTypeClick:"},
+        @{@"title" : @"信息流列表复用（SDK 托管）", @"selector" : @"nativeFeedListTypeClick:"},
+        @{@"title" : @"激励视频广告", @"selector" : @"rewardADTypeClick:"},
+    ];
+
+    for (NSDictionary<NSString *, NSString *> *item in items) {
+        SEL selector = NSSelectorFromString(item[@"selector"]);
+        UIButton *button = [IFLYADUtil createADTypeButtonWithFrame:CGRectMake(margin, y, contentWidth, 48)
+                                                             title:item[@"title"]
+                                                            target:self
+                                                            action:selector];
+        [scrollView addSubview:button];
+        y += 62;
+    }
+
+    scrollView.contentSize = CGSizeMake(width, y + 24);
+}
+
+- (void)splashADTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYSplashViewController.alloc.init animated:YES];
+}
+
+- (void)nativeADTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYNativeViewController.alloc.init animated:YES];
+}
+
+- (void)nativeFeedListTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYNativeFeedListViewController.alloc.init animated:YES];
+}
+
+- (void)bannerADTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYBannerViewController.alloc.init animated:YES];
+}
+
+- (void)interstitialADTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYInterstitialViewController.alloc.init animated:YES];
+}
+
+- (void)rewardADTypeClick:(UIButton *)sender {
+    [self.navigationController pushViewController:IFLYRewardVideoViewController.alloc.init animated:YES];
+}
+
+@end
