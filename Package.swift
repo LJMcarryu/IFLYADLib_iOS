@@ -22,38 +22,38 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "IFLYAdCore",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdCore.xcframework.zip",
-            checksum: "1b29d1003906b4d65d0250758ad28199c4d52f5996615dfc99de92ca060508ea"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/IFLYAdCore.xcframework.zip",
+            checksum: "f031547c13c5ddd6ec0197a6b657168e8a555ed2388b327455e62903e3e12cf7"
         ),
         .binaryTarget(
             name: "IFLYAdVideoUI",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdVideoUI.xcframework.zip",
-            checksum: "38a513bb089e4942041502d0ca19e9a41b0ca812065785255c9bdf6d13da2d2d"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/IFLYAdVideoUI.xcframework.zip",
+            checksum: "39a034dc6cfef76337429e0fa68d0350475b679144481de72d7a6b98b111d417"
         ),
         .binaryTarget(
             name: "IFLYAdBanner",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdBanner.xcframework.zip",
-            checksum: "b057278734d429cede2cc45b5ddec2f487c06a88ca3c163757f78bc83ead0e95"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/IFLYAdBanner.xcframework.zip",
+            checksum: "9248c67424521a8a3b226e8ecc6689e0d61565a7bab43a01a88db3f67b061baa"
         ),
         .binaryTarget(
             name: "IFLYAdSplash",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdSplash.xcframework.zip",
-            checksum: "fced6e67ee924395086eb660ea97962ac0ec4f6bc8ad53e8486b30ca867c25d0"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/IFLYAdSplash.xcframework.zip",
+            checksum: "ec58bdc6ed7f341da0782d4f018e4771dcda152b5a7e3f1f799365b9b12bc9ee"
         ),
         .binaryTarget(
             name: "IFLYAdInterstitial",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdInterstitial.xcframework.zip",
-            checksum: "e76b299cb6544751c77a58f61f28a7b20d31e7384c7957c0381b1b721cb71740"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/IFLYAdInterstitial.xcframework.zip",
+            checksum: "d76c54fc8971929ed8cf1e31926cc6aa56d4ea62142c31aa27efb9c2027e5f53"
         ),
         .binaryTarget(
             name: "IFLYAdNativeFeed",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdNativeFeed.xcframework.zip",
-            checksum: "24df054a5eea916a560e86b03d54c9e6eda5e7adf8b533d126de5d4041895bca"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/IFLYAdNativeFeed.xcframework.zip",
+            checksum: "e6f36a1d1befee16823d82943fa9ef4a7b80b72c602aba39582891291b2e6ec5"
         ),
         .binaryTarget(
             name: "IFLYAdReward",
-            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYAdReward.xcframework.zip",
-            checksum: "81dc156b3d601dec9dcdc1ffcb968d95536ce17cbc388041d9cdd2d2cb04d649"
+            url: "https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/IFLYAdReward.xcframework.zip",
+            checksum: "b878a480d8dde1b292af1af5b40d5e5d54f863e878a68253f24691ce47db8445"
         ),
         .target(
             name: "Core",

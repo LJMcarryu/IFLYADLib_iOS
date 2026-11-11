@@ -2,11 +2,11 @@
 
 Pod::Spec.new do |s|
   s.name = 'IFLYADLib'
-  s.version = '6.5.0'
+  s.version = '6.5.1'
   s.summary = '讯飞广告 iOS SDK，支持按广告形式组合接入。'
   s.homepage = 'https://github.com/LJMcarryu/IFLYADLib_iOS'
   s.author = 'LJMcarryu'
-  s.source = { :http => 'https://download-adsdk.voiceads.cn/ios_sdk/6.5.0/general/IFLYADLib-modelA-6.5.0.zip' }
+  s.source = { :http => 'https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/IFLYADLib-modelA-6.5.1.zip' }
   s.license = { :type => 'MIT', :file => 'LICENSE' }
   s.platform = :ios, '11.0'
   s.static_framework = true
