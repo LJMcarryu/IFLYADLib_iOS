@@ -1,11 +1,11 @@
 {
-  "sdkVersion": "6.5.0",
-  "sdkTagCommit": "8dd4d6ea368fb6f189c70e9746e73e8d645ef206",
+  "sdkVersion": "6.5.1",
+  "sdkTagCommit": "23ae9527f3681d19ec13bd5e3120025b8633eda4",
   "demoSourceCommit": "addca9cc6adb55137c535e4ede0c48f624536196",
   "demoSourceDirectory": "IFLYADLibSimple",
   "integration": "manual",
   "resourceSHA256": {
-    "SDKResources/PrivacyInfo.xcprivacy": "4a6dba56ca62d4a3294dc9b076893b958a64f3a2512ea4528bc2a7362a3f0e64",
+    "SDKResources/PrivacyInfo.xcprivacy": "1631bf3d711da2672fc3b07d22608e742f8005b8d946f9d8704dcc9c4e6b1301",
     "SDKResources/IFLYADLibRewardResources.bundle/IFLYAd_reward_click_hand@2x.png": "0931d7eff1986453563b0ba96ad4f7f5e6da53ce3e927a755c228e8623c4d42a",
     "SDKResources/IFLYADLibRewardResources.bundle/IFLYAd_reward_volume_off@2x.png": "08554deab6a60632ce078015b8b18d574ce5d7b8fbc0a48dcfd9a369198a8ecb",
     "SDKResources/IFLYADLibRewardResources.bundle/IFLYAd_reward_close.png": "dda9a928240c837c11d7eb73838417c52ff54ad06bda505f894830e26bcbe3c3",
