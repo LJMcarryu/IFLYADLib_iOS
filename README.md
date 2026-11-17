@@ -1,9 +1,9 @@
 # IFLYADLib iOS SDK
 
 <!-- ifly-fast-release-notice:start -->
-当前版本：`6.5.1`。本版已通过 CocoaPods、SwiftPM、手动集成的安装及 arm64 模拟器/设备架构构建验证；真机广告展示仍需在宿主 App 中联调。
+当前版本：`6.5.2`。本版尚未完成安装、构建与广告展示验证，请先在宿主 App 中联调。
 
-<!-- ifly-release-status: {"version":"6.5.1","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.1/general/fast-release-record.json"} -->
+<!-- ifly-release-status: {"version":"6.5.2","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.2/general/fast-release-record.json"} -->
 
 <!-- ifly-fast-release-notice:end -->
 
@@ -35,7 +35,7 @@
 | 链接 | 静态 XCFramework，选择 **Do Not Embed**；最终 App target 需要 `$(inherited) -ObjC` |
 | 共存 | 同一 App 选择一种安装方式；通用版与优酷定制版不能同时链接，其他渠道也不承诺共存 |
 
-## 升级到 6.5.1
+## 升级到 6.5.2
 
 七模块 XCFramework 采用带 modulemap 的静态 framework。Swift 可直接导入模块，无需为本 SDK 配置 bridging header；Objective-C 需从旧 `<IFLYADLib/...>` 路径迁移。步骤见[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)。
 
@@ -49,7 +49,7 @@ platform :ios, '11.0'
 
 target 'YourApp' do
   use_frameworks!
-  pod 'IFLYADLib', '6.5.1'
+  pod 'IFLYADLib', '6.5.2'
 end
 ```
 
@@ -122,7 +122,7 @@ open YourApp.xcworkspace
 
 ## 示例工程
 
-[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.5.1`，移入生产 App 时保留自己的隐私流程和业务生命周期。
+[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.5.2`，移入生产 App 时保留自己的隐私流程和业务生命周期。
 
 ## 常见问题
 
