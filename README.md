@@ -61,7 +61,7 @@ open YourApp.xcworkspace
 该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前通过 CocoaPods trunk 获取版本清单，二进制仍由 TOS 分发。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
-- [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：6.5.1 同时下载 TOS 二进制包和资源补充包，按格式链接依赖并复制资源及隐私清单。
+- [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：6.5.2 完整包包含二进制及 `ManualResources`，按格式链接依赖并复制资源及隐私清单。
 
 ## 首次使用
 
@@ -118,7 +118,7 @@ open YourApp.xcworkspace
 | SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 打开 workspace，解析远程 6.5.1 包 |
 | 手动集成 | [IFLYADLibManualSimple](IFLYADLibManualSimple/README.md) | 运行示例内 `准备SDK.py`，再打开 workspace |
 
-三种示例均固定使用 SDK `6.5.1`，具体运行步骤见各自 README。同一 App 只选择一种接入方式。
+CocoaPods 示例固定 SDK `6.5.2`；独立 SwiftPM 和手动示例仍固定 `6.5.1`，未作为本版接入验证。接入自己的 App 使用上方 `6.5.2` 安装指南；示例运行步骤与依赖版本见各自 README。同一 App 只选择一种接入方式。
 
 ## 示例工程
 
