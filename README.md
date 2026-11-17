@@ -1,7 +1,7 @@
 # IFLYADLib iOS SDK
 
 <!-- ifly-fast-release-notice:start -->
-当前版本：`6.5.2`。本版尚未完成安装、构建与广告展示验证，请先在宿主 App 中联调。
+当前版本：`6.5.2`。三种接入示例已通过安装、版本锁定与 arm64 模拟器/设备 Debug 构建及资源核对；真机广告运行仍需在宿主 App 中联调。完整发布验收尚未完成。
 
 <!-- ifly-release-status: {"version":"6.5.2","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.2/general/fast-release-record.json"} -->
 
@@ -115,10 +115,10 @@ open YourApp.xcworkspace
 | 接入方式 | 独立示例 | 首次准备 |
 | --- | --- | --- |
 | CocoaPods | [IFLYADLibSimple](IFLYADLibSimple/README.md) | 在示例目录运行 `pod install` |
-| SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 打开 workspace，解析远程 6.5.1 包 |
+| SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 打开 workspace，解析远程 6.5.2 包 |
 | 手动集成 | [IFLYADLibManualSimple](IFLYADLibManualSimple/README.md) | 运行示例内 `准备SDK.py`，再打开 workspace |
 
-CocoaPods 示例固定 SDK `6.5.2`；独立 SwiftPM 和手动示例仍固定 `6.5.1`，未作为本版接入验证。接入自己的 App 使用上方 `6.5.2` 安装指南；示例运行步骤与依赖版本见各自 README。同一 App 只选择一种接入方式。
+CocoaPods、SwiftPM 和手动示例均固定 SDK `6.5.2`，已通过 Xcode 26.2 下的 arm64 模拟器与设备 Debug 构建，以及版本、链接与资源核对。真机广告运行和签名分发需在宿主 App 中验证。接入自己的 App 使用上方 `6.5.2` 安装指南；示例运行步骤与依赖版本见各自 README。同一 App 只选择一种接入方式。
 
 ## 示例工程
 

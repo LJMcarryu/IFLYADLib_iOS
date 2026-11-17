@@ -7,6 +7,8 @@
 
 本示例的 `Podfile` 固定 `6.5.2`。宿主窗口和授权要求见[配置与隐私](../docs/接入指南/配置与隐私.md)。
 
+SDK 6.5.2 已通过 Xcode 26.2 下的 arm64 模拟器与设备 Debug 构建，以及版本、链接与资源核对；真机广告运行和签名分发需另行验证。
+
 ## 下载入口与版本
 
 无需 Git 时，可下载 [GitHub main 分支源码 ZIP](https://github.com/LJMcarryu/IFLYADLib_iOS/archive/refs/heads/main.zip)，解压后进入 `IFLYADLib_iOS-main/IFLYADLibSimple/`，再执行下方安装命令。不要只下载 `.xcodeproj`。使用 Git 的命令见下文；已有副本先确认本页与 Podfile 都固定 SDK `6.5.2`。

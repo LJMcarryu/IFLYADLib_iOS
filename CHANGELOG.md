@@ -2,11 +2,11 @@
 
 ## [6.5.2] - 发布说明
 
-优化广告展示与交互体验，调整请求处理与日志输出。
+优化广告展示与交互体验，调整请求处理与日志输出。同步 CocoaPods、SwiftPM 和手动 Demo 的 6.5.2 依赖、资源及接入说明。
 
 <!-- ifly-release-status: {"version":"6.5.2","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.2/general/fast-release-record.json"} -->
 
-本版尚未完成安装、构建与广告展示验证，请先在宿主 App 中联调。
+三种接入示例已通过安装、版本锁定与 arm64 模拟器/设备 Debug 构建及资源核对；真机广告运行仍需在宿主 App 中联调。完整发布验收尚未完成。
 
 ## [6.5.1] - 发布说明
 
@@ -14,7 +14,6 @@
 
 
 
-本版尚未完成安装、构建与广告展示验证，请先在宿主 App 中联调。
 
 ## [6.5.0] - 更新说明
 
