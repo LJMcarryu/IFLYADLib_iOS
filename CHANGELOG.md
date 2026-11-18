@@ -1,10 +1,17 @@
 # 更新日志
 
+## [6.5.3-beta.1] - 预发布候选
+
+本预发布仅用于接入测试；生产环境默认继续使用 `6.5.2`。发布可用性与验收范围以同版发布记录为准，真机广告运行、宿主联调和 Apple 审核须分别验证。
+
+<!-- ifly-release-status: {"version":"6.5.3-beta.1","status":"FORMAL","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.3-beta.1/general/release-record.json"} -->
+
+- 优化开屏返回宿主后的展示处理与广告加载稳定性。
+- 不兼容调整：本预发布移除 `IFLYNativeFeedAdData.marketURL` 和 `IFLYNativeFeedAdData.downloadURL`。使用这些属性的接入方须移除访问并重新编译适配层。`targetURL` 仅表示落地页地址，不能等价替代已移除的商店或下载地址；点击和跳转继续由 SDK 处理。
+
 ## [6.5.2] - 发布说明
 
 优化广告展示与交互体验，调整请求处理与日志输出。同步 CocoaPods、SwiftPM 和手动 Demo 的 6.5.2 依赖、资源及接入说明。
-
-<!-- ifly-release-status: {"version":"6.5.2","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.2/general/fast-release-record.json"} -->
 
 三种接入示例已通过安装、版本锁定与 arm64 模拟器/设备 Debug 构建及资源核对；真机广告运行仍需在宿主 App 中联调。完整发布验收尚未完成。
 
