@@ -127,11 +127,11 @@ open YourApp.xcworkspace
 | SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 打开 workspace，解析远程 6.5.2 包 |
 | 手动集成 | [IFLYADLibManualSimple](IFLYADLibManualSimple/README.md) | 运行示例内 `准备SDK.py`，再打开 workspace |
 
-CocoaPods、SwiftPM 和手动示例均固定 SDK `6.5.2`，已通过 Xcode 26.2 下的 arm64 模拟器与设备 Debug 构建，以及版本、链接与资源核对。真机广告运行和签名分发需在宿主 App 中验证。接入自己的 App 使用上方 `6.5.2` 安装指南；示例运行步骤与依赖版本见各自 README。同一 App 只选择一种接入方式。
+CocoaPods 示例固定预发布 SDK `6.5.3-beta.1`，通过同版 Tag 的 Podspec 安装，仅用于预发布接入测试；独立 SwiftPM 和手动示例保持 `6.5.2`，不作为本预发布的示例验证。真机广告运行和签名分发需在宿主 App 中验证。接入自己的 App 使用上方 `6.5.2` 安装指南；示例运行步骤与依赖版本见各自 README。同一 App 只选择一种接入方式。
 
 ## 示例工程
 
-[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。示例依赖固定为 `6.5.2`，移入生产 App 时保留自己的隐私流程和业务生命周期。
+[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。该 CocoaPods 示例依赖固定为 `6.5.3-beta.1`；生产 App 继续使用稳定版 `6.5.2`，并保留自己的隐私流程和业务生命周期。
 
 ## 常见问题
 

@@ -1,23 +1,23 @@
 # IFLYADLibSimple 接入示例
 
 > 本示例遵循公开仓 Demo 契约：固定 SDK 版本、独立 Podfile、可复现运行说明和脱敏问题反馈。
-本工程使用 `IFLYADLib 6.5.2`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
+本工程使用 `IFLYADLib 6.5.3-beta.1`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
 
 自己的 App 如何安装 SDK、各格式的公开接口与完整配置，见[仓库接入指南](../README.md)。
 
-本示例的 `Podfile` 固定 `6.5.2`。宿主窗口和授权要求见[配置与隐私](../docs/接入指南/配置与隐私.md)。
+本示例的 `Podfile` 固定 `6.5.3-beta.1`。宿主窗口和授权要求见[配置与隐私](../docs/接入指南/配置与隐私.md)。
 
-SDK 6.5.2 已通过 Xcode 26.2 下的 arm64 模拟器与设备 Debug 构建，以及版本、链接与资源核对；真机广告运行和签名分发需另行验证。
+本预发布的构建与消费验证范围以同版发布记录为准；真机广告运行和签名分发需另行验证。
 
 ## 下载入口与版本
 
-无需 Git 时，可下载 [GitHub main 分支源码 ZIP](https://github.com/LJMcarryu/IFLYADLib_iOS/archive/refs/heads/main.zip)，解压后进入 `IFLYADLib_iOS-main/IFLYADLibSimple/`，再执行下方安装命令。不要只下载 `.xcodeproj`。使用 Git 的命令见下文；已有副本先确认本页与 Podfile 都固定 SDK `6.5.2`。
+无需 Git 时，可下载 [GitHub main 分支源码 ZIP](https://github.com/LJMcarryu/IFLYADLib_iOS/archive/refs/heads/main.zip)，解压后进入 `IFLYADLib_iOS-main/IFLYADLibSimple/`，再执行下方安装命令。不要只下载 `.xcodeproj`。使用 Git 的命令见下文；已有副本先确认本页与 Podfile 都固定 SDK `6.5.3-beta.1`。
 
-依赖安装后核对 `Podfile.lock` 中 `IFLYADLib` 为 `6.5.2`。版本找不到或锁文件冲突的处理见[安装指南](../docs/接入指南/安装与分包.md#cocoapods)。
+依赖安装后核对 `Podfile.lock` 中 `IFLYADLib` 为 `6.5.3-beta.1`。版本找不到或锁文件冲突的处理见[安装指南](../docs/接入指南/安装与分包.md#cocoapods)。
 
 ## 下载与运行
 
-准备 macOS、Xcode、CocoaPods 和一个可用的 iOS Simulator runtime。工程最低部署版本为 iOS 11.0；真机调试需要选择自己的开发者 Team 和 Bundle Identifier。安装依赖需要访问 CocoaPods trunk 源和 TOS 下载地址。
+准备 macOS、Xcode、CocoaPods 和一个可用的 iOS Simulator runtime。工程最低部署版本为 iOS 11.0；真机调试需要选择自己的开发者 Team 和 Bundle Identifier。安装依赖需要访问 GitHub 固定 Tag 的 Podspec 和 TOS 下载地址。
 
 首次获取最新示例，在终端执行：
 
@@ -28,7 +28,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-已有仓库时，进入本目录从 `pod install` 开始。Podfile 通过 CocoaPods trunk 固定使用 `6.5.2`，默认安装 `Full`；更新示例源码不会自动升级 SDK。
+已有仓库时，进入本目录从 `pod install` 开始。Podfile 通过固定 Tag 的 Podspec 使用 `6.5.3-beta.1`，默认安装 `Full`；更新示例源码不会自动升级 SDK。
 
 1. 在 Xcode 选择 **IFLYADLibSimple** scheme 和一个已安装的 iPhone 模拟器或真机。
 2. 按下方说明替换广告位，真机运行时在 **Signing & Capabilities** 设置签名，再 Build & Run。
@@ -129,7 +129,7 @@ xcodebuild build \
 
 | 现象 | 检查顺序 |
 | --- | --- |
-| Podspec 下载失败、TLS/超时 | 检查网络能否访问 Podspec 和 TOS 发布记录；恢复后重新 `pod install`，确认版本已发布到 CocoaPods trunk 后重试 |
+| Podspec 下载失败、TLS/超时 | 检查网络能否访问 Podspec 和 TOS 发布记录；恢复后重新 `pod install`，确认同版 Tag 已发布后重试 |
 | 找不到 `IFLYADLib.h` 或某个广告类 | 确认 Pods 安装成功、打开 workspace，且使用 Full；检查是否误删格式 subspec |
 | 重复符号或版本不一致 | 移除手工添加的另一份 SDK；不要同时接入通用版与同名类的定制包 |
 | Show 不可点击 | 检查是否收到 Ready，或实例已被展示、关闭、销毁；重新 Load 新实例 |
