@@ -40,5 +40,5 @@ public final class SDKModuleConsumer: NSObject, IFLYBannerAdDelegate,
 #endif
 
 public enum ReleaseConsumer {
-    public static let verificationMarker = "IFLYADLib-6.5.2"
+    public static let verificationMarker = "IFLYADLib-6.5.3-beta.1"
 }
