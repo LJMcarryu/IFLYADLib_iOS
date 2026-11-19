@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/LJMcarryu/IFLYADLib_iOS.git",
       "state" : {
-        "revision" : "40a9b640bb77b2a930cb84c51ee7872f13532e6e",
-        "version" : "6.5.2"
+        "revision" : "33721f2c9a7a2959afdb2ab9ab2f9b3186f3709d",
+        "version" : "6.5.3-beta.1"
       }
     }
   ],
