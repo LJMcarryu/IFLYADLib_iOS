@@ -1,8 +1,15 @@
 # IFLYADLib iOS SDK
 
+<!-- ifly-fast-release-notice:start -->
+当前版本：`6.5.3`。本版尚未完成安装、构建与广告展示验证，请先在宿主 App 中联调。
+
+<!-- ifly-release-status: {"version":"6.5.3","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.3/general/fast-release-record.json"} -->
+
+<!-- ifly-fast-release-notice:end -->
+
 预发布候选：`6.5.3-beta.1`，仅供接入测试。生产环境默认继续使用 `6.5.2`。安装可用性与验收范围以同版发布记录为准；本说明不代表本版真机广告运行、宿主联调或 Apple 审核已通过。
 
-<!-- ifly-release-status: {"version":"6.5.3-beta.1","status":"FORMAL","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.3-beta.1/general/release-record.json"} -->
+
 
 面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频，支持按广告形式组合接入。本仓库提供安装清单、接入指南和 Objective-C 示例。
 
@@ -32,7 +39,7 @@
 | 链接 | 静态 XCFramework，选择 **Do Not Embed**；最终 App target 需要 `$(inherited) -ObjC` |
 | 共存 | 同一 App 选择一种安装方式；通用版与优酷定制版不能同时链接，其他渠道也不承诺共存 |
 
-## 升级到 6.5.2
+## 升级到 6.5.3
 
 七模块 XCFramework 采用带 modulemap 的静态 framework。Swift 可直接导入模块，无需为本 SDK 配置 bridging header；Objective-C 需从旧 `<IFLYADLib/...>` 路径迁移。步骤见[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)。
 
@@ -41,10 +48,10 @@
 仅在测试分支中选用本预发布；常规生产接入继续使用下方 `6.5.2` 安装配置。完成同版发布后，需要测试时将 Podfile 中的对应依赖精确指定为：
 
 ```ruby
-pod 'IFLYADLib', '6.5.3-beta.1'
+pod 'IFLYADLib', '6.5.3'
 ```
 
-保留既有资源与链接配置，重新执行 `pod install` 并检查 `Podfile.lock` 中的版本。SwiftPM 测试接入请选择 Exact Version `6.5.3-beta.1`，不要使用浮动版本范围。
+保留既有资源与链接配置，重新执行 `pod install` 并检查 `Podfile.lock` 中的版本。SwiftPM 测试接入请选择 Exact Version `6.5.3`，不要使用浮动版本范围。
 
 本预发布移除 `IFLYNativeFeedAdData.marketURL` 和 `IFLYNativeFeedAdData.downloadURL`。使用这些属性的接入方须移除访问并重新编译适配层。`targetURL` 仅表示落地页地址，不能等价替代已移除的商店或下载地址；点击和跳转继续由 SDK 处理。详情见[NativeFeed 迁移说明](docs/接入指南/自渲染信息流.md#653-beta1-迁移)。
 
@@ -58,7 +65,7 @@ platform :ios, '11.0'
 
 target 'YourApp' do
   use_frameworks!
-  pod 'IFLYADLib', '6.5.2'
+  pod 'IFLYADLib', '6.5.3'
 end
 ```
 
@@ -131,7 +138,7 @@ open YourApp.xcworkspace
 
 ## 示例工程
 
-[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。该 CocoaPods 示例依赖固定为 `6.5.3-beta.1`；生产 App 继续使用稳定版 `6.5.2`，并保留自己的隐私流程和业务生命周期。
+[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。该 CocoaPods 示例依赖固定为 `6.5.3`；生产 App 继续使用稳定版 `6.5.2`，并保留自己的隐私流程和业务生命周期。
 
 ## 常见问题
 
