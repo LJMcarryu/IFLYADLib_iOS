@@ -7,8 +7,6 @@
 
 <!-- ifly-fast-release-notice:end -->
 
-预发布候选：`6.5.3-beta.1`，仅供接入测试。生产环境默认继续使用 `6.5.2`。安装可用性与验收范围以同版发布记录为准；本说明不代表本版真机广告运行、宿主联调或 Apple 审核已通过。
-
 
 
 面向 iOS 应用的广告 SDK，提供开屏、Banner、插屏、自渲染信息流和激励视频，支持按广告形式组合接入。本仓库提供安装清单、接入指南和 Objective-C 示例。
@@ -43,9 +41,9 @@
 
 七模块 XCFramework 采用带 modulemap 的静态 framework。Swift 可直接导入模块，无需为本 SDK 配置 bridging header；Objective-C 需从旧 `<IFLYADLib/...>` 路径迁移。步骤见[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)。
 
-## 6.5.3-beta.1 预发布测试
+## 6.5.3 版本说明
 
-仅在测试分支中选用本预发布；常规生产接入继续使用下方 `6.5.2` 安装配置。完成同版发布后，需要测试时将 Podfile 中的对应依赖精确指定为：
+当前版本为 6.5.3；接入时将 Podfile 中的对应依赖精确指定为：
 
 ```ruby
 pod 'IFLYADLib', '6.5.3'
@@ -53,7 +51,7 @@ pod 'IFLYADLib', '6.5.3'
 
 保留既有资源与链接配置，重新执行 `pod install` 并检查 `Podfile.lock` 中的版本。SwiftPM 测试接入请选择 Exact Version `6.5.3`，不要使用浮动版本范围。
 
-本预发布移除 `IFLYNativeFeedAdData.marketURL` 和 `IFLYNativeFeedAdData.downloadURL`。使用这些属性的接入方须移除访问并重新编译适配层。`targetURL` 仅表示落地页地址，不能等价替代已移除的商店或下载地址；点击和跳转继续由 SDK 处理。详情见[NativeFeed 迁移说明](docs/接入指南/自渲染信息流.md#653-beta1-迁移)。
+6.5.3 移除 `IFLYNativeFeedAdData.marketURL` 和 `IFLYNativeFeedAdData.downloadURL`。使用这些属性的接入方须移除访问并重新编译适配层。`targetURL` 仅表示落地页地址，不能等价替代已移除的商店或下载地址；点击和跳转继续由 SDK 处理。详情见[NativeFeed 迁移说明](docs/接入指南/自渲染信息流.md#653-迁移)。
 
 ## 安装
 
@@ -77,7 +75,7 @@ open YourApp.xcworkspace
 该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前通过 CocoaPods trunk 获取版本清单，二进制仍由 TOS 分发。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
-- [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：6.5.2 完整包包含二进制及 `ManualResources`，按格式链接依赖并复制资源及隐私清单。
+- [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：6.5.3 完整包包含二进制及 `ManualResources`，按格式链接依赖并复制资源及隐私清单。
 
 ## 首次使用
 
@@ -131,14 +129,14 @@ open YourApp.xcworkspace
 | 接入方式 | 独立示例 | 首次准备 |
 | --- | --- | --- |
 | CocoaPods | [IFLYADLibSimple](IFLYADLibSimple/README.md) | 在示例目录运行 `pod install` |
-| SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 打开 workspace，解析远程 6.5.2 包 |
+| SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 打开 workspace，解析远程 6.5.3 包 |
 | 手动集成 | [IFLYADLibManualSimple](IFLYADLibManualSimple/README.md) | 运行示例内 `准备SDK.py`，再打开 workspace |
 
-三种接入示例均固定预发布 SDK `6.5.3-beta.1`，用于测试接入。2026-11-19 已通过 Xcode 26.2 下的 arm64 模拟器与设备架构 Debug 构建，并核对版本锁、SDK 链接、资源和隐私清单；设备架构构建关闭代码签名，不代表真机安装、广告运行或 Apple 审核通过。生产 App 默认继续使用 `6.5.2`；运行步骤见各示例 README。同一 App 只选择一种接入方式。
+三种接入示例均已同步至 SDK `6.5.3`；本次快速发布未执行安装、构建与广告展示复验，请按发布回执在宿主 App 中联调。
 
 ## 示例工程
 
-[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。该 CocoaPods 示例依赖固定为 `6.5.3`；生产 App 继续使用稳定版 `6.5.2`，并保留自己的隐私流程和业务生命周期。
+[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。该 CocoaPods 示例依赖固定为 `6.5.3`；请按同版发布回执进行联调，并保留自己的隐私流程和业务生命周期。
 
 ## 常见问题
 

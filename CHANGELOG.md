@@ -6,7 +6,7 @@
 
 本版尚未完成安装、构建与广告展示验证，请先在宿主 App 中联调。
 
-## 未发布
+## 6.5.3 变更
 
 - 调整通用 SwiftPM Demo 的签名与 Bundle Identifier 配置，并统一通过 Xcode 构建设置提供跟踪权限说明。真机运行前须设置接入方自己的 Team 与 Bundle Identifier。
 
