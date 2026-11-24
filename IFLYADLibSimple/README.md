@@ -1,19 +1,17 @@
 # IFLYADLibSimple 接入示例
 
-> 本示例遵循公开仓 Demo 契约：固定 SDK 版本、独立 Podfile、可复现运行说明和脱敏问题反馈。
 本工程使用 `IFLYADLib 6.5.4`，包含开屏、Banner、插屏、激励视频，以及信息流基础卡片和列表复用，共六个页面。内置渲染页面展示加载、就绪、展示和关闭；信息流页面展示素材渲染、视图挂载与解绑。
 
 自己的 App 如何安装 SDK、各格式的公开接口与完整配置，见[仓库接入指南](../README.md)。
 
 本示例的 `Podfile` 固定 `6.5.4`。宿主窗口和授权要求见[配置与隐私](../docs/接入指南/配置与隐私.md)。
 
-本次快速发布尚未完成安装、构建与广告展示复验；真机广告运行和签名分发需按同版发布记录另行验证。
 
 ## 下载入口与版本
 
-无需 Git 时，可下载 [GitHub main 分支源码 ZIP](https://github.com/LJMcarryu/IFLYADLib_iOS/archive/refs/heads/main.zip)，解压后进入 `IFLYADLib_iOS-main/IFLYADLibSimple/`，再执行下方安装命令。不要只下载 `.xcodeproj`。使用 Git 的命令见下文；已有副本先确认本页与 Podfile 都固定 SDK `6.5.3`。
+无需 Git 时，可下载 [GitHub main 分支源码 ZIP](https://github.com/LJMcarryu/IFLYADLib_iOS/archive/refs/heads/main.zip)，解压后进入 `IFLYADLib_iOS-main/IFLYADLibSimple/`，再执行下方安装命令。不要只下载 `.xcodeproj`。使用 Git 的命令见下文；已有副本先确认本页与 Podfile 都固定 SDK `6.5.4`。
 
-依赖安装后核对 `Podfile.lock` 中 `IFLYADLib` 为 `6.5.3`。版本找不到或锁文件冲突的处理见[安装指南](../docs/接入指南/安装与分包.md#cocoapods)。
+依赖安装后核对 `Podfile.lock` 中 `IFLYADLib` 为 `6.5.4`。版本找不到或锁文件冲突的处理见[安装指南](../docs/接入指南/安装与分包.md#cocoapods)。
 
 ## 下载与运行
 
@@ -28,7 +26,7 @@ pod install
 open IFLYADLibSimple.xcworkspace
 ```
 
-已有仓库时，进入本目录从 `pod install` 开始。Podfile 通过固定 Tag 的 Podspec 使用 `6.5.3`，默认安装 `Full`；更新示例源码不会自动升级 SDK。
+已有仓库时，进入本目录从 `pod install` 开始。Podfile 通过固定 Tag 的 Podspec 使用 `6.5.4`，默认安装 `Full`；更新示例源码不会自动升级 SDK。
 
 1. 在 Xcode 选择 **IFLYADLibSimple** scheme 和一个已安装的 iPhone 模拟器或真机。
 2. 按下方说明替换广告位，真机运行时在 **Signing & Capabilities** 设置签名，再 Build & Run。
@@ -144,6 +142,6 @@ xcodebuild build \
 
 先查[错误处理与生命周期](../docs/接入指南/常见问题.md)，仍需帮助时通过双方约定的支持渠道提供 SDK 版本、Xcode/iOS 版本、模拟器或机型、页面入口、操作顺序和错误码。截图与日志先脱敏，不提交完整 token、设备标识或业务敏感数据。
 
-## 6.5.3 快速发布说明
+## 已验证范围
 
-本示例已同步至 SDK `6.5.3`；本次快速发布未执行独立安装、构建与广告展示复验，请按发布回执在宿主 App 中联调。
+2026-11-24，固定 SDK `6.5.4`，使用 Xcode 26.2 完成 Debug 的 iOS Simulator arm64 和 iOS 设备 arm64 构建，并核对依赖身份、链接符号、资源及隐私清单。设备架构构建关闭代码签名。未安装或运行 App，未验证广告加载、填充、展示、点击跳转、签名分发、x86_64 或 iOS 11 设备运行。
