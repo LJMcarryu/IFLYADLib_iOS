@@ -1,7 +1,9 @@
 {
-  "sdkVersion": "6.5.4",
-  "sdkTagCommit": "461be989d25da301e830dc31cc65028364fff9b3",
+  "sdkVersion": "6.5.5",
   "demoSourceCommit": "addca9cc6adb55137c535e4ede0c48f624536196",
   "demoSourceDirectory": "IFLYADLibSimple",
-  "integration": "swiftpm"
+  "integration": "swiftpm",
+  "generatedFromSDKVersion": "6.5.4",
+  "generatedFromSDKTagCommit": "461be989d25da301e830dc31cc65028364fff9b3",
+  "sdkTagCommitStatus": "not-resolved"
 }

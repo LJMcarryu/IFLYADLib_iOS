@@ -1,42 +1,42 @@
 {
   "schemaVersion": 1,
-  "version": "6.5.4",
+  "version": "6.5.5",
   "channel": "general",
   "assets": [
     {
       "name": "IFLYAdCore.xcframework",
-      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.4/general/IFLYAdCore.xcframework.zip",
-      "sha256": "6f2a4283935b824f4a9c89af9ae9b1b4aac848205d421156c0e8e71110bf146e"
+      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.5/general/IFLYAdCore.xcframework.zip",
+      "sha256": "ce63c4a03faaf9fb6917bdc4cb71e37c1cea89d2e3189fbaafe896d33e47fcdd"
     },
     {
       "name": "IFLYAdVideoUI.xcframework",
-      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.4/general/IFLYAdVideoUI.xcframework.zip",
-      "sha256": "ef748a5d85528c752e44fc6ba1cc78a48bcbefec238570803f9fc193e92eae9c"
+      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.5/general/IFLYAdVideoUI.xcframework.zip",
+      "sha256": "9f5686b046dbbe03c3fa9e7ebf338d3ce8e3820a764c7449d336bfbba9f56151"
     },
     {
       "name": "IFLYAdBanner.xcframework",
-      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.4/general/IFLYAdBanner.xcframework.zip",
-      "sha256": "41451c878fc6edcca1ec3fe70fc56379a6754abb3e71147fbb2808b64ac19991"
+      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.5/general/IFLYAdBanner.xcframework.zip",
+      "sha256": "df235d28cefdca33ac202a55043b28d5900894a5ee864bf50dbc88cd5aa7f4ef"
     },
     {
       "name": "IFLYAdSplash.xcframework",
-      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.4/general/IFLYAdSplash.xcframework.zip",
-      "sha256": "ed4e2938c5d2739939939192f9433bef22c84fb175512d94559b880ec3283022"
+      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.5/general/IFLYAdSplash.xcframework.zip",
+      "sha256": "e086e9314d79cc266051120123b1afe9484e9f4031564bac46de5ae94b63a5f2"
     },
     {
       "name": "IFLYAdInterstitial.xcframework",
-      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.4/general/IFLYAdInterstitial.xcframework.zip",
-      "sha256": "340021756b26248204d3a7e60a7fba02869ef8b0548f03054743c9c9ebe78986"
+      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.5/general/IFLYAdInterstitial.xcframework.zip",
+      "sha256": "7c4ff0c28b8888babe34904bfb7339a3a6df3fe4de0e07d8911fd47d49c3abdb"
     },
     {
       "name": "IFLYAdNativeFeed.xcframework",
-      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.4/general/IFLYAdNativeFeed.xcframework.zip",
-      "sha256": "00f7c281df5e10bad32e38ce8a5f102c11035ffa86c619f18d2958272502282b"
+      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.5/general/IFLYAdNativeFeed.xcframework.zip",
+      "sha256": "f2eecfa82e5f04c56c26a9dc0163e2fa9e003a9bb31ef3010d613b3dd43705eb"
     },
     {
       "name": "IFLYAdReward.xcframework",
-      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.4/general/IFLYAdReward.xcframework.zip",
-      "sha256": "2c63ea8e8d7912c1e77c1c66b13ba7b6e439e92265ae229d100c332e2a670568"
+      "url": "https://download-adsdk.voiceads.cn/ios_sdk/6.5.5/general/IFLYAdReward.xcframework.zip",
+      "sha256": "dff6d38e43433c71fa54da2ba9659c032ee227171ad3be930a8388997ebb6f82"
     }
   ]
 }

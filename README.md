@@ -1,9 +1,9 @@
 # IFLYADLib iOS SDK
 
 <!-- ifly-fast-release-notice:start -->
-当前版本：`6.5.4`。本版尚未完成安装、构建与广告展示验证，请先在宿主 App 中联调。
+当前版本：`6.5.5`。本版尚未完成安装、构建与广告展示验证，请先在宿主 App 中联调。
 
-<!-- ifly-release-status: {"version":"6.5.4","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.4/general/fast-release-record.json"} -->
+<!-- ifly-release-status: {"version":"6.5.5","status":"FAST_UNVERIFIED","distribution":"tos","releaseUrl":"https://download-adsdk.voiceads.cn/ios_sdk/6.5.5/general/fast-release-record.json"} -->
 
 <!-- ifly-fast-release-notice:end -->
 
@@ -39,22 +39,6 @@
 
 七模块 XCFramework 采用带 modulemap 的静态 framework。Swift 可直接导入模块，无需为本 SDK 配置 bridging header；Objective-C 需从旧 `<IFLYADLib/...>` 路径迁移。步骤见[Swift 模块接入与头路径迁移](docs/接入指南/Swift模块接入与头路径迁移.md)。
 
-## 6.5.4 版本说明
-
-修复自渲染信息流从横屏打开仅竖屏落地页时反复旋转的问题。使用默认方向配置的接入方无需新增适配；升级后请在宿主 App 中核对左右横屏进入落地页、关闭返回和前后台切换。
-
-本次快速发布未执行安装、构建与广告展示复验；旧系统真机、真实媒体宿主及 Apple 审核仍需分别验证。
-
-当前版本为 6.5.4；接入时将 Podfile 中的对应依赖精确指定为：
-
-```ruby
-pod 'IFLYADLib', '6.5.4'
-```
-
-保留既有资源与链接配置，重新执行 `pod install` 并检查 `Podfile.lock` 中的版本。SwiftPM 测试接入请选择 Exact Version `6.5.4`，不要使用浮动版本范围。
-
-6.5.3 移除 `IFLYNativeFeedAdData.marketURL` 和 `IFLYNativeFeedAdData.downloadURL`。使用这些属性的接入方须移除访问并重新编译适配层。`targetURL` 仅表示落地页地址，不能等价替代已移除的商店或下载地址；点击和跳转继续由 SDK 处理。详情见[NativeFeed 迁移说明](docs/接入指南/自渲染信息流.md#653-迁移)。
-
 ## 安装
 
 首次接入可使用 CocoaPods，按 CocoaPods 官方 trunk 安装固定版本：
@@ -65,7 +49,7 @@ platform :ios, '11.0'
 
 target 'YourApp' do
   use_frameworks!
-  pod 'IFLYADLib', '6.5.4'
+  pod 'IFLYADLib', '6.5.5'
 end
 ```
 
@@ -77,7 +61,7 @@ open YourApp.xcworkspace
 该写法安装全部五种格式，CocoaPods 自动配置资源和 `-ObjC`。当前通过 CocoaPods trunk 获取版本清单，二进制仍由 TOS 分发。仅需部分格式时替换为对应 subspec；Core 本身不包含广告形式。
 
 - [按格式组合 CocoaPods 依赖](docs/接入指南/安装与分包.md#cocoapods)
-- [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：6.5.4 完整包包含二进制及 `ManualResources`，按格式链接依赖并复制资源及隐私清单。
+- [下载与手动集成](docs/接入指南/安装与分包.md#下载与手动集成)：6.5.5 完整包包含二进制及 `ManualResources`，按格式链接依赖并复制资源及隐私清单。
 
 ## 首次使用
 
@@ -131,14 +115,14 @@ open YourApp.xcworkspace
 | 接入方式 | 独立示例 | 首次准备 |
 | --- | --- | --- |
 | CocoaPods | [IFLYADLibSimple](IFLYADLibSimple/README.md) | 在示例目录运行 `pod install` |
-| SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 打开 workspace，解析远程 6.5.4 包 |
+| SwiftPM | [IFLYADLibSwiftPMSimple](IFLYADLibSwiftPMSimple/README.md) | 打开 workspace，解析远程 6.5.5 包 |
 | 手动集成 | [IFLYADLibManualSimple](IFLYADLibManualSimple/README.md) | 运行示例内 `准备SDK.py`，再打开 workspace |
 
-三种接入示例的依赖均固定为 SDK `6.5.4`；各方式的验证范围见对应示例 README，接入后仍需在实际宿主 App 中验证广告展示与业务流程。
+三种接入示例的依赖均固定为 SDK `6.5.5`；各方式的验证范围见对应示例 README，接入后仍需在实际宿主 App 中验证广告展示与业务流程。
 
 ## 示例工程
 
-[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。该 CocoaPods 示例依赖固定为 `6.5.4`；请按同版发布回执进行联调，并保留自己的隐私流程和业务生命周期。
+[`IFLYADLibSimple`](IFLYADLibSimple/README.md) 提供五种格式、六个页面。指南包含下载运行、广告位配置、页面操作与预期结果。该 CocoaPods 示例依赖固定为 `6.5.5`；请按同版发布回执进行联调，并保留自己的隐私流程和业务生命周期。
 
 ## 常见问题
 
